@@ -3,22 +3,21 @@
 ## Primary Navigation
 
 - **Home** (`/`) - Landing, value prop, primary CTA
-- **News & Activities** (`/news-activities`) - Unified announcements feed (news, activities, events, announcements)
-- **About Us** (`/about-us`) - Unit information, leadership profiles
-- **Directory** (`/directory`) - Internal sub-units & departments, external network/partnerships
+- **News & Activities** (`/news-activities`) - Unified feed for news, events, and announcements
+- **About Us** (`/about-us`) - Unit information, leadership profiles, history
+- **Directory** (`/directory`) - Internal sub-units, departments, and external partnerships
 - **Document Library** (`/document-library`) - Centralized downloadable resources
+- **Contact** (`/contact`) - Lead capture, centralized contact info/social links
 
 ## Secondary Navigation
 
-- **Events & Announcements** (`/events-announcements`) - Filtered view of news & activities for events and announcements
 - **Unit Commanders & Leadership** (`/about-us/leadership`) - Detailed profiles of commanders and leadership
 - **Internal Sub-Units & Departments** (`/directory/internal`) - Directory of internal sub-units and departments
 - **External Network & Partnerships** (`/directory/external`) - Directory of external network and partnerships
+- **Search Results** (`/search`) - Displays results from site search
 
 ## Utility Pages
 
-- **Contact** (`/contact`) - Lead capture, centralized contact info/social links
-- **Search Results** (`/search`) - Displays results from site search
 - **Privacy Policy** (`/privacy-policy`) - Legal compliance
 - **Terms of Service** (`/terms-of-service`) - Legal compliance
 
