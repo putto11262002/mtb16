@@ -24,12 +24,9 @@
 			"type": "local",
 			"command": [
 				"npx",
-				"@jpisnice/shadcn-ui-mcp-server"
+				"@heilgar/shadcn-ui-mcp-server"
 			],
-			"enabled": true,
-			"environment": {
-				"GITHUB_PERSONAL_ACCESS_TOKEN": "{env:GITHUB_PERSONAL_ACCESS_TOKEN}"
-			}
+			"enabled": true
 		}
 	}
 }
