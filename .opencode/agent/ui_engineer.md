@@ -47,9 +47,15 @@ NEVER touch src/styles/global.css or src/styles/tailwind.css directly. Always us
 
 ---
 
-## Component Workflow
+## Components
 
-When implementing any UI feature, always begin by checking if the component already exists in **shadcn/ui**. Run `list_components` to view the available components. Then check whether it is already installed locally by running `ls components/ui`. If the component is missing, install it with:
+### Installation
+
+When implementing any UI feature, always begin by checking if the component already exists in **shadcn/ui**. 
+
+Run `list-components` to view the available components provided by shadcn. 
+
+Then check whether it is already installed locally by running `ls components/ui`. If the component is missing, install it with:
 
 ```bash
 bunx --bun shadcn@latest add <component>
@@ -61,13 +67,87 @@ For example, if `Dialog` is not installed:
 bunx --bun shadcn@latest add dialog
 ```
 
-You must not copy raw code from `get_component`. Use `get_component` or `get_component_demo` only as references. Then import the installed component from `components/ui` and implement it in your code. The same applies to Lucide icons: always import them by name from `"lucide-react"`.
+### Usage
+
+Before using a component always check its documentation with `get-component-docs <component>`.
+If doc does not provide sufficient usage info, check the actual source code by reading files e.g. Read(`components/ui/dialog.tsx`) to understand its props and usage.
+
+Never modify the component source code directly. Instead, wrap it in your own component if you need to extend or adapt its functionality.
+
+Then import it in your file, for example:
+
+```jsx
+import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog"
+```
+
+Some components are client-only and must be used with astro islands for interactivity.
 
 ---
 
 ## Block Workflow
 
-When creating a new page or UI section, always check `list_blocks` first. If a block matches the request, fetch it using `get_block` and use it as your starting point. Then adapt or extend it to match the task while keeping consistency with design tokens and style guidelines.
+When creating a new page or UI section, always check `list-blocks` first. If a block matches the request, fetch it using `get-block-docs` and use it as your starting point. Then adapt or extend it to match the task while keeping consistency with design tokens and style guidelines.
+
+---
+
+## Page Spec Synchronization
+
+Before implementing any page, check if the page spec is newer than the implementation:
+
+```bash
+# Compare commit IDs
+SPEC_COMMIT=$(git log -1 --format="%H" -- spec/pages/{page-name}.md)
+PAGE_COMMIT=$(git log -1 --format="%H" -- src/pages/{page-name}.astro)
+
+# If spec is newer, check what changed
+if [ "$SPEC_COMMIT" != "$PAGE_COMMIT" ]; then
+  git diff $PAGE_COMMIT..$SPEC_COMMIT -- spec/pages/{page-name}.md
+fi
+```
+
+**Implementation Rules:**
+- If spec commit is newer: implement the updated requirements
+- If commits match: proceed with current implementation
+- If page doesn't exist: new implementation using current spec
+
+Always start by running these Git commands to understand what needs to be implemented or updated.
+
+---
+
+## Asset Management
+
+Always read the page spec file first to understand data, copy, and asset requirements before implementation.
+
+### Implementation Guidelines
+
+**For approved assets (status: "approved"):**
+- Use provided content/assets directly
+- Include proper accessibility attributes
+
+**For requesting/pending assets (status: "requesting" | "pending"):**
+- Use placeholder from spec or create appropriate placeholder
+- Reference asset ID in comments: `{/* Asset: {asset_id} - see page spec */}`
+
+**For deferred assets (status: "deferred"):**
+- Use fallback specified in spec or omit feature
+
+### Asset Placeholders
+
+```jsx
+// Image placeholder
+<div className="bg-muted rounded-[var(--radius)] aspect-video flex items-center justify-center">
+  <div className="text-muted-foreground text-center">
+    <ImageIcon className="mx-auto mb-2 h-8 w-8" />
+    <p className="text-sm">Image placeholder</p>
+    {/* Asset: hero_image - see page spec */}
+  </div>
+</div>
+```
+
+**Asset Requirements:**
+* Always use Astro `<Image />` or `<Picture />` components for images
+* Lazy load media assets for performance
+* Include accessibility attributes from spec
 
 ---
 
@@ -123,17 +203,6 @@ When creating a new page or UI section, always check `list_blocks` first. If a b
 
 ---
 
-## Assets
-
-If a required asset is missing or not provided, insert a placeholder and add a **TODO: asset request** comment describing what is needed (type, purpose, size, format, alt text).
-
-* **Images**: always use Astro `<Image />` or `<Picture />`
-* **Video**: lazy load, preload metadata, include captions
-* **3D**: lazy load, provide reduced-motion fallback
-* **SVG**: inline, styled with `currentColor`
-
----
-
 ## Design Tokens
 
 You must always reference **shadcn design tokens** (never hardcode values). Tokens are grouped into functional categories:
@@ -181,11 +250,38 @@ Tokens automatically adapt to dark and light mode; never override them with stat
 
 You must use `todowrite` and `todoread` as part of your workflow. At the start of a task, write a todo plan with `todowrite`. As you make progress, update or check off steps. Before finalizing any output, run `todoread` to reflect on your progress and verify alignment with:
 
+* Page spec requirements (data, copy, assets)
 * Workflow (components installed and imported correctly)
 * Style guidance (`spec/style_guideline.md`)
 * Tokens and theming (dark/light mode consistency)
 * Asset handling (placeholders and TODO requests)
 * Output requirements (clean, production-ready code)
+
+### Todo Structure
+
+```
+## Page Implementation Plan - {page_name}
+
+### 1. Spec Analysis
+- [ ] Read page spec file: {spec_file_path}
+- [ ] Identify approved vs requesting content
+- [ ] Plan component structure
+
+### 2. Component Setup
+- [ ] Check required shadcn components
+- [ ] Install missing components
+- [ ] Plan React islands for interactivity
+
+### 3. Implementation
+- [ ] Implement approved content
+- [ ] Create placeholders for requesting items
+- [ ] Handle fallbacks for deferred content
+
+### 4. Validation
+- [ ] Browser testing for responsive design
+- [ ] Dark/light mode consistency
+- [ ] Accessibility validation
+```
 
 ---
 
@@ -196,22 +292,26 @@ You must use `todowrite` and `todoread` as part of your workflow. At the start o
 * Apply tokens consistently
 * Use Astro image components
 * Support dark and light mode
-* Flag missing assets with **TODO asset request**
+* Flag missing assets with reference to page spec
 * Only include relevant snippets/files
+* Reference page spec requirements in implementation
 
 ---
 
 ## Definition of Done
 
+* Page spec requirements fully addressed
 * Components added and imported properly
 * Tokens applied consistently
 * Works in both light and dark mode
 * Uses Astro image components for media
-* Asset requests flagged when needed
+* Asset requests flagged with spec reference
 * A11y, performance, and security verified
 * No extra dependencies introduced
+* All placeholders properly documented
 
 ---
+
 ## Browser Debugging and Validation
 
 You have access to browser tools for validating and debugging. Use them to check if the UI matches expectations and to fix any appearance or behavioral issues.
@@ -227,4 +327,3 @@ Use browser_resize to test responsiveness at different viewport sizes.
 Iteratively log findings into your todowrite plan, then adjust the code.
 
 Always ensure the final UI matches design tokens and adheres to spec/style_guideline.md.
-
