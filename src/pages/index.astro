@@ -1,0 +1,187 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroSection from '../components/islands/HeroSection.jsx';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+
+// Placeholder data - In a real application, this would come from a CMS
+const heroHeadline = 'ยินดีต้อนรับสู่ MBT 16 – แหล่งข่าวสารและประกาศอย่างเป็นทางการ';
+const heroSubhead = 'รับข่าวสารล่าสุด ประกาศ และทรัพยากรที่สามารถดาวน์โหลดได้';
+const heroImage = '/hero-image.jpeg';
+const heroImageAlt = 'หน่วยทหารในแถว';
+
+const newsArticles = [
+  {
+    id: 1,
+    title: 'การฝึกประจำปีสำเร็จลุล่วง',
+    date: '20 กรกฎาคม 2025',
+    summary:
+      'หน่วยของเราได้ทำการฝึกประจำปีสำเร็จอย่างยอดเยี่ยม แสดงให้เห็นถึงความพร้อมและความเชี่ยวชาญ',
+    link: '/news/unit-training-exercise-concludes-successfully',
+  },
+  {
+    id: 2,
+    title: 'เปิดตัวโครงการสัมพันธ์ชุมชน',
+    date: '15 กรกฎาคม 2025',
+    summary:
+      'MBT 16 ภูมิใจที่จะประกาศเปิดตัวโครงการสัมพันธ์ชุมชนใหม่ที่มุ่งเน้นการสร้างความสัมพันธ์ที่แน่นแฟ้นกับชุมชนท้องถิ่น',
+    link: '/news/community-outreach-program-launched',
+  },
+  {
+    id: 3,
+    title: 'การติดตั้งอุปกรณ์ใหม่กำลังดำเนินการ',
+    date: '10 กรกฎาคม 2025',
+    summary:
+      'การติดตั้งอุปกรณ์ใหม่ที่ทันสมัยกำลังดำเนินไปอย่างราบรื่น เพิ่มความสามารถในการปฏิบัติงานของเรา',
+    link: '/news/new-equipment-integration-underway',
+  },
+];
+
+const announcements = [
+  {
+    id: 1,
+    title: 'กิจกรรมวันครอบครัวที่กำลังจะมาถึง',
+    date: '5 สิงหาคม 2025',
+    summary: 'ร่วมกิจกรรมวันครอบครัวประจำปีของเรา พร้อมกับเกม อาหาร และกิจกรรมสำหรับทุกช่วงวัย',
+    link: '/announcements/upcoming-family-day-event',
+  },
+  {
+    id: 2,
+    title: 'กำหนดการชี้แจงความปลอดภัยอย่างเป็นทางการ',
+    date: '1 สิงหาคม 2025',
+    summary: 'การชี้แจงความปลอดภัยอย่างเป็นทางการสำหรับบุคลากรทุกคนจะจัดขึ้นในวันที่ 10 สิงหาคม',
+    link: '/announcements/mandatory-safety-briefing-scheduled',
+  },
+  {
+    id: 3,
+    title: 'อัปเดตนโยบายการเข้าฐาน',
+    date: '28 กรกฎาคม 2025',
+    summary: 'มีการปรับปรุงนโยบายการเข้าฐานที่สำคัญ โปรดตรวจสอบแนวทางใหม่',
+    link: '/announcements/base-access-policy-update',
+  },
+];
+
+const valueProps = [
+  {
+    title: 'รับข่าวสารล่าสุด',
+    description: 'รับข่าวสารและประกาศอย่างเป็นทางการล่าสุดโดยตรงจากแหล่งข่าว',
+  },
+  {
+    title: 'ศูนย์ทรัพยากร',
+    description: 'เข้าถึงเอกสารสำคัญ แบบฟอร์ม และวัสดุการศึกษา',
+  },
+  {
+    title: 'การเชื่อมโยงชุมชน',
+    description: 'มีส่วนร่วมในกิจกรรมหน่วยและเชื่อมโยงกับสมาชิกคนอื่นๆ',
+  },
+];
+
+const primaryCta = {
+  text: 'เรียนรู้เพิ่มเติมเกี่ยวกับหน่วย',
+  target: '/about-us',
+};
+---
+
+<BaseLayout title="Home" description="MBT 16 official site: news, announcements, leadership info, and downloadable resources.">
+  <HeroSection
+    headline={heroHeadline}
+    subhead={heroSubhead}
+    imageUrl={heroImage}
+    imageAlt={heroImageAlt}
+    ctaText={primaryCta.text}
+    ctaTarget={primaryCta.target}
+    client:load
+  />
+
+  <section class="container mx-auto py-16 px-4">
+    <div class="text-center mb-16">
+      <h2
+        class="text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+      >
+        Our Mission
+      </h2>
+      <div class="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-full">
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {
+        valueProps.map((prop, index) => (
+          <Card
+            key={index}
+            className="bg-card text-card-foreground rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-border"
+          >
+            <CardHeader>
+              <CardTitle class="text-xl font-bold text-primary">{prop.title}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p class="text-foreground/80">{prop.description}</p>
+            </CardContent>
+          </Card>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="bg-muted py-16">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-bold mb-4">Latest News</h2>
+        <div class="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-full">
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {
+          newsArticles.map((article) => (
+            <Card
+              key={article.id}
+              className="bg-background rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-border overflow-hidden"
+            >
+              <div class="bg-muted h-48 flex items-center justify-center">
+                <div class="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16" />
+              </div>
+              <CardHeader>
+                <CardTitle class="text-lg font-bold">{article.title}</CardTitle>
+                <p class="text-sm text-muted-foreground">{article.date}</p>
+              </CardHeader>
+              <CardContent>
+                <p class="text-foreground/80 mb-4">{article.summary}</p>
+                <Button variant="outline" asChild>
+                  <a href={article.link}>Read More</a>
+                </Button>
+              </CardContent>
+            </Card>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="container mx-auto py-16 px-4">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl font-bold mb-4">Announcements</h2>
+      <div class="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-full">
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {
+        announcements.map((announcement) => (
+          <Card
+            key={announcement.id}
+            className="bg-card text-card-foreground rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-border"
+          >
+            <CardHeader>
+              <CardTitle class="text-lg font-bold">{announcement.title}</CardTitle>
+              <p class="text-sm text-muted-foreground">{announcement.date}</p>
+            </CardHeader>
+            <CardContent>
+              <p class="text-foreground/80 mb-4">{announcement.summary}</p>
+              <Button variant="outline" asChild>
+                <a href={announcement.link}>View Announcement</a>
+              </Button>
+            </CardContent>
+          </Card>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>
