@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const title = "Internal Directory";
+const description = "Contact information for internal sub-units and departments within MBT 16.";
+---
+
+<BaseLayout {title} {description}>
+  <div class="container mx-auto py-16 px-4">
+    <h1 class="text-4xl font-bold mb-8 text-center">Internal Directory</h1>
+    
+    <div class="bg-muted rounded-xl p-8 mb-12 text-center">
+      <p class="text-lg">
+        Internal directory information will be available here.
+      </p>
+    </div>
+    
+    <div class="text-center">
+      <a 
+        href="/directory" 
+        class="inline-block bg-secondary text-secondary-foreground px-6 py-3 rounded-lg font-medium hover:bg-secondary/90 transition-colors"
+      >
+        Back to Directory
+      </a>
+    </div>
+  </div>
+</BaseLayout>
