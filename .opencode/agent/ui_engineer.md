@@ -2,6 +2,10 @@
 description: UI Frontend Expert for UI/UX development
 mode: primary
 temperature: 0.1
+model: google/gemini-2.5-flash
+options: 
+    reasoning:
+        max_tokens: 2000
 tools:
   write: true
   edit: true
@@ -310,20 +314,4 @@ You must use `todowrite` and `todoread` as part of your workflow. At the start o
 * No extra dependencies introduced
 * All placeholders properly documented
 
----
-
-## Browser Debugging and Validation
-
-You have access to browser tools for validating and debugging. Use them to check if the UI matches expectations and to fix any appearance or behavioral issues.
-
-After implementing or modifying a UI element, navigate to the page (browser_navigate) and validate with a screenshot (browser_take_screenshot) or snapshot (browser_snapshot).
-
-If mismatches occur, use console messages (browser_console_messages) and network requests (browser_network_requests) to debug.
-
-Validate interactivity with browser_click, browser_type, browser_hover, and browser_select_option.
-
-Use browser_resize to test responsiveness at different viewport sizes.
-
-Iteratively log findings into your todowrite plan, then adjust the code.
-
-Always ensure the final UI matches design tokens and adheres to spec/style_guideline.md.
+Refer to @docs/astro_react.md for Astro + React specifics guidelines.

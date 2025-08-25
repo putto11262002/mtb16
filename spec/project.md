@@ -38,7 +38,9 @@ status: approved
   - Contact & Connect Section (Contact page, centralized contact info/social links)
   - Search Functionality
   - Responsive Design
-  - Content Management System (CMS)
+  - Custom-built simple admin interface for managing announcements, news, resources, and basic site information.
+  - Homepage must include a section about the unit leader.
+  - Announcements and news feeds must support image assets.
 - **Project Idea / Vision:** To modernize and rebuild the existing, outdated website to better serve its public relations and information dissemination goals.
 - **Note:** The primary language used in the website is Thai.
 

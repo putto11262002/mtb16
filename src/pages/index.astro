@@ -184,4 +184,44 @@ const primaryCta = {
       }
     </div>
   </section>
+
+  <section class="bg-muted py-16">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-bold mb-4">ผู้นำหน่วย</h2>
+        <div class="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-full">
+        </div>
+        <p class="text-xl text-muted-foreground mt-4 max-w-3xl mx-auto">
+          นำโดยผู้บังคับบัญชาที่มีประสบการณ์และความมุ่งมั่นต่อความเป็นเลิศและการรับใช้ชุมชน
+        </p>
+      </div>
+      <div class="flex flex-col items-center">
+        <Card className="bg-background rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-border overflow-hidden max-w-2xl">
+          <div class="md:flex">
+            <div class="md:flex-shrink-0 md:w-1/3 flex items-center justify-center">
+              <img 
+                src="/unit_commander.jpg" 
+                alt="พันเอก วรเชษฐ์ ตานาสนร, ผู้บัญชาการหน่วย" 
+                class="object-cover w-full h-48 md:h-64"
+              />
+            </div>
+            <div class="p-8 md:w-2/3">
+              <CardHeader class="p-0 mb-4">
+                <CardTitle class="text-2xl font-bold">พันเอก วรเชษฐ์ ตานาสนร</CardTitle>
+                <p class="text-lg text-primary">ผู้บัญชาการหน่วย</p>
+              </CardHeader>
+              <CardContent class="p-0">
+                <p class="text-foreground/80 mb-4">
+                  ด้วยประสบการณ์การรับราชการทางทหารมากกว่า 20 ปี พันเอก ตานาสนร นำหน่วย MBT 16 ด้วยความอุทิศตนต่อความเป็นเลิศในการปฏิบัติงานและการมีส่วนร่วมกับชุมชน
+                </p>
+                <Button asChild>
+                  <a href="/about-us/leadership">ดูทีมผู้นำทั้งหมด</a>
+                </Button>
+              </CardContent>
+            </div>
+          </div>
+        </Card>
+      </div>
+    </div>
+  </section>
 </BaseLayout>

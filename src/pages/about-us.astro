@@ -1,50 +1,81 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 
-const title = "About Us";
-const description = "Learn more about MBT 16, our mission, history, and leadership.";
+const title = "About MBT 16 – History & Leadership";
+const description = "Learn about the mission, values, and leadership of MBT 16.";
 ---
 
 <BaseLayout {title} {description}>
   <div class="container mx-auto py-16 px-4">
-    <h1 class="text-4xl font-bold mb-8 text-center">About MBT 16</h1>
+    <div class="text-center mb-16">
+      <h1 class="text-4xl font-bold mb-4">About MBT 16</h1>
+      <p class="text-xl text-muted-foreground">Our mission, values, and leadership</p>
+    </div>
     
-    <div class="prose prose-lg max-w-3xl mx-auto dark:prose-invert">
-      <p class="text-xl text-center mb-12">
-        MBT 16 (มณฑลทหารบกที่ 16) is a key unit dedicated to serving our community and nation.
-      </p>
-      
-      <div class="bg-muted rounded-xl p-8 mb-12">
-        <h2 class="text-2xl font-bold mb-4">Our Mission</h2>
-        <p>
-          We are committed to excellence in all our operations, maintaining the highest standards 
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+      <div class="bg-muted rounded-xl p-8">
+        <h2 class="text-2xl font-bold mb-6">Our Mission</h2>
+        <p class="mb-6">
+          MBT 16 is committed to excellence in all our operations, maintaining the highest standards 
           of professionalism while fostering strong relationships with our local community and 
           partners.
         </p>
+        
+        <h3 class="text-xl font-bold mb-4 mt-8">Our Values</h3>
+        <ul class="space-y-3">
+          <li class="flex items-start">
+            <span class="inline-block w-2 h-2 rounded-full bg-primary mt-2 mr-3"></span>
+            <span><strong>Integrity:</strong> We act with honesty and transparency in all our dealings.</span>
+          </li>
+          <li class="flex items-start">
+            <span class="inline-block w-2 h-2 rounded-full bg-primary mt-2 mr-3"></span>
+            <span><strong>Service:</strong> We are dedicated to serving our community and nation.</span>
+          </li>
+          <li class="flex items-start">
+            <span class="inline-block w-2 h-2 rounded-full bg-primary mt-2 mr-3"></span>
+            <span><strong>Excellence:</strong> We strive for the highest standards in everything we do.</span>
+          </li>
+          <li class="flex items-start">
+            <span class="inline-block w-2 h-2 rounded-full bg-primary mt-2 mr-3"></span>
+            <span><strong>Respect:</strong> We treat all individuals with dignity and respect.</span>
+          </li>
+        </ul>
       </div>
       
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-        <div>
-          <h2 class="text-2xl font-bold mb-4">Our History</h2>
-          <p>
-            Established with a proud tradition of service, MBT 16 has evolved to meet the changing 
-            needs of our community while maintaining our core values of honor, duty, and respect.
-          </p>
-        </div>
-        <div>
-          <h2 class="text-2xl font-bold mb-4">Our Values</h2>
-          <ul class="list-disc pl-6 space-y-2">
-            <li>Integrity in all actions</li>
-            <li>Service to community and nation</li>
-            <li>Excellence in operations</li>
-            <li>Respect for all individuals</li>
-          </ul>
+      <div class="bg-muted rounded-xl p-8">
+        <h2 class="text-2xl font-bold mb-6">Our History</h2>
+        <div class="space-y-4">
+          <div class="border-l-4 border-primary pl-4 py-1">
+            <h3 class="font-bold">Establishment (1985)</h3>
+            <p class="text-muted-foreground">MBT 16 was established to serve the region with dedication.</p>
+          </div>
+          <div class="border-l-4 border-primary pl-4 py-1">
+            <h3 class="font-bold">Major Renovation (2005)</h3>
+            <p class="text-muted-foreground">Facilities were upgraded to modern standards.</p>
+          </div>
+          <div class="border-l-4 border-primary pl-4 py-1">
+            <h3 class="font-bold">Community Outreach Program (2015)</h3>
+            <p class="text-muted-foreground">Launched initiatives to better connect with local communities.</p>
+          </div>
+          <div class="border-l-4 border-primary pl-4 py-1">
+            <h3 class="font-bold">Modernization Project (2020)</h3>
+            <p class="text-muted-foreground">Implemented cutting-edge technology and training programs.</p>
+          </div>
         </div>
       </div>
-      
-      <div class="text-center">
-        <a href="/about-us/leadership" class="inline-block bg-primary text-primary-foreground px-6 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors">
-          Meet Our Leadership Team
+    </div>
+    
+    <div class="mt-16 text-center">
+      <div class="bg-card border border-border rounded-xl p-8 max-w-3xl mx-auto">
+        <h2 class="text-2xl font-bold mb-4">Meet Our Leadership Team</h2>
+        <p class="mb-6 text-muted-foreground">
+          Our leadership team brings decades of experience and expertise to guide MBT 16.
+        </p>
+        <a 
+          href="/about-us/leadership" 
+          class="inline-block bg-primary text-primary-foreground px-6 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors"
+        >
+          View Leadership Profiles
         </a>
       </div>
     </div>

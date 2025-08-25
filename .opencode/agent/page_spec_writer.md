@@ -37,8 +37,8 @@ Generate `/spec/pages/{route}.md` files that specify measurable outcomes, requir
 ## Inputs (Read These First)
 1. `spec/project.md` - Business goals, audience, key messages
 2. `spec/sitemap.md` - Routes and user journeys  
-3. `spec/ui-ux-guidelines.md` - Design constraints and theme
-4. `spec/data-model.md` (if exists) - Available data sources
+3. `spec/style_guideline.md` - Design constraints and theme
+4. `spec/data_model.md` (if exists) - Available data sources
 5. Existing `spec/pages/*.md` files - Current page specs to update
 
 ## Deterministic Filename Rules
