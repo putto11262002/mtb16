@@ -1,11 +1,21 @@
 ---
 import type { AstroBuiltinAttributes } from "astro";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
+import { cn } from "@/lib/utils";
+import MobileNav from "@/components/blocks/MobileNav.astro";
 
 const { title, description } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en" class="scroll-smooth">
+<html lang="th" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -19,25 +29,105 @@ const { title, description } = Astro.props;
   </head>
   <body class="dark bg-background text-foreground">
     <header
-      class="bg-gradient-to-r from-primary to-secondary text-primary-foreground py-4 shadow-md"
+      class="bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-md"
     >
-      <div class="container mx-auto flex justify-between items-center px-4">
-        <a href="/" class="text-2xl font-bold">MBT 16</a>
-        <nav>
-          <ul class="flex space-x-6">
-            <li><a href="/news" class="hover:underline transition-all duration-300">News</a></li>
-            <li>
-              <a href="/announcements" class="hover:underline transition-all duration-300"
-                >Announcements</a>
-            </li>
-            <li>
-              <a href="/about-us" class="hover:underline transition-all duration-300">About Us</a>
-            </li>
-            <li>
-              <a href="/contact" class="hover:underline transition-all duration-300">Contact</a>
-            </li>
-          </ul>
-        </nav>
+      <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center py-4">
+          <a href="/" class="text-2xl font-bold">MBT 16</a>
+          
+          <NavigationMenu class="hidden md:block">
+            <NavigationMenuList>
+              <NavigationMenuItem>
+                <a 
+                  href="/news" 
+                  class="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
+                >
+                  ข่าวสาร
+                </a>
+              </NavigationMenuItem>
+              
+              <NavigationMenuItem>
+                <a 
+                  href="/announcements" 
+                  class="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
+                >
+                  ประกาศ
+                </a>
+              </NavigationMenuItem>
+              
+              <NavigationMenuItem>
+                <NavigationMenuTrigger class="bg-background">เกี่ยวกับเรา</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul class="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                    <li>
+                      <a href="/about-us" class="[&>div]:text-sm [&>div]:font-medium block p-2 rounded-md hover:bg-accent">
+                        <div class="text-sm font-medium">ประวัติหน่วย</div>
+                        <p class="text-sm text-muted-foreground">
+                          ข้อมูลเกี่ยวกับภารกิจ ค่านิยม และประวัติศาสตร์ของหน่วย
+                        </p>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="/about-us/leadership" class="[&>div]:text-sm [&>div]:font-medium block p-2 rounded-md hover:bg-accent">
+                        <div class="text-sm font-medium">ผู้บัญชาการและผู้นำ</div>
+                        <p class="text-sm text-muted-foreground">
+                          ข้อมูลเกี่ยวกับผู้นำและผู้บัญชาการของหน่วย
+                        </p>
+                      </a>
+                    </li>
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+              
+              <NavigationMenuItem>
+                <NavigationMenuTrigger class="bg-background">ไดเรกทอรี</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul class="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                    <li>
+                      <a href="/directory/internal" class="[&>div]:text-sm [&>div]:font-medium block p-2 rounded-md hover:bg-accent">
+                        <div class="text-sm font-medium">หน่วยย่อยและแผนกภายใน</div>
+                        <p class="text-sm text-muted-foreground">
+                          ไดเรกทอรีของหน่วยย่อยและแผนกภายใน
+                        </p>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="/directory/external" class="[&>div]:text-sm [&>div]:font-medium block p-2 rounded-md hover:bg-accent">
+                        <div class="text-sm font-medium">เครือข่ายภายนอกและความร่วมมือ</div>
+                        <p class="text-sm text-muted-foreground">
+                          ไดเรกทอรีของเครือข่ายภายนอกและความร่วมมือ
+                        </p>
+                      </a>
+                    </li>
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+              
+              <NavigationMenuItem>
+                <a 
+                  href="/document-library" 
+                  class="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
+                >
+                  คลังเอกสาร
+                </a>
+              </NavigationMenuItem>
+              
+              <NavigationMenuItem>
+                <a 
+                  href="/contact" 
+                  class="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
+                >
+                  ติดต่อ
+                </a>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
+          
+          <!-- Mobile menu -->
+          <div class="md:hidden">
+            <MobileNav />
+          </div>
+        </div>
       </div>
     </header>
     
@@ -51,11 +141,11 @@ const { title, description } = Astro.props;
         <ul class="flex justify-center space-x-8 mt-4">
           <li>
             <a href="/privacy-policy" class="hover:underline transition-all duration-300"
-              >Privacy Policy</a>
+              >นโยบายความเป็นส่วนตัว</a>
           </li>
           <li>
             <a href="/terms-of-service" class="hover:underline transition-all duration-300"
-              >Terms of Service</a>
+              >ข้อกำหนดการใช้งาน</a>
           </li>
         </ul>
       </div>
