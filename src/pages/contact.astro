@@ -1,0 +1,44 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const title = "Contact";
+const description = "Get in touch with MBT 16 for inquiries, feedback, or assistance.";
+---
+
+<BaseLayout {title} {description}>
+  <div class="container mx-auto py-16 px-4">
+    <h1 class="text-4xl font-bold mb-8 text-center">Contact Us</h1>
+    
+    <div class="max-w-3xl mx-auto">
+      <div class="bg-muted rounded-xl p-8 mb-12">
+        <h2 class="text-2xl font-bold mb-4">General Inquiries</h2>
+        <p class="mb-4">
+          For general questions about MBT 16, please reach out to our public affairs office:
+        </p>
+        <ul class="space-y-2">
+          <li><strong>Email:</strong> info@mbt16.mil.th</li>
+          <li><strong>Phone:</strong> +66 2-123-4567</li>
+          <li><strong>Address:</strong> 123 Military Base Road, Bangkok, Thailand</li>
+        </ul>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="bg-muted rounded-xl p-6">
+          <h3 class="text-xl font-bold mb-3">Emergency Services</h3>
+          <p class="mb-3">For emergencies, please contact:</p>
+          <ul class="space-y-1">
+            <li><strong>Emergency Line:</strong> +66 2-123-4568</li>
+          </ul>
+        </div>
+        
+        <div class="bg-muted rounded-xl p-6">
+          <h3 class="text-xl font-bold mb-3">Feedback & Suggestions</h3>
+          <p class="mb-3">We welcome your feedback to improve our services:</p>
+          <ul class="space-y-1">
+            <li><strong>Email:</strong> feedback@mbt16.mil.th</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

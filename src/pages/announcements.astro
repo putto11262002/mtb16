@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const title = "Announcements";
+const description = "Official announcements and important notices from MBT 16.";
+---
+
+<BaseLayout {title} {description}>
+  <div class="container mx-auto py-16 px-4">
+    <h1 class="text-4xl font-bold mb-8 text-center">Official Announcements</h1>
+    
+    <div class="bg-muted rounded-xl p-8 mb-12 text-center">
+      <p class="text-lg">
+        No announcements available at this time. Important notices will be posted here when needed.
+      </p>
+    </div>
+    
+    <div class="text-center">
+      <p class="text-muted-foreground">
+        Check back regularly for important updates and announcements.
+      </p>
+    </div>
+  </div>
+</BaseLayout>

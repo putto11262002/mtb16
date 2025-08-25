@@ -1,0 +1,52 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const title = "About Us";
+const description = "Learn more about MBT 16, our mission, history, and leadership.";
+---
+
+<BaseLayout {title} {description}>
+  <div class="container mx-auto py-16 px-4">
+    <h1 class="text-4xl font-bold mb-8 text-center">About MBT 16</h1>
+    
+    <div class="prose prose-lg max-w-3xl mx-auto dark:prose-invert">
+      <p class="text-xl text-center mb-12">
+        MBT 16 (มณฑลทหารบกที่ 16) is a key unit dedicated to serving our community and nation.
+      </p>
+      
+      <div class="bg-muted rounded-xl p-8 mb-12">
+        <h2 class="text-2xl font-bold mb-4">Our Mission</h2>
+        <p>
+          We are committed to excellence in all our operations, maintaining the highest standards 
+          of professionalism while fostering strong relationships with our local community and 
+          partners.
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+        <div>
+          <h2 class="text-2xl font-bold mb-4">Our History</h2>
+          <p>
+            Established with a proud tradition of service, MBT 16 has evolved to meet the changing 
+            needs of our community while maintaining our core values of honor, duty, and respect.
+          </p>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold mb-4">Our Values</h2>
+          <ul class="list-disc pl-6 space-y-2">
+            <li>Integrity in all actions</li>
+            <li>Service to community and nation</li>
+            <li>Excellence in operations</li>
+            <li>Respect for all individuals</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="text-center">
+        <a href="/about-us/leadership" class="inline-block bg-primary text-primary-foreground px-6 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors">
+          Meet Our Leadership Team
+        </a>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

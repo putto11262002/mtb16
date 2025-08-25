@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const title = "News";
+const description = "Stay up to date with the latest news and events from MBT 16.";
+---
+
+<BaseLayout {title} {description}>
+  <div class="container mx-auto py-16 px-4">
+    <h1 class="text-4xl font-bold mb-8 text-center">Latest News</h1>
+    
+    <div class="bg-muted rounded-xl p-8 mb-12 text-center">
+      <p class="text-lg">
+        No news articles available at this time. Please check back later for updates.
+      </p>
+    </div>
+    
+    <div class="text-center">
+      <p class="text-muted-foreground">
+        News articles will be published here as they become available.
+      </p>
+    </div>
+  </div>
+</BaseLayout>
