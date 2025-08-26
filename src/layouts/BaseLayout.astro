@@ -1,0 +1,64 @@
+---
+import type { AstroBuiltinAttributes } from 'astro';
+import DesktopNav from '@/components/islands/DesktopNav';
+import { cn } from '@/lib/utils';
+import MobileNav from '@/components/islands/MobileNav';
+import '../styles/global.css';
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="th" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title ? `${title} | MBT 16` : 'MBT 16 | Army Unit News & Resources'}</title>
+    <meta
+      name="description"
+      content={description ||
+        'MBT 16 official site: news, announcements, leadership info, and downloadable resources.'}
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body class="dark bg-background text-foreground">
+    <header class="bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-md">
+      <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center py-4">
+          <a href="/" class="text-2xl font-bold">MBT 16</a>
+
+          <div className="hidden md:block">
+            <DesktopNav client:idle />
+          </div>
+
+          <!-- Mobile menu -->
+          <div class="md:hidden">
+            <MobileNav client:idle />
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="bg-gradient-to-r from-primary to-secondary text-primary-foreground py-12 mt-16">
+      <div class="container mx-auto text-center px-4">
+        <p class="text-lg">&copy; {new Date().getFullYear()} MBT 16. All rights reserved.</p>
+        <ul class="flex justify-center space-x-8 mt-4">
+          <li>
+            <a href="/privacy-policy" class="hover:underline transition-all duration-300"
+              >นโยบายความเป็นส่วนตัว</a
+            >
+          </li>
+          <li>
+            <a href="/terms-of-service" class="hover:underline transition-all duration-300"
+              >ข้อกำหนดการใช้งาน</a
+            >
+          </li>
+        </ul>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -3,22 +3,22 @@
 ## Primary Navigation
 
 - **Home** (`/`) - Landing, value prop, primary CTA
-- **News & Activities** (`/news-activities`) - Unified announcements feed (news, activities, events, announcements)
-- **About Us** (`/about-us`) - Unit information, leadership profiles
-- **Directory** (`/directory`) - Internal sub-units & departments, external network/partnerships
+- **News** (`/news`) - News reports, events, and public relations content
+- **Announcements** (`/announcements`) - Formal, official communications and notices
+- **About Us** (`/about-us`) - Unit information, leadership profiles, history
+- **Directory** (`/directory`) - Internal sub-units, departments, and external partnerships
 - **Document Library** (`/document-library`) - Centralized downloadable resources
+- **Contact** (`/contact`) - Lead capture, centralized contact info/social links
 
 ## Secondary Navigation
 
-- **Events & Announcements** (`/events-announcements`) - Filtered view of news & activities for events and announcements
 - **Unit Commanders & Leadership** (`/about-us/leadership`) - Detailed profiles of commanders and leadership
 - **Internal Sub-Units & Departments** (`/directory/internal`) - Directory of internal sub-units and departments
 - **External Network & Partnerships** (`/directory/external`) - Directory of external network and partnerships
+- **Search Results** (`/search`) - Displays results from site search
 
 ## Utility Pages
 
-- **Contact** (`/contact`) - Lead capture, centralized contact info/social links
-- **Search Results** (`/search`) - Displays results from site search
 - **Privacy Policy** (`/privacy-policy`) - Legal compliance
 - **Terms of Service** (`/terms-of-service`) - Legal compliance
 
@@ -27,15 +27,15 @@
 ### Non-Army Visitors Journey
 
 1. Entry: `/` → Goal: Understand MBT 16's role and mission
-2. Discovery: `/news-activities` → Goal: Find current events and announcements
-3. Decision: `/about-us` → Goal: Learn more about the unit and its leadership
+2. Discovery: `/news` → Goal: Find current events and news reports
+3. Decision: `/announcements` → Goal: View official notices and formal communications
 4. Conversion: `/contact` → Goal: Get in touch for inquiries
 
 ### Army Personnel Journey
 
 1. Entry: `/` → Goal: Quickly access relevant internal information
 2. Discovery: `/document-library` → Goal: Find and download necessary resources
-3. Decision: `/news-activities` → Goal: View internal events and announcements
+3. Decision: `/announcements` → Goal: View official notices and formal communications
 4. Conversion: `/directory/internal` → Goal: Locate contact information for specific sub-units
 
 ## Route Rules
@@ -51,6 +51,6 @@
 
 ## Meta Structure
 
-- **Total pages**: 13
+- **Total pages**: 14
 - **Primary nav depth**: 1
 - **Estimated build priority**: P1 routes listed first

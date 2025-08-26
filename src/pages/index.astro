@@ -1,113 +1,323 @@
 ---
-import Layout from '../layouts/main.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroSection from '../components/islands/HeroSection.jsx';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+
+// Placeholder data - In a real application, this would come from a CMS
+const heroHeadline = 'ยินดีต้อนรับสู่ MBT 16 – แหล่งข่าวสารและประกาศอย่างเป็นทางการ';
+const heroSubhead = 'รับข่าวสารล่าสุด ประกาศ และทรัพยากรที่สามารถดาวน์โหลดได้';
+const heroImage = '/hero-image.jpeg';
+const heroImageAlt = 'หน่วยทหารในแถว';
+
+const newsArticles = [
+  {
+    id: 1,
+    title: 'การฝึกประจำปีสำเร็จลุล่วง',
+    date: '20 กรกฎาคม 2025',
+    summary:
+      'หน่วยของเราได้ทำการฝึกประจำปีสำเร็จอย่างยอดเยี่ยม แสดงให้เห็นถึงความพร้อมและความเชี่ยวชาญ',
+    link: '/news/unit-training-exercise-concludes-successfully',
+  },
+  {
+    id: 2,
+    title: 'เปิดตัวโครงการสัมพันธ์ชุมชน',
+    date: '15 กรกฎาคม 2025',
+    summary:
+      'MBT 16 ภูมิใจที่จะประกาศเปิดตัวโครงการสัมพันธ์ชุมชนใหม่ที่มุ่งเน้นการสร้างความสัมพันธ์ที่แน่นแฟ้นกับชุมชนท้องถิ่น',
+    link: '/news/community-outreach-program-launched',
+  },
+  {
+    id: 3,
+    title: 'การติดตั้งอุปกรณ์ใหม่กำลังดำเนินการ',
+    date: '10 กรกฎาคม 2025',
+    summary:
+      'การติดตั้งอุปกรณ์ใหม่ที่ทันสมัยกำลังดำเนินไปอย่างราบรื่น เพิ่มความสามารถในการปฏิบัติงานของเรา',
+    link: '/news/new-equipment-integration-underway',
+  },
+];
+
+const announcements = [
+  {
+    id: 1,
+    title: 'กิจกรรมวันครอบครัวที่กำลังจะมาถึง',
+    date: '5 สิงหาคม 2025',
+    summary: 'ร่วมกิจกรรมวันครอบครัวประจำปีของเรา พร้อมกับเกม อาหาร และกิจกรรมสำหรับทุกช่วงวัย',
+    link: '/announcements/upcoming-family-day-event',
+  },
+  {
+    id: 2,
+    title: 'กำหนดการชี้แจงความปลอดภัยอย่างเป็นทางการ',
+    date: '1 สิงหาคม 2025',
+    summary: 'การชี้แจงความปลอดภัยอย่างเป็นทางการสำหรับบุคลากรทุกคนจะจัดขึ้นในวันที่ 10 สิงหาคม',
+    link: '/announcements/mandatory-safety-briefing-scheduled',
+  },
+  {
+    id: 3,
+    title: 'อัปเดตนโยบายการเข้าฐาน',
+    date: '28 กรกฎาคม 2025',
+    summary: 'มีการปรับปรุงนโยบายการเข้าฐานที่สำคัญ โปรดตรวจสอบแนวทางใหม่',
+    link: '/announcements/base-access-policy-update',
+  },
+];
+
+const valueProps = [
+  {
+    title: 'รับข่าวสารล่าสุด',
+    description: 'รับข่าวสารและประกาศอย่างเป็นทางการล่าสุดโดยตรงจากแหล่งข่าว',
+  },
+  {
+    title: 'ศูนย์ทรัพยากร',
+    description: 'เข้าถึงเอกสารสำคัญ แบบฟอร์ม และวัสดุการศึกษา',
+  },
+  {
+    title: 'การเชื่อมโยงชุมชน',
+    description: 'มีส่วนร่วมในกิจกรรมหน่วยและเชื่อมโยงกับสมาชิกคนอื่นๆ',
+  },
+];
+
+const primaryCta = {
+  text: 'เรียนรู้เพิ่มเติมเกี่ยวกับหน่วย',
+  target: '/about-us',
+};
 ---
 
-<Layout title="Welcome to the Landing Page">
-  <main>
-    <section id="hero" class="relative h-[60vh] flex items-center justify-center text-center bg-cover bg-center" style="background-image: url('/placeholder-hero.jpg');">
-      <div class="absolute inset-0 bg-black opacity-50"></div>
-      <div class="relative z-10 text-white">
-        {/* TODO: asset request for unit crest/logo */}
-        <img src="/placeholder-logo.png" alt="Unit Logo" class="mx-auto mb-4 h-24 w-24" />
-        <h1 class="text-5xl font-bold mb-2">Unit Name</h1>
-        <p class="text-xl">Motto or mission tagline</p>
-      </div>
-    </section>
-    
-    <section id="news-activities" class="container mx-auto py-12">
-      <h2 class="text-3xl font-bold text-center mb-8">ข่าวสารและกิจกรรม</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {/* News Item 1 */}
-        <div class="bg-card text-card-foreground rounded-lg shadow-md overflow-hidden">
-          {/* TODO: asset request for news thumbnail */}
-          <img src="/placeholder-news.jpg" alt="News Thumbnail" class="w-full h-48 object-cover"/>
-          <div class="p-6">
-            <h3 class="text-xl font-semibold mb-2">ข่าวประชาสัมพันธ์ 1</h3>
-            <p class="text-muted-foreground text-sm mb-4">วันที่ 23 สิงหาคม 2568</p>
-            <p class="text-foreground mb-4">รายละเอียดข่าวสั้นๆ...</p>
-            <a href="#" class="text-primary hover:underline">อ่านเพิ่มเติม</a>
-          </div>
-        </div>
-        {/* News Item 2 */}
-        <div class="bg-card text-card-foreground rounded-lg shadow-md overflow-hidden">
-          {/* TODO: asset request for news thumbnail */}
-          <img src="/placeholder-news.jpg" alt="News Thumbnail" class="w-full h-48 object-cover"/>
-          <div class="p-6">
-            <h3 class="text-xl font-semibold mb-2">กิจกรรมพิเศษ 1</h3>
-            <p class="text-muted-foreground text-sm mb-4">วันที่ 22 สิงหาคม 2568</p>
-            <p class="text-foreground mb-4">รายละเอียดกิจกรรมสั้นๆ...</p>
-            <a href="#" class="text-primary hover:underline">อ่านเพิ่มเติม</a>
-          </div>
-        </div>
-        {/* News Item 3 */}
-        <div class="bg-card text-card-foreground rounded-lg shadow-md overflow-hidden">
-          {/* TODO: asset request for news thumbnail */}
-          <img src="/placeholder-news.jpg" alt="News Thumbnail" class="w-full h-48 object-cover"/>
-          <div class="p-6">
-            <h3 class="text-xl font-semibold mb-2">ประกาศสำคัญ 1</h3>
-            <p class="text-muted-foreground text-sm mb-4">วันที่ 21 สิงหาคม 2568</p>
-            <p class="text-foreground mb-4">รายละเอียดประกาศสั้นๆ...</p>
-            <a href="#" class="text-primary hover:underline">อ่านเพิ่มเติม</a>
-          </div>
-        </div>
-      </div>
-      <div class="text-center mt-8">
-        <a href="#" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">ดูข่าวสารทั้งหมด</a>
-      </div>
-    </section>
-    <section id="events-announcements" class="container mx-auto py-12">
-      <h2 class="text-3xl font-bold text-center mb-8">กิจกรรมและประกาศ</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Recruitment Notices */}
-        <div class="bg-card text-card-foreground rounded-lg shadow-md p-6 flex items-start space-x-4">
-          <div class="flex-shrink-0 text-primary">
-            {/* TODO: asset request for recruitment icon */}
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-plus"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
-          </div>
-          <div>
-            <h3 class="text-xl font-semibold mb-2">ประกาศรับสมัคร</h3>
-            <p class="text-foreground">รายละเอียดประกาศรับสมัครบุคลากรใหม่</p>
-            <a href="#" class="text-primary hover:underline text-sm mt-2 block">ดูรายละเอียด</a>
-          </div>
-        </div>
-        {/* Procurement/Tenders */}
-        <div class="bg-card text-card-foreground rounded-lg shadow-md p-6 flex items-start space-x-4">
-          <div class="flex-shrink-0 text-green-500">
-            {/* TODO: asset request for procurement icon */}
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clipboard-list"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>
-          </div>
-          <div>
-            <h3 class="text-xl font-semibold mb-2">ประกาศจัดซื้อจัดจ้าง</h3>
-            <p class="text-foreground">รายละเอียดประกาศการจัดซื้อจัดจ้างและประกวดราคา</p>
-            <a href="#" class="text-primary hover:underline text-sm mt-2 block">ดูรายละเอียด</a>
-          </div>
-        </div>
-        {/* Public Ceremonies */}
-        <div class="bg-card text-card-foreground rounded-lg shadow-md p-6 flex items-start space-x-4">
-          <div class="flex-shrink-0 text-blue-500">
-            {/* TODO: asset request for ceremony icon */}
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-          </div>
-          <div>
-            <h3 class="text-xl font-semibold mb-2">พิธีสาธารณะ</h3>
-            <p class="text-foreground">รายละเอียดเกี่ยวกับพิธีและกิจกรรมพิเศษต่างๆ</p>
-            <a href="#" class="text-primary hover:underline text-sm mt-2 block">ดูรายละเอียด</a>
-          </div>
-        </div>
-        {/* Special Events */}
-        <div class="bg-card text-card-foreground rounded-lg shadow-md p-6 flex items-start space-x-4">
-          <div class="flex-shrink-0 text-yellow-500">
-            {/* TODO: asset request for special event icon */}
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          </div>
-          <div>
-            <h3 class="text-xl font-semibold mb-2">กิจกรรมพิเศษ</h3>
-            <p class="text-foreground">รายละเอียดกิจกรรมพิเศษที่กำลังจะเกิดขึ้น</p>
-            <a href="#" class="text-primary hover:underline text-sm mt-2 block">ดูรายละเอียด</a>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
+<BaseLayout
+  title="Home"
+  description="MBT 16 official site: news, announcements, leadership info, and downloadable resources."
+>
+  <HeroSection
+    headline={heroHeadline}
+    subhead={heroSubhead}
+    imageUrl={heroImage}
+    imageAlt={heroImageAlt}
+    ctaText={primaryCta.text}
+    ctaTarget={primaryCta.target}
+    client:load
+  />
 
-</Layout>
+  <section class="container mx-auto py-16 px-4">
+    <div class="text-center mb-16">
+      <h2
+        class="text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+      >
+        คำขวัญ
+      </h2>
+      <p class="text-2xl font-bold">"แม่นยำ กระชับ ฉับไว"</p>
+      <p class="text-xl text-muted-foreground">"Accuracy Concise Swiftly"</p>
+      <div
+        class="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-full mt-4"
+      ></div>
+    </div>
+    <div class="text-center mb-16">
+      <h2
+        class="text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+      >
+        ภารกิจ
+      </h2>
+      <div class="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-full"></div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <Card
+        className="bg-card text-card-foreground rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-border"
+      >
+        <CardHeader>
+          <CardTitle class="text-xl font-bold text-primary"
+            >บังคับบัญชากำลังประจำถิ่น</CardTitle
+          >
+        </CardHeader>
+        <CardContent>
+          <p class="text-foreground/80">
+            บังคับบัญชากำลังประจำถิ่นของกองทัพบก ตามที่กระทรวงกลาโหมกำหนด
+          </p>
+        </CardContent>
+      </Card>
+      <Card
+        className="bg-card text-card-foreground rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-border"
+      >
+        <CardHeader>
+          <CardTitle class="text-xl font-bold text-primary">รักษาความสงบเรียบร้อย</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p class="text-foreground/80">
+            รักษาความสงบเรียบร้อยในพื้นที่ รวมทั้งการศาลทหาร การคดี
+            การช่วยดำเนินการคุ้มครองพยานในคดีอาญาและการเรือนจำ
+          </p>
+        </CardContent>
+      </Card>
+      <Card
+        className="bg-card text-card-foreground rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-border"
+      >
+        <CardHeader>
+          <CardTitle class="text-xl font-bold text-primary"
+            >ดำเนินการสัสดีและสรรพกำลัง</CardTitle
+          >
+        </CardHeader>
+        <CardContent>
+          <p class="text-foreground/80">
+            ดำเนินการสัสดี การเกณฑ์ช่วยราชการทหาร และการระดมสรรพกำลังในเขตพื้นที่
+          </p>
+        </CardContent>
+      </Card>
+      <Card
+        className="bg-card text-card-foreground rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-border"
+      >
+        <CardHeader>
+          <CardTitle class="text-xl font-bold text-primary">สนับสนุนหน่วยทหาร</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p class="text-foreground/80">สนับสนุนหน่วยทหารที่อยู่ในเขตพื้นที่</p>
+        </CardContent>
+      </Card>
+      <Card
+        className="bg-card text-card-foreground rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-border"
+      >
+        <CardHeader>
+          <CardTitle class="text-xl font-bold text-primary">ดำเนินการตามแผนยุทธศาสตร์</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p class="text-foreground/80">
+            ดำเนินการตามแผนยุทธศาสตร์การต่อสู้เบ็ดเสร็จเพื่อรักษาความสงบภายใน และการป้องกันประเทศ
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  </section>
+
+  <section class="container mx-auto py-16 px-4">
+    <div class="text-center mb-16">
+      <h2
+        class="text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+      >
+        วิสัยทัศน์และคำขวัญ
+      </h2>
+      <div class="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-full"></div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+      <Card
+        className="bg-card text-card-foreground rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-border text-center"
+      >
+        <CardHeader>
+          <CardTitle class="text-2xl font-bold text-primary">วิสัยทัศน์</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p class="text-xl font-medium">มณฑลทหารบกที่ ๑๖</p>
+        </CardContent>
+      </Card>
+      <Card
+        className="bg-card text-card-foreground rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-border text-center"
+      >
+        <CardHeader>
+          <CardTitle class="text-2xl font-bold text-primary">คำขวัญ</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p class="text-2xl font-bold tracking-wider">" แม่นยำ กระชับ ฉับไว "</p>
+          <p class="text-lg text-muted-foreground mt-2">Accuracy Concise Swiftly</p>
+        </CardContent>
+      </Card>
+    </div>
+  </section>
+
+  <section class="bg-muted py-16">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-bold mb-4">Latest News</h2>
+        <div class="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-full"></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {
+          newsArticles.map((article) => (
+            <Card
+              key={article.id}
+              className="bg-background rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-border overflow-hidden"
+            >
+              <div class="bg-muted h-48 flex items-center justify-center">
+                <div class="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16" />
+              </div>
+              <CardHeader>
+                <CardTitle class="text-lg font-bold">{article.title}</CardTitle>
+                <p class="text-sm text-muted-foreground">{article.date}</p>
+              </CardHeader>
+              <CardContent>
+                <p class="text-foreground/80 mb-4">{article.summary}</p>
+                <Button variant="outline" asChild>
+                  <a href={article.link}>Read More</a>
+                </Button>
+              </CardContent>
+            </Card>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="container mx-auto py-16 px-4">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl font-bold mb-4">Announcements</h2>
+      <div class="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-full"></div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {
+        announcements.map((announcement) => (
+          <Card
+            key={announcement.id}
+            className="bg-card text-card-foreground rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-border"
+          >
+            <CardHeader>
+              <CardTitle class="text-lg font-bold">{announcement.title}</CardTitle>
+              <p class="text-sm text-muted-foreground">{announcement.date}</p>
+            </CardHeader>
+            <CardContent>
+              <p class="text-foreground/80 mb-4">{announcement.summary}</p>
+              <Button variant="outline" asChild>
+                <a href={announcement.link}>View Announcement</a>
+              </Button>
+            </CardContent>
+          </Card>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="bg-muted py-16">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-bold mb-4">ผู้นำหน่วย</h2>
+        <div class="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-full"></div>
+        <p class="text-xl text-muted-foreground mt-4 max-w-3xl mx-auto">
+          นำโดยผู้บังคับบัญชาที่มีประสบการณ์และความมุ่งมั่นต่อความเป็นเลิศและการรับใช้ชุมชน
+        </p>
+      </div>
+      <div class="flex flex-col items-center">
+        <Card
+          className="bg-background rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-border overflow-hidden max-w-2xl"
+        >
+          <div class="md:flex">
+            <div class="md:flex-shrink-0 md:w-1/3 flex items-center justify-center">
+              <img
+                src="/unit_commander.jpg"
+                alt="พันเอก วรเชษฐ์ ตานาสนร, ผู้บัญชาการหน่วย"
+                class="object-cover w-full h-48 md:h-64"
+              />
+            </div>
+            <div class="p-8 md:w-2/3">
+              <CardHeader class="p-0 mb-4">
+                <CardTitle class="text-2xl font-bold">พันเอก วรเชษฐ์ ตานาสนร</CardTitle>
+                <p class="text-lg text-primary">ผู้บัญชาการหน่วย</p>
+              </CardHeader>
+              <CardContent class="p-0">
+                <p class="text-foreground/80 mb-4">
+                  ด้วยประสบการณ์การรับราชการทางทหารมากกว่า 20 ปี พันเอก ตานาสนร นำหน่วย MBT 16
+                  ด้วยความอุทิศตนต่อความเป็นเลิศในการปฏิบัติงานและการมีส่วนร่วมกับชุมชน
+                </p>
+                <Button asChild>
+                  <a href="/about-us/leadership">ดูทีมผู้นำทั้งหมด</a>
+                </Button>
+              </CardContent>
+            </div>
+          </div>
+        </Card>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

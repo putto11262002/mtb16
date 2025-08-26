@@ -1,95 +1,101 @@
 route: "/about-us/leadership"
-page_name: "Unit Commanders & Leadership"
+page_name: "Unit Leadership"
 
 # 1) Purpose & Audience
 
-purpose: trust | education
-primary_audience: "Local Community, General Public, Army Personnel"
+purpose: trust
+primary_audience: "General Public"
 top_user_tasks:
 
-- "Learn about the key leaders of MBT 16"
-- "Understand the roles and responsibilities of the leadership team"
-- "Gain confidence in the unit's command structure"
+- "View profiles of MBT 16 commanders and leadership"
+- "Learn leadership roles and responsibilities"
 
 # 2) Core Messages (what this page must convey)
 
 key_messages:
 
-- "MBT 16 is led by experienced and dedicated professionals."
-- "Our leadership team is committed to the unit's mission and the well-being of its personnel."
-- "Transparency and accountability are core tenets of our command."
+- "MBT 16’s leadership brings expertise, integrity, and experience"
+- "Profiles include roles, bios, and contact methods"
   proof_points:
-- "Individual profiles with photos, ranks, and brief biographies"
-- "Clear hierarchy or organizational chart (if applicable)"
+- "List of leadership entries from cms.DirectoryEntry filtered by category 'Leadership'"
 
 # 3) Must-Include Content (content contract, not UI)
 
 must_include:
 
-- type: "leadership_profiles"
-  display_fields: ["name", "rank", "position", "photo", "short_bio"]
-  min_count: 3
-- type: "organizational_overview"
-  description: "Brief explanation of the leadership structure."
-
-exclusions:
-
-- "Personal contact information (unless publicly available)"
-- "Sensitive career details or operational assignments"
+- type: "primary_cta"
+  intent: "View detailed profile"
+  target: "/directory/[slug]"
+- type: "value_props"
+  count: 3-5
+  qualities: ["tangible", "non-jargon"]
+  exclusions:
+- "News, announcements, or general directory items"
 
 # 4) UX Outcomes (observable behaviors)
 
 ux_outcomes:
 
-- "Users can easily identify the key leaders of MBT 16."
-- "Users feel a sense of trust and professionalism from the leadership team."
-- "Users understand the chain of command within the unit."
+- "Users can select a leader within 3 seconds"
+- "Profiles display headshot, name, rank, and role summary"
 
 # 5) Data & Content Inputs
 
 data_needs:
 
-- id: "leadership_data"
-  description: "Data for each leader including name, rank, position, photo URL, and a concise biography."
+- id: "leadership_entries"
+  type: "cms_collection"
+  description: "Directory entries for leadership"
   constraints: {min_count: 3}
+  status: "approved"
+  source: "cms.DirectoryEntry?category=Leadership"
   copy_blocks:
-- id: "page_headline"
-  tone: "formal, respectful"
-  length: "≤ 7 words"
+- id: "headline"
+  type: "generated_content"
+  tone: "professional"
+  length: "≤ 5 words"
+  status: "approved"
+  content: "Our Leadership"
+- id: "subhead"
+  type: "generated_content"
+  tone: "benefit-led"
+  length: "≤ 10 words"
+  status: "approved"
+  content: "Meet the team guiding MBT 16"
   asset_needs:
-- id: "leader_photos"
+- id: "leader_photo"
+  type: "dynamic_content"
+  format: "jpg|webp"
   alt_required: true
-  aspect_ratio: "3:4"
+  status: "approved"
+  description: "Headshot image provided by image_url field"
 
 # 6) Measurement & SEO
 
 success_signals:
-kpis: - "Average time on page ≥ 90 seconds" - "Click-through rate to individual profiles (if applicable) ≥ 10%"
-telemetry_events: - id: "leadership_page_view" props: {} - id: "leader_profile_click" props: {leader_id: "{id}"}
+kpis: - "Profile click rate ≥ 30%"
+telemetry_events: - id: "leadership_profile_click" props: {leader_id:"<id>"}
 seo_intent:
-title: "MBT 16 Leadership | Unit Commanders & Key Personnel"
-description: "Meet the dedicated commanders and leadership team of MBT 16 (มณฑลทหารบกที่ 16). Learn about their roles and commitment to service."
-target_keywords: ["MBT 16 leadership", "unit commanders", "military hierarchy", "army officers", "leadership profiles"]
+title: "MBT 16 Leadership – Commanders & Officers"
+description: "Meet the leadership team of MBT 16: biographies, roles, and experience."
+target_keywords: ["MBT 16 leadership", "unit commanders"]
 
 # 7) Accessibility & Performance Guardrails
 
 a11y_requirements:
 
-- "All leader photos have descriptive alt text."
-- "Text content is clear and easy to read."
-- "Page is navigable by keyboard."
+- "Images have descriptive alt text (name and rank)"
+- "Profile links keyboard accessible"
   perf_targets:
 - "LCP ≤ 2.5s (mobile)"
 - "CLS < 0.1"
-- "TBT ≤ 200ms"
 
 # 8) Acceptance Criteria (testable outcomes)
 
 acceptance_criteria:
 
-- Given a user is on the leadership page, when they view a leader's profile, then their rank, name, and position are clearly displayed.
-- Given the page loads, when leader photos are present, then they are high-resolution and appropriately cropped.
-- Given the page loads, when multiple leaders are listed, then the order is logical (e.g., by rank or position).
+- Given page load, when scanning, then at least three leadership cards displayed
+- Given user selects a profile, when click, then navigates to individual profile page
   review_checklist:
 - "[ ] Messages align with project.md goals"
 - "[ ] Route matches sitemap.md exactly"

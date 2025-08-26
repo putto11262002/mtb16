@@ -1,107 +1,121 @@
 route: "/"
-page_name: "Home Page"
+page_name: "Home"
 
 # 1) Purpose & Audience
 
 purpose: acquisition
-primary_audience: "Non-Army Visitors, Local Community, General Public"
+primary_audience: "General Public"
 top_user_tasks:
 
 - "Understand MBT 16's role and mission"
-- "Find current news and activities"
-- "Discover key unit information"
+- "Navigate to news or announcements"
 
 # 2) Core Messages (what this page must convey)
 
 key_messages:
 
-- "MBT 16 is a vital part of the community, committed to its mission."
-- "Stay informed with the latest news, activities, and announcements from MBT 16."
-- "Learn about MBT 16's structure, leadership, and community involvement."
+- "MBT 16 provides up-to-date news, official announcements, and resources"
+- "Engage with community and unit information"
   proof_points:
-- "Prominent display of recent news/activities"
-- "Clear links to 'About Us' and 'News & Activities' pages"
+- "Dynamic feed of latest news and announcements from cms.News and cms.Announcement collections"
 
 # 3) Must-Include Content (content contract, not UI)
 
 must_include:
 
 - type: "primary_cta"
-  intent: "Explore News & Activities"
-  target: "/news-activities"
+  intent: "Learn more about the unit"
+  target: "/about-us"
 - type: "value_props"
-  count: 3
-  qualities: ["concise", "impactful", "Thai language"]
-- type: "recent_news_feed"
-  count: 3
-  source: "CMS"
-- type: "unit_mission_statement"
-  source: "project.md"
-
-exclusions:
-
-- "Sensitive internal operational details"
-- "Recruitment application forms (only announcements)"
+  count: 3-5
+  qualities: ["tangible", "non-jargon"]
+  exclusions:
+- "Recruitment application forms or e-commerce options"
 
 # 4) UX Outcomes (observable behaviors)
 
 ux_outcomes:
 
-- "Primary CTA visible above fold on mobile and desktop."
-- "Users can identify the unit's core purpose within 5 seconds."
-- "Users can easily navigate to recent news or about sections."
+- "Primary CTA visible above fold on mobile"
+- "Key message recognized within 5 seconds"
 
 # 5) Data & Content Inputs
 
 data_needs:
 
-- id: "recent_news"
-  description: "Latest 3 news/activity items with title, date, and summary."
-  constraints: {min_count: 0}
+- id: "news_feed"
+  type: "cms_collection"
+  description: "Latest news articles"
+  constraints: {min_count: 3, max_count: 10}
+  status: "approved"
+  source: "cms.News"
+- id: "announcement_feed"
+  type: "cms_collection"
+  description: "Latest announcements"
+  constraints: {min_count: 3, max_count: 10}
+  status: "approved"
+  source: "cms.Announcement"
+- id: "dynamic_copy"
+  type: "cms_collection"
+  description: "Hero title and subheading"
+  constraints: {min_count: 1}
+  status: "approved"
+  source: "cms.DynamicCopy"
   copy_blocks:
 - id: "headline"
-  tone: "informative, welcoming"
+  type: "generated_content"
+  tone: "friendly"
   length: "≤ 10 words"
-- id: "mission_summary"
-  tone: "formal, clear"
-  length: "≤ 50 words"
+  status: "approved"
+  content: "Welcome to MBT 16 – Your source for news and official updates"
+- id: "subhead"
+  type: "generated_content"
+  tone: "benefit-led"
+  length: "≤ 15 words"
+  status: "approved"
+  content: "Stay informed with our latest announcements, news stories, and downloadable resources"
   asset_needs:
 - id: "hero_image"
+  type: "static_asset"
+  format: "jpg|webp"
   alt_required: true
   aspect_ratio: "16:9"
+  dimensions: "min 1200x675"
+  status: "approved"
+  description: "Hero banner featuring unit imagery or abstract military-themed gradient"
 - id: "unit_logo"
+  type: "static_asset"
+  format: "svg"
   alt_required: true
-  aspect_ratio: "1:1"
+  status: "approved"
+  description: "MBT 16 logo for brand recognition"
 
 # 6) Measurement & SEO
 
 success_signals:
-kpis: - "Bounce Rate ≤ 40%" - "Click-through rate on 'Explore News & Activities' CTA ≥ 15%" - "Time on Site ≥ 60 seconds"
-telemetry_events: - id: "home_page_view" props: {} - id: "cta_explore_news_click" props: {}
+kpis: - "Bounce rate ≤ 50%" - "Time on page ≥ 60s"
+telemetry_events: - id: "home_cta_click" props: {target:"/about-us"}
 seo_intent:
-title: "MBT 16 - Official Website | News, Activities & Unit Information"
-description: "Explore the official website of MBT 16 (มณฑลทหารบกที่ 16) for the latest news, activities, unit information, and community engagement."
-target_keywords: ["MBT 16", "มณฑลทหารบกที่ 16", "Thai Army", "military news", "unit information", "public relations"]
+title: "MBT 16 | Home – Army Unit News & Resources"
+description: "MBT 16 official site: news, announcements, leadership info, and downloadable resources."
+target_keywords: ["MBT 16", "military news", "announcements"]
 
 # 7) Accessibility & Performance Guardrails
 
 a11y_requirements:
 
-- "All images have descriptive alt text."
-- "Navigation is fully keyboard accessible."
-- "Color contrast meets WCAG 2.1 AA standards."
+- "All interactive elements keyboard accessible"
+- "Contrast ≥ 4.5:1 for text"
   perf_targets:
 - "LCP ≤ 2.5s (mobile)"
 - "CLS < 0.1"
-- "Total Blocking Time (TBT) ≤ 200ms"
 
 # 8) Acceptance Criteria (testable outcomes)
 
 acceptance_criteria:
 
-- Given a user lands on the home page, when they scroll, then the primary CTA remains visible or easily accessible.
-- Given a user is on the home page, when they click the 'Explore News & Activities' CTA, then they are redirected to the /news-activities page.
-- Given the page loads, when the hero image is displayed, then its alt text accurately describes the image content.
+- Given a mobile user lands on home, when page loads, then primary CTA is visible without scrolling
+- Given any user, when viewing hero, then key message text is readable within 5s
   review_checklist:
 - "[ ] Messages align with project.md goals"
 - "[ ] Route matches sitemap.md exactly"
