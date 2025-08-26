@@ -101,26 +101,86 @@ const primaryCta = {
       <h2
         class="text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
       >
-        Our Mission
+        คำขวัญ
+      </h2>
+      <p class="text-2xl font-bold">"แม่นยำ กระชับ ฉับไว"</p>
+      <p class="text-xl text-muted-foreground">"Accuracy Concise Swiftly"</p>
+      <div
+        class="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-full mt-4"
+      ></div>
+    </div>
+    <div class="text-center mb-16">
+      <h2
+        class="text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+      >
+        ภารกิจ
       </h2>
       <div class="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-full"></div>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      {
-        valueProps.map((prop, index) => (
-          <Card
-            key={index}
-            className="bg-card text-card-foreground rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-border"
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <Card
+        className="bg-card text-card-foreground rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-border"
+      >
+        <CardHeader>
+          <CardTitle class="text-xl font-bold text-primary"
+            >บังคับบัญชากำลังประจำถิ่น</CardTitle
           >
-            <CardHeader>
-              <CardTitle class="text-xl font-bold text-primary">{prop.title}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p class="text-foreground/80">{prop.description}</p>
-            </CardContent>
-          </Card>
-        ))
-      }
+        </CardHeader>
+        <CardContent>
+          <p class="text-foreground/80">
+            บังคับบัญชากำลังประจำถิ่นของกองทัพบก ตามที่กระทรวงกลาโหมกำหนด
+          </p>
+        </CardContent>
+      </Card>
+      <Card
+        className="bg-card text-card-foreground rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-border"
+      >
+        <CardHeader>
+          <CardTitle class="text-xl font-bold text-primary">รักษาความสงบเรียบร้อย</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p class="text-foreground/80">
+            รักษาความสงบเรียบร้อยในพื้นที่ รวมทั้งการศาลทหาร การคดี
+            การช่วยดำเนินการคุ้มครองพยานในคดีอาญาและการเรือนจำ
+          </p>
+        </CardContent>
+      </Card>
+      <Card
+        className="bg-card text-card-foreground rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-border"
+      >
+        <CardHeader>
+          <CardTitle class="text-xl font-bold text-primary"
+            >ดำเนินการสัสดีและสรรพกำลัง</CardTitle
+          >
+        </CardHeader>
+        <CardContent>
+          <p class="text-foreground/80">
+            ดำเนินการสัสดี การเกณฑ์ช่วยราชการทหาร และการระดมสรรพกำลังในเขตพื้นที่
+          </p>
+        </CardContent>
+      </Card>
+      <Card
+        className="bg-card text-card-foreground rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-border"
+      >
+        <CardHeader>
+          <CardTitle class="text-xl font-bold text-primary">สนับสนุนหน่วยทหาร</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p class="text-foreground/80">สนับสนุนหน่วยทหารที่อยู่ในเขตพื้นที่</p>
+        </CardContent>
+      </Card>
+      <Card
+        className="bg-card text-card-foreground rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-border"
+      >
+        <CardHeader>
+          <CardTitle class="text-xl font-bold text-primary">ดำเนินการตามแผนยุทธศาสตร์</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p class="text-foreground/80">
+            ดำเนินการตามแผนยุทธศาสตร์การต่อสู้เบ็ดเสร็จเพื่อรักษาความสงบภายใน และการป้องกันประเทศ
+          </p>
+        </CardContent>
+      </Card>
     </div>
   </section>
 
