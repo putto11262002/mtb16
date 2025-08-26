@@ -1,4 +1,18 @@
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from '@/components/ui/navigation-menu';
 import { Menu } from 'lucide-react';
 
 export default function MobileNav() {
@@ -11,76 +25,105 @@ export default function MobileNav() {
         </button>
       </SheetTrigger>
       <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-background">
+        <SheetHeader>
+          <SheetTitle>
+            <a href="/" className="text-2xl font-bold text-foreground">
+              MBT 16
+            </a>
+          </SheetTitle>
+        </SheetHeader>
         <div className="flex flex-col space-y-6 py-6">
-          <a href="/" className="text-2xl font-bold text-foreground">
-            MBT 16
-          </a>
-
-          <nav className="flex flex-col space-y-6 mt-10">
-            <a
-              href="/news"
-              className="text-foreground hover:text-accent-foreground py-3 px-4 rounded-md hover:bg-accent transition-colors bg-transparent"
-            >
-              ข่าวสาร
-            </a>
-
-            <a
-              href="/announcements"
-              className="text-foreground hover:text-accent-foreground py-3 px-4 rounded-md hover:bg-accent transition-colors bg-transparent"
-            >
-              ประกาศ
-            </a>
-
-            <div className="space-y-3">
-              <div className="text-foreground font-medium py-3 px-4">เกี่ยวกับเรา</div>
-              <div className="flex flex-col pl-4 space-y-3">
-                <a
-                  href="/about-us"
-                  className="text-foreground hover:text-accent-foreground py-3 px-4 rounded-md hover:bg-accent transition-colors bg-transparent"
+          <NavigationMenu orientation="vertical" className="w-full">
+            <NavigationMenuList className="flex-col items-start space-y-4 w-full">
+              <NavigationMenuItem className="w-full">
+                <NavigationMenuLink
+                  href="/news"
+                  className="text-foreground hover:text-accent-foreground py-3 px-4 rounded-md hover:bg-accent transition-colors bg-transparent w-full block"
                 >
-                  ประวัติหน่วย
-                </a>
-                <a
-                  href="/about-us/leadership"
-                  className="text-foreground hover:text-accent-foreground py-3 px-4 rounded-md hover:bg-accent transition-colors bg-transparent"
-                >
-                  ผู้บัญชาการและผู้นำ
-                </a>
-              </div>
-            </div>
+                  ข่าวสาร
+                </NavigationMenuLink>
+              </NavigationMenuItem>
 
-            <div className="space-y-3">
-              <div className="text-foreground font-medium py-3 px-4">ไดเรกทอรี</div>
-              <div className="flex flex-col pl-4 space-y-3">
-                <a
-                  href="/directory/internal"
-                  className="text-foreground hover:text-accent-foreground py-3 px-4 rounded-md hover:bg-accent transition-colors bg-transparent"
+              <NavigationMenuItem className="w-full">
+                <NavigationMenuLink
+                  href="/announcements"
+                  className="text-foreground hover:text-accent-foreground py-3 px-4 rounded-md hover:bg-accent transition-colors bg-transparent w-full block"
                 >
-                  หน่วยย่อยและแผนกภายใน
-                </a>
-                <a
-                  href="/directory/external"
-                  className="text-foreground hover:text-accent-foreground py-3 px-4 rounded-md hover:bg-accent transition-colors bg-transparent"
+                  ประกาศ
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+
+              <NavigationMenuItem className="w-full">
+                <NavigationMenuTrigger className="text-foreground w-full justify-start py-3 px-4">
+                  เกี่ยวกับเรา
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid w-full gap-3 p-4">
+                    <li>
+                      <NavigationMenuLink
+                        href="/about-us"
+                        className="block p-2 rounded-md hover:bg-accent text-foreground bg-transparent"
+                      >
+                        ประวัติหน่วย
+                      </NavigationMenuLink>
+                    </li>
+                    <li>
+                      <NavigationMenuLink
+                        href="/about-us/leadership"
+                        className="block p-2 rounded-md hover:bg-accent text-foreground bg-transparent"
+                      >
+                        ผู้บัญชาการและผู้นำ
+                      </NavigationMenuLink>
+                    </li>
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+
+              <NavigationMenuItem className="w-full">
+                <NavigationMenuTrigger className="text-foreground w-full justify-start py-3 px-4">
+                  ไดเรกทอรี
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid w-full gap-3 p-4">
+                    <li>
+                      <NavigationMenuLink
+                        href="/directory/internal"
+                        className="block p-2 rounded-md hover:bg-accent text-foreground bg-transparent"
+                      >
+                        หน่วยย่อยและแผนกภายใน
+                      </NavigationMenuLink>
+                    </li>
+                    <li>
+                      <NavigationMenuLink
+                        href="/directory/external"
+                        className="block p-2 rounded-md hover:bg-accent text-foreground bg-transparent"
+                      >
+                        เครือข่ายภายนอกและความร่วมมือ
+                      </NavigationMenuLink>
+                    </li>
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+
+              <NavigationMenuItem className="w-full">
+                <NavigationMenuLink
+                  href="/document-library"
+                  className="text-foreground hover:text-accent-foreground py-3 px-4 rounded-md hover:bg-accent transition-colors bg-transparent w-full block"
                 >
-                  เครือข่ายภายนอกและความร่วมมือ
-                </a>
-              </div>
-            </div>
+                  คลังเอกสาร
+                </NavigationMenuLink>
+              </NavigationMenuItem>
 
-            <a
-              href="/document-library"
-              className="text-foreground hover:text-accent-foreground py-3 px-4 rounded-md hover:bg-accent transition-colors bg-transparent"
-            >
-              คลังเอกสาร
-            </a>
-
-            <a
-              href="/contact"
-              className="text-foreground hover:text-accent-foreground py-3 px-4 rounded-md hover:bg-accent transition-colors bg-transparent"
-            >
-              ติดต่อ
-            </a>
-          </nav>
+              <NavigationMenuItem className="w-full">
+                <NavigationMenuLink
+                  href="/contact"
+                  className="text-foreground hover:text-accent-foreground py-3 px-4 rounded-md hover:bg-accent transition-colors bg-transparent w-full block"
+                >
+                  ติดต่อ
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
         </div>
       </SheetContent>
     </Sheet>
