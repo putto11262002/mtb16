@@ -30,7 +30,7 @@ export default function DesktopNav() {
         </NavigationMenuItem>
 
         <NavigationMenuItem>
-          <NavigationMenuTrigger className="bg-background text-foreground">
+          <NavigationMenuTrigger className="text-foreground bg-transparent">
             เกี่ยวกับเรา
           </NavigationMenuTrigger>
           <NavigationMenuContent>
@@ -62,7 +62,7 @@ export default function DesktopNav() {
         </NavigationMenuItem>
 
         <NavigationMenuItem>
-          <NavigationMenuTrigger className="bg-background text-foreground">
+          <NavigationMenuTrigger className="text-foreground bg-transparent">
             ไดเรกทอรี
           </NavigationMenuTrigger>
           <NavigationMenuContent>
