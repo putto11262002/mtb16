@@ -1,0 +1,21 @@
+---
+// src/components/blocks/CommanderCard.astro
+import type { Commander } from '@/lib/mock-commanders';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
+
+interface Props {
+  commander: Commander;
+}
+
+const { commander } = Astro.props;
+---
+
+<div class="flex flex-col items-center text-center">
+  <img
+    src={commander.image}
+    alt={`รูปโปรไฟล์ของ ${commander.name}`}
+    class="w-32 h-32 rounded-full object-cover mb-4 border-4 border-primary shadow-lg"
+  />
+  <h3 class="text-xl font-bold text-foreground">{commander.name}</h3>
+  <p class="text-md text-primary">{commander.title}</p>
+</div>

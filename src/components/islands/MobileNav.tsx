@@ -31,6 +31,13 @@ export default function MobileNav() {
               ประกาศ
             </a>
 
+            <a
+              href="/uni-command"
+              className="text-foreground hover:text-accent-foreground py-3 px-4 rounded-md hover:bg-accent transition-colors bg-transparent"
+            >
+              ทำเนียบผู้บังคับบัญชา
+            </a>
+
             <div className="space-y-3">
               <div className="text-foreground font-medium py-3 px-4">เกี่ยวกับเรา</div>
               <div className="flex flex-col pl-4 space-y-3">
