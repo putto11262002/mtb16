@@ -3,6 +3,7 @@ import type { AstroBuiltinAttributes } from 'astro';
 import DesktopNav from '@/components/islands/DesktopNav';
 import { cn } from '@/lib/utils';
 import MobileNav from '@/components/islands/MobileNav';
+import '../styles/global.css';
 
 const { title, description } = Astro.props;
 ---
@@ -19,7 +20,6 @@ const { title, description } = Astro.props;
         'MBT 16 official site: news, announcements, leadership info, and downloadable resources.'}
     />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="stylesheet" href="/src/styles/global.css" />
   </head>
   <body class="dark bg-background text-foreground">
     <header class="bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-md">
@@ -27,7 +27,7 @@ const { title, description } = Astro.props;
         <div class="flex justify-between items-center py-4">
           <a href="/" class="text-2xl font-bold">MBT 16</a>
 
-<div className="hidden md:block">
+          <div className="hidden md:block">
             <DesktopNav client:idle />
           </div>
 
@@ -62,4 +62,3 @@ const { title, description } = Astro.props;
     </footer>
   </body>
 </html>
-
