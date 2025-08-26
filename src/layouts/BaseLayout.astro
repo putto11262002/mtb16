@@ -13,11 +13,13 @@ const { title, description } = Astro.props;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title ? `${title} | MBT 16` : 'MBT 16 | Army Unit News & Resources'}</title>
+    <title>
+      {title ? `${title} | มทบ. ๑๖` : 'มทบ. ๑๖ | ข่าวสารและทรัพยากรของหน่วยทหาร'}
+    </title>
     <meta
       name="description"
       content={description ||
-        'MBT 16 official site: news, announcements, leadership info, and downloadable resources.'}
+        'เว็บไซต์อย่างเป็นทางการของ มทบ. ๑๖: ข่าวสาร, ประกาศ, ข้อมูลผู้นำ, และทรัพยากรสำหรับดาวน์โหลด'}
     />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
@@ -25,7 +27,7 @@ const { title, description } = Astro.props;
     <header class="bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-md">
       <div class="container mx-auto px-4">
         <div class="flex justify-between items-center py-4">
-          <a href="/" class="text-2xl font-bold">MBT 16</a>
+          <a href="/" class="text-2xl font-bold">มทบ. ๑๖</a>
 
           <div className="hidden md:block">
             <DesktopNav client:idle />
@@ -45,7 +47,7 @@ const { title, description } = Astro.props;
 
     <footer class="bg-gradient-to-r from-primary to-secondary text-primary-foreground py-12 mt-16">
       <div class="container mx-auto text-center px-4">
-        <p class="text-lg">&copy; {new Date().getFullYear()} MBT 16. All rights reserved.</p>
+        <p class="text-lg">© {new Date().getFullYear()} มทบ. ๑๖. สงวนลิขสิทธิ์</p>
         <ul class="flex justify-center space-x-8 mt-4">
           <li>
             <a href="/privacy-policy" class="hover:underline transition-all duration-300"
