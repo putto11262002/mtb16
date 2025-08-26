@@ -2,14 +2,135 @@
 
 ## Domain Overview
 
-business_domain: "Public-facing website content management"
+business_domain: "Public-facing website content management for a military unit"
 primary_workflows:
 
-- "Content publishing and updates for static pages, news, events, and announcements"
+- "Content publishing and updates for formal announcements and news/PR"
 - "Directory listing management (internal and external)"
 - "Document library organization and access"
+- "Management of small, dynamic text snippets for UI"
 
 ## Core Entities
+
+### Announcement
+
+description: "Represents formal, crucial communications for the public or unit members."
+purpose: "To disseminate official notices, policy updates, or critical information."
+lifecycle: "create → update → archive"
+
+fields:
+
+- name: "id"
+  type: "uuid"
+  required: true
+  unique: true
+- name: "title"
+  type: "string"
+  required: true
+  constraints:
+  max_length: 500
+  description: "The title of the announcement."
+- name: "content"
+  type: "text"
+  required: true
+  description: "The full body content of the announcement."
+- name: "published_at"
+  type: "datetime"
+  required: true
+  description: "The date and time the announcement was published."
+- name: "author"
+  type: "string"
+  required: false
+  constraints:
+  max_length: 255
+  description: "The author or responsible party for the announcement (e.g., 'Headquarters', 'Commander\'s Office')."
+- name: "tags"
+  type: "json"
+  required: false
+  description: "Keywords or categories for the announcement (e.g., 'policy', 'safety', 'recruitment')."
+- name: "attachments"
+  type: "json"
+  required: false
+  description: "An array of objects, each representing an attached file with its URL and optional metadata (e.g., [{'url': '...', 'title': '...'}])."
+
+access_patterns:
+
+- query: "Retrieve latest announcements, ordered by published_at"
+  frequency: "high"
+  performance_notes: "Index on 'published_at'."
+- query: "Retrieve announcements by tag"
+  frequency: "medium"
+  performance_notes: "Index on 'tags' if possible, or full-text search."
+
+### News
+
+description: "Represents public relations content, including reports on past events/work."
+purpose: "To showcase unit activities, achievements, and general updates for public consumption."
+lifecycle: "create → update → archive"
+
+fields:
+
+- name: "id"
+  type: "uuid"
+  required: true
+  unique: true
+- name: "title"
+  type: "string"
+  required: true
+  constraints:
+  max_length: 500
+  description: "The title of the news article."
+- name: "summary"
+  type: "text"
+  required: false
+  description: "A brief summary or excerpt of the news article, useful for listings."
+- name: "content"
+  type: "text"
+  required: true
+  description: "The full body content of the news article."
+- name: "published_at"
+  type: "datetime"
+  required: true
+  description: "The date and time the news article was published or the event/work occurred."
+- name: "author"
+  type: "string"
+  required: false
+  constraints:
+  max_length: 255
+  description: "The author of the news article."
+- name: "image_url"
+  type: "string"
+  required: false
+  constraints:
+  max_length: 1000
+  format: "url"
+  description: "URL to a featured image for the news article, if applicable."
+- name: "tags"
+  type: "json"
+  required: false
+  description: "Keywords or categories for the news article (e.g., 'community service', 'training', 'awards')."
+- name: "location"
+  type: "string"
+  required: false
+  constraints:
+  max_length: 500
+  description: "Location where the event/work described in the news article took place, if applicable."
+- name: "attachments"
+  type: "json"
+  required: false
+  description: "An array of objects, each representing an attached file with its URL and optional metadata (e.g., [{'url': '...', 'title': '...'}])."
+
+access_patterns:
+
+- query: "Retrieve latest news articles, ordered by published_at"
+  frequency: "high"
+  performance_notes: "Index on 'published_at'."
+- query: "Retrieve news articles by tag"
+  frequency: "medium"
+  performance_notes: "Index on 'tags' if possible, or full-text search."
+- query: "Search news articles by title, summary, or content"
+  frequency: "medium"
+  performance_notes: "Full-text search index on 'title', 'summary', and 'content'."
 
 ### DynamicCopy
 
@@ -167,135 +288,6 @@ access_patterns:
   frequency: "medium"
   performance_notes: "Full-text search index on 'title' and 'description'."
 
-### Event
-
-description: "Represents an upcoming or past event."
-purpose: "To store details about events for display on the website."
-lifecycle: "create → update → archive"
-
-fields:
-
-- name: "id"
-  type: "uuid"
-  required: true
-  unique: true
-- name: "title"
-  type: "string"
-  required: true
-  constraints:
-  max_length: 500
-  description: "The title of the event."
-- name: "description"
-  type: "text"
-  required: true
-  description: "Full description of the event."
-- name: "start_datetime"
-  type: "datetime"
-  required: true
-  description: "The start date and time of the event."
-- name: "end_datetime"
-  type: "datetime"
-  required: false
-  description: "The end date and time of the event (if applicable)."
-- name: "location"
-  type: "string"
-  required: false
-  constraints:
-  max_length: 500
-  description: "Physical or virtual location of the event."
-- name: "image_url"
-  type: "string"
-  required: false
-  constraints:
-  max_length: 1000
-  format: "url"
-  description: "URL to a featured image for the event."
-- name: "registration_url"
-  type: "string"
-  required: false
-  constraints:
-  max_length: 1000
-  format: "url"
-  description: "URL for event registration."
-- name: "category"
-  type: "string"
-  required: false
-  constraints:
-  max_length: 255
-  description: "Category for events (e.g., 'Webinar', 'Conference', 'Workshop')."
-- name: "published_at"
-  type: "datetime"
-  required: false
-  description: "Timestamp when the event was published."
-
-access_patterns:
-
-- query: "Retrieve upcoming events, ordered by start_datetime"
-  frequency: "high"
-  performance_notes: "Index on 'start_datetime'."
-- query: "Retrieve events by category"
-  frequency: "medium"
-  performance_notes: "Index on 'category'."
-
-### NewsArticle
-
-description: "Represents a news article or announcement."
-purpose: "To store and manage news and activity updates."
-lifecycle: "create → update → archive"
-
-fields:
-
-- name: "id"
-  type: "uuid"
-  required: true
-  unique: true
-- name: "title"
-  type: "string"
-  required: true
-  constraints:
-  max_length: 500
-  description: "The title of the news article/announcement."
-- name: "summary"
-  type: "text"
-  required: false
-  description: "A brief summary or excerpt of the article."
-- name: "content"
-  type: "text"
-  required: true
-  description: "The full body content of the news article."
-- name: "published_at"
-  type: "datetime"
-  required: true
-  description: "The date and time the article was published."
-- name: "author"
-  type: "string"
-  required: false
-  constraints:
-  max_length: 255
-  description: "The author of the news article."
-- name: "image_url"
-  type: "string"
-  required: false
-  constraints:
-  max_length: 1000
-  format: "url"
-  description: "URL to a featured image for the article."
-- name: "category"
-  type: "string"
-  required: false
-  constraints:
-  max_length: 255
-  description: "Category for news articles (e.g., 'Press Release', 'Blog', 'Company Update')."
-
-access_patterns:
-
-- query: "Retrieve latest news articles, ordered by published_at"
-  frequency: "high"
-  performance_notes: "Index on 'published_at'."
-- query: "Retrieve news articles by category"
-  frequency: "medium"
-  performance_notes: "Index on 'category'."
-
 ## Relationships
 
-# (To be defined based on further discussion)
+# (No explicit relationships between core entities at this time)

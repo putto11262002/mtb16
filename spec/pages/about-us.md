@@ -3,105 +3,106 @@ page_name: "About Us"
 
 # 1) Purpose & Audience
 
-purpose: education | trust
-primary_audience: "Local Community, General Public, Non-Army Visitors"
+purpose: education
+primary_audience: "General Public"
 top_user_tasks:
 
-- "Learn about MBT 16's mission and history"
-- "Understand the unit's role and values"
-- "Find information about the unit's structure"
+- "Discover MBT 16’s mission, history, and values"
+- "Navigate to leadership profiles"
 
 # 2) Core Messages (what this page must convey)
 
 key_messages:
 
-- "MBT 16 is a dedicated and integral part of national security and community support."
-- "Our unit operates with integrity, discipline, and a commitment to service."
-- "We are transparent about our structure and leadership."
+- "MBT 16 has a distinguished history of service and community engagement"
+- "Our leadership team guides the unit with expertise and integrity"
   proof_points:
-- "Clear mission statement and historical overview"
-- "Organizational structure diagram (if applicable)"
-- "Links to leadership profiles"
+- "Timeline of key milestones in MBT 16 history"
+- "Summary of leadership roles and achievements"
 
 # 3) Must-Include Content (content contract, not UI)
 
 must_include:
 
-- type: "mission_statement"
-  source: "project.md"
-- type: "history_overview"
-  length: "~200 words"
-- type: "values_statement"
-  count: 3-5
-- type: "leadership_section"
-  intent: "Introduce key leadership"
+- type: "primary_cta"
+  intent: "View leadership profiles"
   target: "/about-us/leadership"
-
-exclusions:
-
-- "Highly sensitive operational details"
-- "Individual personnel details beyond leadership"
+- type: "value_props"
+  count: 3-5
+  qualities: ["tangible", "non-jargon"]
+  exclusions:
+- "News or announcement feeds"
 
 # 4) UX Outcomes (observable behaviors)
 
 ux_outcomes:
 
-- "Users can articulate MBT 16's core mission after visiting."
-- "Users feel a sense of trust and transparency regarding the unit."
-- "Users can easily find information about the unit's leadership."
+- "Users locate leadership section link within 5 seconds"
+- "Historical timeline entries are scannable and clearly labeled"
 
 # 5) Data & Content Inputs
 
 data_needs:
 
 - id: "unit_history"
-  description: "Key historical milestones and founding principles."
-- id: "unit_values"
-  description: "Core values that guide the unit's operations."
+  type: "static_asset"
+  description: "Content block or asset representing historical timeline"
+  constraints: {min_count: 1}
+  status: "requesting"
+  source: "upload_required"
+- id: "leadership_overview"
+  type: "generated_content"
+  description: "Summary text introducing leadership team"
+  constraints: {min_count: 1}
+  status: "requesting"
+  source: "cms.DynamicCopy"
   copy_blocks:
-- id: "about_headline"
-  tone: "formal, informative"
-  length: "≤ 7 words"
-- id: "history_text"
-  tone: "informative"
-  length: "~200 words"
+- id: "headline"
+  type: "generated_content"
+  tone: "professional"
+  length: "≤ 5 words"
+  status: "approved"
+  content: "About MBT 16"
+- id: "subhead"
+  type: "generated_content"
+  tone: "benefit-led"
+  length: "≤ 12 words"
+  status: "approved"
+  content: "Our mission, values, and leadership"
   asset_needs:
-- id: "unit_crest"
+- id: "history_image"
+  type: "static_asset"
+  format: "jpg|png"
   alt_required: true
-  aspect_ratio: "1:1"
-- id: "historical_photo"
-  alt_required: true
-  aspect_ratio: "16:9"
+  status: "requesting"
+  description: "Archival or illustrative image showcasing MBT 16’s history"
 
 # 6) Measurement & SEO
 
 success_signals:
-kpis: - "Time on page ≥ 120 seconds" - "Click-through rate to /about-us/leadership ≥ 10%"
-telemetry_events: - id: "about_us_page_view" props: {} - id: "leadership_link_click" props: {}
+kpis: - "Click-through rate to leadership ≥ 20%"
+telemetry_events: - id: "about_leadership_click" props: {target:"/about-us/leadership"}
 seo_intent:
-title: "About MBT 16 | Mission, History & Values of the Thai Army Unit"
-description: "Learn about MBT 16 (มณฑลทหารบกที่ 16)'s mission, rich history, core values, and organizational structure."
-target_keywords: ["MBT 16 mission", "Thai army history", "unit values", "military organization", "about us"]
+title: "About MBT 16 – History & Leadership"
+description: "Learn about the mission, values, and leadership of MBT 16."
+target_keywords: ["MBT 16 history", "unit leadership"]
 
 # 7) Accessibility & Performance Guardrails
 
 a11y_requirements:
 
-- "All textual content is easily readable."
-- "Any diagrams or charts have text alternatives."
-- "Page is navigable using keyboard only."
+- "Images have alt text describing historical context"
+- "Contrast ≥ 4.5:1 for timeline text"
   perf_targets:
-- "LCP ≤ 2.5s (mobile)"
+- "LCP ≤ 2.5s (desktop)"
 - "CLS < 0.1"
-- "TBT ≤ 200ms"
 
 # 8) Acceptance Criteria (testable outcomes)
 
 acceptance_criteria:
 
-- Given a user is on the About Us page, when they read the content, then they can identify the unit's primary mission.
-- Given the page loads, when the leadership section is present, then a clickable link to the detailed leadership page is available.
-- Given a user navigates to the page, when all content is loaded, then there are no layout shifts.
+- Given page load, when scanning page, then headline and subhead visible within first view
+- Given user clicks leadership CTA, when click event, then navigates to leadership page
   review_checklist:
 - "[ ] Messages align with project.md goals"
 - "[ ] Route matches sitemap.md exactly"

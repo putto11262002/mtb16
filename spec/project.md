@@ -9,7 +9,7 @@ status: approved
 
 - **Company / Project Name:** MBT 16 (มณฑลทหารบกที่ 16)
 - **One-liner:** A platform for public relations for the army unit.
-- **Description:** The website will provide information about the unit, news, events, announcements, and downloadable resources.
+- **Description:** The website will provide information about the unit, news reports (including past events), formal announcements, and downloadable resources.
 
 ## Goals
 
@@ -25,12 +25,12 @@ status: approved
 - **Personas:** Army Personnel, Local Community, General Public.
 - **Top Journeys / Tasks:**
   - **Non-Army Visitors:** Find information about the unit and the general Thai army, see recruitment announcements.
-  - **Army Personnel:** View events, announcements, and download resources.
+  - **Army Personnel:** View news, announcements, and download resources.
 
 ## Requirements & Idea
 
 - **Core Requirements:**
-  - Unified Announcements Feed (News, Activities, Events, Announcements with tags)
+  - Distinct Feeds for Formal Announcements and News/PR (both with tagging)
   - Unit Information Pages (About, Leadership Profiles)
   - Internal Sub-Units & Departments Directory
   - External Network/Partnerships Directory
@@ -38,13 +38,15 @@ status: approved
   - Contact & Connect Section (Contact page, centralized contact info/social links)
   - Search Functionality
   - Responsive Design
-  - Content Management System (CMS)
+  - Custom-built simple admin interface for managing announcements, news, resources, and basic site information.
+  - Homepage must include a section about the unit leader.
+  - Announcements and news feeds must support image assets.
 - **Project Idea / Vision:** To modernize and rebuild the existing, outdated website to better serve its public relations and information dissemination goals.
 - **Note:** The primary language used in the website is Thai.
 
 ## Scope
 
-- **Pages in Scope:** Homepage, News & Activities Feed Page, Individual News/Activity Pages, Events & Announcements Feed Page, Individual Event/Announcement Pages, About the Unit Page, Unit Commanders & Leadership Page, Internal Sub-Units & Departments Directory Page, Individual Sub-Unit Pages, External Network/Partnerships Directory Page, Document Library Page, Contact Page, Search Results Page.
+- **Pages in Scope:** Homepage, Announcements Feed Page, Individual Announcement Pages, News Feed Page, Individual News Pages, About the Unit Page, Unit Commanders & Leadership Page, Internal Sub-Units & Departments Directory Page, Individual Sub-Unit Pages, External Network/Partnerships Directory Page, Document Library Page, Contact Page, Search Results Page.
 - **Features / Integrations:** (Implicitly covered by Core Requirements and CMS choice)
 
 ## Constraints

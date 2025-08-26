@@ -4,88 +4,79 @@ page_name: "Privacy Policy"
 # 1) Purpose & Audience
 
 purpose: trust
-primary_audience: "All Audiences (Local Community, General Public, Army Personnel)"
+primary_audience: "General Public & Army Personnel"
 top_user_tasks:
 
-- "Understand how personal data is collected and used"
-- "Learn about data protection and user rights"
-- "Comply with legal and regulatory requirements"
+- "Understand how MBT 16 collects and uses personal data"
+- "Find information on data protection practices"
 
 # 2) Core Messages (what this page must convey)
 
 key_messages:
 
-- "MBT 16 is committed to protecting your privacy and personal data."
-- "We are transparent about our data handling practices."
-- "Your trust is paramount to us."
+- "MBT 16 is committed to protecting your privacy"
+- "Data collection and usage practices are transparent and compliant"
   proof_points:
-- "Clear, concise language explaining data practices"
-- "Sections on data collection, usage, sharing, and user rights"
+- "Detailed privacy policy text pulled from static asset"
 
 # 3) Must-Include Content (content contract, not UI)
 
 must_include:
 
-- type: "legal_text"
-  sections: ["Introduction", "Data Collection", "Data Usage", "Data Sharing", "Data Security", "User Rights", "Cookies", "Changes to Policy", "Contact Information"]
-  language: "Thai"
-- type: "last_updated_date"
-
-exclusions:
-
-- "Jargon or overly complex legal language without clear explanations"
-- "Any content that contradicts actual data handling practices"
+- type: "static_content"
+  description: "Full privacy policy text"
+  exclusions:
+- "Links to recruitment or unrelated services"
 
 # 4) UX Outcomes (observable behaviors)
 
 ux_outcomes:
 
-- "Users can easily find and understand the privacy policy."
-- "Users feel confident that their data is handled responsibly."
-- "Users can locate specific sections of interest within the policy."
+- "Text is readable with clear headings and sections"
+- "Users can find specific policy sections via table of contents"
 
 # 5) Data & Content Inputs
 
 data_needs:
 
-- id: "privacy_policy_text"
-  description: "Comprehensive legal text for the privacy policy, including all required sections."
+- id: "privacy_text"
+  type: "static_asset"
+  description: "Legal privacy policy document"
+  constraints: {min_count: 1}
+  status: "approved"
+  source: "upload_required"
   copy_blocks:
-- id: "page_title"
-  tone: "formal, clear"
-  length: "≤ 5 words"
+- id: "none"
+  type: "static_content"
   asset_needs:
 - id: "none"
+  type: "static_content"
 
 # 6) Measurement & SEO
 
 success_signals:
-kpis: - "Average time on page ≥ 180 seconds" - "Scroll depth ≥ 75%"
-telemetry_events: - id: "privacy_policy_page_view" props: {}
+kpis: - "Average time on page ≥ 120s"
+telemetry_events: - id: "policy_section_view" props: {section:"<section name>"}
 seo_intent:
-title: "MBT 16 Privacy Policy | Data Protection & User Rights"
-description: "Read the official Privacy Policy of MBT 16 (มณฑลทหารบกที่ 16) to understand our data collection, usage, and protection practices."
-target_keywords: ["MBT 16 privacy", "privacy policy", "data protection", "user rights", "Thai army data"]
+title: "MBT 16 Privacy Policy"
+description: "Learn how MBT 16 collects, uses, and protects personal data."
+target_keywords: ["MBT 16 privacy policy", "data protection"]
 
 # 7) Accessibility & Performance Guardrails
 
 a11y_requirements:
 
-- "Text is highly readable with good contrast and font size."
-- "Page content is structured with headings for easy navigation."
-- "Printable version available or easily printable from browser."
+- "All headings use semantic HTML"
+- "Contrast ≥ 4.5:1 for text"
   perf_targets:
-- "LCP ≤ 2.5s (mobile)"
-- "CLS < 0.1"
-- "TBT ≤ 200ms"
+- "Text load time ≤ 1s"
 
 # 8) Acceptance Criteria (testable outcomes)
 
 acceptance_criteria:
 
-- Given a user is on the Privacy Policy page, when they read the content, then they can identify how their data is used.
-- Given the page loads, when the policy is displayed, then it includes a clear "Last Updated" date.
-- Given a user navigates the page, when they use headings, then they can jump to relevant sections.
+- Given page load, when scanning, then table of contents is present
+- Given user selects section in TOC, when click, then jumps to section
   review_checklist:
 - "[ ] Messages align with project.md goals"
 - "[ ] Route matches sitemap.md exactly"

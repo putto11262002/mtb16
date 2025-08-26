@@ -4,94 +4,107 @@ page_name: "Directory"
 # 1) Purpose & Audience
 
 purpose: support
-primary_audience: "Army Personnel, Local Community, General Public"
+primary_audience: "Army Personnel & General Public"
 top_user_tasks:
 
-- "Find contact information for internal sub-units and departments"
-- "Discover external network and partnerships"
-- "Navigate to specific directory listings"
+- "Locate contact information for internal sub-units"
+- "Discover external partnerships and resources"
 
 # 2) Core Messages (what this page must convey)
 
 key_messages:
 
-- "Easily connect with the relevant departments and partners of MBT 16."
-- "MBT 16 fosters strong internal and external relationships."
-- "Our comprehensive directory ensures you find the information you need."
+- "All unit and partner contacts are centralized in one directory"
+- "Easily filter between internal and external listings"
   proof_points:
-- "Clear categorization of internal and external directories"
-- "Search and filter capabilities for directory listings"
+- "Counts of internal and external entries from cms.DirectoryEntry"
 
 # 3) Must-Include Content (content contract, not UI)
 
 must_include:
 
-- type: "directory_links"
-  links: ["/directory/internal", "/directory/external"]
-- type: "search_bar"
-  intent: "Search directory listings"
-- type: "brief_description"
-  content: "This directory provides contact information for internal sub-units and departments, as well as our external network and partnerships."
-
-exclusions:
-
-- "Individual contact information for non-public facing personnel"
-- "Sensitive internal operational details"
+- type: "primary_cta"
+  intent: "View internal directory"
+  target: "/directory/internal"
+- type: "primary_cta"
+  intent: "View external partnerships"
+  target: "/directory/external"
+- type: "value_props"
+  count: 2-4
+  qualities: ["tangible", "non-jargon"]
+  exclusions:
+- "News or announcements content"
 
 # 4) UX Outcomes (observable behaviors)
 
 ux_outcomes:
 
-- "Users can quickly choose between internal and external directories."
-- "Users can efficiently locate specific directory entries."
-- "Users understand the purpose and scope of the directory."
+- "Users click either internal or external link within 5 seconds"
+- "Entry counts for both categories are visible at a glance"
 
 # 5) Data & Content Inputs
 
 data_needs:
 
-- id: "internal_directory_summary"
-  description: "Summary of internal sub-units and departments available."
-- id: "external_directory_summary"
-  description: "Summary of external network and partnerships available."
+- id: "internal_entries"
+  type: "cms_collection"
+  description: "Directory entries where type=internal"
+  constraints: {min_count: 5}
+  status: "approved"
+  source: "cms.DirectoryEntry?type=internal"
+- id: "external_entries"
+  type: "cms_collection"
+  description: "Directory entries where type=external"
+  constraints: {min_count: 5}
+  status: "approved"
+  source: "cms.DirectoryEntry?type=external"
   copy_blocks:
-- id: "directory_headline"
-  tone: "informative, helpful"
+- id: "headline"
+  type: "generated_content"
+  tone: "informative"
   length: "≤ 5 words"
+  status: "approved"
+  content: "Unit Directory"
+- id: "subhead"
+  type: "generated_content"
+  tone: "benefit-led"
+  length: "≤ 10 words"
+  status: "approved"
+  content: "Find contacts for internal and external listings"
   asset_needs:
 - id: "directory_icon"
+  type: "static_asset"
+  format: "svg"
   alt_required: true
-  aspect_ratio: "1:1"
+  status: "approved"
+  description: "Icon representing directory or list"
 
 # 6) Measurement & SEO
 
 success_signals:
-kpis: - "Click-through rate to internal/external directories ≥ 20%" - "Search usage rate ≥ 15%"
-telemetry_events: - id: "directory_page_view" props: {} - id: "directory_type_selection" props: {type: "{internal|external}"}
+kpis: - "Click-through rate to internal ≥ 30%" - "Click-through rate to external ≥ 20%"
+telemetry_events: - id: "directory_link_click" props: {category:"internal|external"}
 seo_intent:
-title: "MBT 16 Directory | Internal Units & External Partnerships"
-description: "Find contact information for MBT 16's internal sub-units and departments, as well as our external network and partnerships."
-target_keywords: ["MBT 16 directory", "military units contact", "army partnerships", "department contacts"]
+title: "MBT 16 | Directory"
+description: "Centralized directory of unit contacts and external partnerships."
+target_keywords: ["MBT 16 directory", "unit contacts", "partners"]
 
 # 7) Accessibility & Performance Guardrails
 
 a11y_requirements:
 
-- "Directory links are clearly labeled and navigable."
-- "Search functionality is accessible via keyboard."
-- "Information is presented in a clear and structured manner."
+- "Links have discernible names for screen readers"
+- "Contrast ≥ 4.5:1 for link text"
   perf_targets:
-- "LCP ≤ 2.5s (mobile)"
+- "LCP ≤ 2.5s"
 - "CLS < 0.1"
-- "TBT ≤ 200ms"
 
 # 8) Acceptance Criteria (testable outcomes)
 
 acceptance_criteria:
 
-- Given a user is on the Directory page, when they click on 'Internal Sub-Units & Departments', then they are navigated to /directory/internal.
-- Given a user is on the Directory page, when they use the search bar, then relevant directory entries are displayed.
-- Given the page loads, when the directory links are present, then they are clearly distinguishable and clickable.
+- Given page load, when user scans, then at least two CTAs (internal/external) are visible
+- Given user clicks CTA, when click occurs, then navigates to the corresponding directory page
   review_checklist:
 - "[ ] Messages align with project.md goals"
 - "[ ] Route matches sitemap.md exactly"
