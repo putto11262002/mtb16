@@ -1,0 +1,9 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import UniCommandView from '@/components/islands/UniCommandView.tsx';
+import { commandHierarchy } from '@/lib/uni-command-data';
+---
+
+<BaseLayout title="ทำเนียบผู้บังคับบัญชา" description="ทำเนียบผู้บังคับบัญชาของ มทบ. ๑๖">
+  <UniCommandView client:load initialCommander={commandHierarchy} />
+</BaseLayout>
