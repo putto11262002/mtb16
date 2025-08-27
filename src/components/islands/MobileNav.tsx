@@ -1,10 +1,4 @@
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 
@@ -22,7 +16,11 @@ export default function MobileNav() {
       <SheetContent side="top" className="bg-background">
         <SheetHeader>
           <SheetTitle>
-            <a href="/" className="text-2xl font-bold text-foreground" onClick={() => setIsOpen(false)}>
+            <a
+              href="/"
+              className="text-2xl font-bold text-foreground"
+              onClick={() => setIsOpen(false)}
+            >
               MBT 16
             </a>
           </SheetTitle>
@@ -61,6 +59,13 @@ export default function MobileNav() {
                 onClick={() => setIsOpen(false)}
               >
                 ผู้บัญชาการและผู้นำ
+              </a>
+              <a
+                href="/uni-command"
+                className="block text-foreground hover:text-accent-foreground py-2 px-3 rounded-md hover:bg-accent transition-colors"
+                onClick={() => setIsOpen(false)}
+              >
+                ทำเนียบผู้บังคับบัญชา
               </a>
             </div>
           </details>

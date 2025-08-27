@@ -57,6 +57,15 @@ export default function DesktopNav() {
                   </p>
                 </NavigationMenuLink>
               </li>
+              <li>
+                <NavigationMenuLink
+                  href="/uni-command"
+                  className="[&>div]:text-sm [&>div]:font-medium block p-2 rounded-md hover:bg-accent text-foreground bg-transparent"
+                >
+                  <div className="text-sm font-medium">ทำเนียบผู้บังคับบัญชา</div>
+                  <p className="text-sm text-muted-foreground">สำรวจสายการบังคับบัญชาของหน่วย</p>
+                </NavigationMenuLink>
+              </li>
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
