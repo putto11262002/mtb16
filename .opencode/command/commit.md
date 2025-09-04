@@ -20,6 +20,8 @@ Context:
 !`git status --porcelain=v1`
 - Recent commits:
 !`git log --oneline -n 5`
+- Diff summary:
+!`git diff HEAD`
 
 Tasks:
 1) Propose: 
