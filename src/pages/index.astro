@@ -1,11 +1,16 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import Layout from '../layouts/BaseLayout.astro';
 ---
 
 <Layout>
-	<Welcome />
+<Fragment slot="head">
+  <title>Welcome to Astro!</title>
+  <meta name="description" content="Welcome to Astro! This is a starter project for building websites with Astro." />
+</Fragment>
+
+<Fragment slot="body">
+  <h1>Welcome to Astro!</h1>
+  <p>This is a starter project for building websites with Astro.</p>
+  <p>To get started, edit <code>src/pages/index.astro</code> or delete everything in the <code>src</code> directory and start fresh.</p>
+</Fragment>
 </Layout>
