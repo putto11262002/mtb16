@@ -1,0 +1,30 @@
+---
+// src/pages/signin.astro
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { actions } from "astro:actions";
+import { Button } from "@/components/ui/button";
+import { SigninForm } from "@/components/islands/client/SigninForm";
+
+export const prerender = false;
+
+// Check if the user is already signed in
+if (Astro.locals.user) {
+  return Astro.redirect("/secure");
+}
+
+const result = Astro.getActionResult(actions.auth.signin);
+if (result && !result.error) {
+return Astro.redirect("/secure");
+}
+---
+<BaseLayout>
+  <Fragment slot="head">
+    <title>Sign In</title>
+    <meta name="description" content="Sign in to your account" />
+  </Fragment>
+  <main slot="body" class="max-w-md mx-auto my-10 p-6 bg-white rounded-lg shadow-md">
+	  <SigninForm client:load />
+  </main>
+</BaseLayout>

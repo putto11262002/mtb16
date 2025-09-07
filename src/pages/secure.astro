@@ -1,0 +1,20 @@
+---
+export const prerender = false; // Disable prerendering for this page
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+if (!Astro.locals.session) {
+ return Astro.redirect("/signin") 
+}
+const user = Astro.locals.user!
+---
+<AdminLayout>
+  <Fragment slot="head">
+    <title>Secure Page</title>
+    <meta name="description" content="This is a secure page." />
+  </Fragment>
+
+  <Fragment slot="body">
+    <h1>Hi {user.name}</h1>
+    <p>This page is protected and requires authentication to access.</p>
+  </Fragment>
+</AdminLayout>
