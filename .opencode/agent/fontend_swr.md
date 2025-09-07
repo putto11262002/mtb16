@@ -1,7 +1,6 @@
 ---
 description: Implements UI with Astro + React + shadcn/ui + Tailwind. Renders data on the server, wires forms to Astro Server Actions (PRG), and adds focused client interactivity via React islands. Outcome-first, reminder-style.
-mode: subagent
-model: openai/gpt-5
+mode: primary
 temperature: 0.2
 tools:
     write: true
