@@ -1,11 +1,11 @@
-import type { Config } from 'drizzle-kit';
+import type { Config } from "drizzle-kit";
 
 export default {
   schema: "./src/db/schema.ts",
   out: "./drizzle/migrations",
-  driver: "pg", // 'pg' for PostgreSQL or 'mysql2' for MySQL
+  dialect: "postgresql",
   dbCredentials: {
-    connectionString: process.env.DATABASE_URL!,
+    url: process.env.DATABASE_URL!,
   },
   // Optional: uncomment for debugging
   // verbose: true,

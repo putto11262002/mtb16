@@ -1,33 +1,33 @@
 {
-  "name": "mtb16",
-  "type": "module",
-  "version": "0.0.1",
-  "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro",
-    "db:push": "drizzle-kit push:pg --config=drizzle.config.ts",
-    "db:migrate": "drizzle-kit migrate:pg --config=drizzle.config.ts"
-  },
-  "dependencies": {
-    "@astrojs/netlify": "^6.5.9",
-    "@astrojs/react": "^4.3.0",
-    "@tailwindcss/vite": "^4.1.12",
-    "@types/react": "^19.1.12",
-    "@types/react-dom": "^19.1.9",
-    "astro": "^5.13.5",
-    "dotenv": "^17.2.2",
-    "drizzle-orm": "^0.44.5",
-    "pg": "^8.16.3",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "tailwindcss": "^4.1.12"
-  },
-  "devDependencies": {
-    "@types/node": "^24.3.0",
-    "@types/pg": "^8.15.5",
-    "drizzle-kit": "^0.31.4",
-    "tsx": "^4.20.5"
-  }
+	"name": "mtb16",
+	"type": "module",
+	"version": "0.0.1",
+	"scripts": {
+		"dev": "astro dev",
+		"build": "astro build",
+		"preview": "astro preview",
+		"astro": "astro",
+		"db:push": "drizzle-kit push",
+		"db:migrate": "drizzle-kit migrate"
+	},
+	"dependencies": {
+		"@astrojs/netlify": "^6.5.9",
+		"@astrojs/react": "^4.3.0",
+		"@tailwindcss/vite": "^4.1.12",
+		"@types/react": "^19.1.12",
+		"@types/react-dom": "^19.1.9",
+		"astro": "^5.13.5",
+		"dotenv": "^17.2.2",
+		"drizzle-orm": "^0.44.5",
+		"pg": "^8.16.3",
+		"react": "^19.1.1",
+		"react-dom": "^19.1.1",
+		"tailwindcss": "^4.1.12"
+	},
+	"devDependencies": {
+		"@types/node": "^24.3.0",
+		"@types/pg": "^8.15.5",
+		"drizzle-kit": "^0.31.4",
+		"tsx": "^4.20.5"
+	}
 }
