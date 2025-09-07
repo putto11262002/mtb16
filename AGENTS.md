@@ -21,10 +21,15 @@ The project uses the following technologies:
 - `src/layouts`: Layout components
 - `src/lib`: Utility functions and libraries
 - `src/styles`: Global styles and Tailwind configuration
-- `src/db`: Database schema and migration files
+- `src/db`: Database schema and migration files (`index.ts` contains the Drizzle DB instance, `schema.ts` exports table objects and types)
+- `src/lib/auth`: Better Auth server and client instances
+- `src/middleware.ts`: Astro middleware for authentication context
 - `src/core`: Core application logic that is framework-agnostic. Organized by feature.
     - `src/core/feature`: Each feature has its own folder containing components, hooks, and related logic.
-- `src/actions`: Astro server actions for handling form submissions and server-side logic
+- `src/actions`: Astro server actions
+    - `src/actions/index.ts`: Aggregates all server actions
+    - `src/actions/<feature>/actions.ts`: Defines actions for a specific feature
+    - `src/actions/<feature>/schema.ts`: Zod schemas for action input validation
 - `scripts`: Helper scripts for setup and maintenance
 
 ## Commands
