@@ -51,58 +51,52 @@
 :root {
   --radius: 0.625rem;
 
-  /* Dim, formal light surfaces */
-  --background: oklch(0.32 0.012 129.7); /* deep jungle (dim light) */
-  --foreground: oklch(0.985 0 0); /* near-white */
+  /* Light mode — greener & dimmer */
+  --background: oklch(0.935 0.022 129.7); /* light olive (less bright) */
+  --foreground: oklch(0.26 0.018 129.7); /* deeper olive text */
 
-  --card: oklch(0.35 0.012 129.7);
-  --card-foreground: oklch(0.985 0 0);
+  --card: oklch(0.945 0.02 129.7); /* slightly lifted surface */
+  --card-foreground: oklch(0.26 0.018 129.7);
 
-  --popover: oklch(0.33 0.012 129.7);
-  --popover-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.945 0.02 129.7);
+  --popover-foreground: oklch(0.26 0.018 129.7);
 
-  /* === Brand Gold (corrected) === */
-  --primary: oklch(0.74 0.17 80); /* true gold / amber */
-  --primary-foreground: oklch(0.145 0 0); /* near-black for legibility */
-
-  /* Supporting tones */
-  --secondary: oklch(0.38 0.012 129.7); /* raised panel */
+  /* Brand (unchanged from dark mode) */
+  --primary: oklch(0.829 0.135 41); /* headline gold */
+  --primary-foreground: oklch(0.207 0.009 126.3);
+  --secondary: oklch(0.27 0.012 129.7); /* deep jungle */
   --secondary-foreground: oklch(0.985 0 0);
 
-  --muted: oklch(0.34 0.01 129.7);
-  --muted-foreground: oklch(0.78 0.015 130); /* soft text on muted */
+  /* Supporting */
+  --muted: oklch(0.9 0.016 129.7); /* olive tint, not gray */
+  --muted-foreground: oklch(0.46 0.016 129.7); /* subdued olive text */
 
-  --accent: oklch(0.41 0.022 151.8); /* teal-camo */
-  --accent-foreground: oklch(0.985 0 0);
+  --accent: oklch(0.88 0.06 54.3); /* khaki wash */
+  --accent-foreground: oklch(0.207 0.009 126.3);
 
-  --destructive: oklch(0.704 0.191 22.216); /* disciplined red */
+  --destructive: oklch(0.577 0.245 27.325);
 
-  /* Controls & outlines */
-  --border: oklch(0.4 0.01 129.7);
-  --input: oklch(0.4 0.01 129.7);
-  --ring: oklch(0.74 0.17 80); /* focus = gold */
+  /* Controls */
+  --border: oklch(0.86 0.014 129.7);
+  --input: oklch(0.86 0.014 129.7);
+  --ring: oklch(0.829 0.135 41); /* brand gold focus */
 
-  /* Charts (brand-cohesive) */
-  --chart-1: oklch(0.74 0.17 80); /* gold */
-  --chart-2: oklch(0.359 0.022 151.8); /* deep teal */
-  --chart-3: oklch(0.62 0.1 55); /* khaki */
-  --chart-4: oklch(0.54 0.08 52); /* sand */
-  --chart-5: oklch(0.43 0.019 52.4); /* olive gray */
+  /* Charts (brand-friendly) */
+  --chart-1: oklch(0.829 0.135 41); /* gold */
+  --chart-2: oklch(0.359 0.022 151.8); /* teal-camo */
+  --chart-3: oklch(0.801 0.088 54.3); /* khaki */
+  --chart-4: oklch(0.725 0.098 51.8); /* sand */
+  --chart-5: oklch(0.434 0.019 52.4); /* olive gray */
 
-  /* Sidebar / header */
-  --sidebar: oklch(0.3 0.012 129.7);
+  /* Sidebar (kept dark header vibe for contrast) */
+  --sidebar: oklch(0.217 0.011 129.7);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.74 0.17 80); /* gold */
-  --sidebar-primary-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.829 0.135 41);
+  --sidebar-primary-foreground: oklch(0.207 0.009 126.3);
   --sidebar-accent: oklch(0.359 0.022 151.8);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.74 0.17 80);
-
-  /* Optional helpers if you want hover/pressed tuned exactly */
-  --gold: oklch(0.74 0.17 80); /* base */
-  --gold-hover: oklch(0.7 0.17 80); /* darker */
-  --gold-press: oklch(0.64 0.16 80); /* darkest */
+  --sidebar-ring: oklch(0.829 0.135 41);
 }
 
 .dark {

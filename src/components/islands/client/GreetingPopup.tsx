@@ -26,7 +26,8 @@ export function GreetingPopup() {
         <DialogHeader>
           <DialogTitle>Welcome to 16th Military Circle</DialogTitle>
           <DialogDescription>
-            Stay informed with the latest news, announcements, and resources from our unit.
+            Stay informed with the latest news, announcements, and resources
+            from our unit.
           </DialogDescription>
         </DialogHeader>
         <div className="flex justify-end">
@@ -38,3 +39,4 @@ export function GreetingPopup() {
 }
 
 export default GreetingPopup;
+
