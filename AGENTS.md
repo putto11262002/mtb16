@@ -1,5 +1,11 @@
-## Tech
+This file outlines the project structure, technologies used, conventions, rules for contributing to the codebase.
+Agents must strictly thoroughly read and ADHERE to the rules and conventions outlined in this document.
 
+## How to use this document
+- Deeply understand the project structure, techology used, rules, and dev workflow before starting any work.
+- When working on specifc technologies e.g. server actions, ui, orm. You MUST read the relevant sections and further read the linked documents.
+
+## Tech
 The project uses the following technologies:
 - Language: TypeScript 5
 - Frontend: Astro 5.13.5, React 19.1.1
@@ -10,6 +16,15 @@ The project uses the following technologies:
 - Hosting: Netlify
 - Package management: pnpm
 - Version control: Git, GitHub
+
+
+## Commands
+
+- `pnpm dev`: Start the development server
+- `pnpm build`: Build the project for production
+- `pnpm preview`: Preview the production build locally
+- `pnpm lint`: Lint the codebase
+- `bash ./scripts/setup-postgres.sh`: Setup a local PostgreSQL database using Docker
 
 ## Project Structure
 
@@ -32,13 +47,6 @@ The project uses the following technologies:
     - `src/actions/<feature>/schema.ts`: Zod schemas for action input validation
 - `scripts`: Helper scripts for setup and maintenance
 
-## Commands
-
-- `pnpm dev`: Start the development server
-- `pnpm build`: Build the project for production
-- `pnpm preview`: Preview the production build locally
-- `pnpm lint`: Lint the codebase
-- `bash ./scripts/setup-postgres.sh`: Setup a local PostgreSQL database using Docker
 
 ## Rules and Conventions
 
