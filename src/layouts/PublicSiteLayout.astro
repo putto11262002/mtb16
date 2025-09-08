@@ -1,0 +1,15 @@
+---
+// src/layouts/HomeLayout.astro
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import NavbarIsland from '@/components/NavbarIsland.astro';
+import Footer from '@/components/Footer.astro';
+---
+
+<BaseLayout>
+  <slot name="head" />
+  <Fragment slot="body">
+    <NavbarIsland />
+    <slot name="body"/>
+    <Footer />
+  </Fragment>
+</BaseLayout>
