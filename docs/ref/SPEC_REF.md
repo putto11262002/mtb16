@@ -1,7 +1,7 @@
 ---
 title: Contentful Website Spec Reference
 description: A single-file, YAML "source of truth" for a Contentful-backed website with an admin panel.
-version: 2.0.0
+version: 3.0.0
 ---
 
 ## 0) Conventions
@@ -9,8 +9,8 @@ version: 2.0.0
 * **IDs:** `kebab-case`, unique within their scope.
 * **Enums:** use lowercase literals listed below.
 * **Dates/Windows:** ISO-8601 dates; reporting windows like `"30d"`.
-* **Placeholders in values:** `:param` (route), `:env` (build/runtime), `:role` (current user role), `:now` (server time).
-* **Layouts:** `layouts[].id` uses `kebab-case`. Every layout MUST declare an `outlet` slot.
+* **Placeholders in values:** only the canonical set in §3.2.
+* **Layouts:** `layouts[].id` uses `kebab-case`. Every layout MUST declare an `outlet` slot. Layouts share the same schema as pages for `params`, `data`, `blocks`, `acl`, and `metrics`, but are **not routes**.
 
 ---
 
@@ -27,7 +27,7 @@ pages: []          # array of pages; outcomes, blocks, data, actions, ACL, metri
 content_model:
   types: []        # array of content types
 # acceptance: []   # optional: brief, binary top-level checks
-```
+````
 
 ---
 
@@ -42,7 +42,9 @@ meta:
   spec_id: web-001              # string
   name: "Unit Website"          # string
   version: 0.1.0                # string (semver suggested)
-  source_brief: docs/product-brief.md
+  source_brief: 
+     path: docs/PRODUCT_BRIEF.md  # optional string
+     version: 0.1.0              # optional string
   metrics:                      # optional global KPIs (few, high-level)
     - id: kpi-post-cadence
       desc: "≥ 4 posts/month"
@@ -151,36 +153,37 @@ pages:
     outcomes:                                              # optional, specific outcomes
       - "Users find a relevant post within 2 clicks"
     params: []                                             # route params if any
-    data:                                                  # declarative queries (see grammar)
+    data:                                                  # declarative queries (see §3)
       queries:
         q_recent:
           mode: many                 # enum: [one, many, count, aggregate]
           type: "newsArticle"
           by: slug                   # enum: [id, slug]
-          where:                     # AND of predicates
+          where:                     # AND of predicates by default; see boolean logic in §3.1
             - field: "publishedAt"
-              op: lt                 # enum: [eq, ne, in, gt, lt, contains, matches]
+              op: lt                 # enum: §3.1
               value: ":now"
           sort: "-publishedAt"
           limit: 12
           offset: 0
           select: ["title","slug","seo"]                   # optional projection
           include: ["author","unit"]                       # expand relations
+          includeDepth: 1                                   # optional; default 1 (max 2 recommended)
           locale: "th-TH"                                  # optional
-    blocks:                                                # semantic, not visual
-      - type: list                                         # enum: [list, detail, content, media, form, cta]
+    blocks:                                                # semantic, not visual (see §2.6.2)
+      - type: collection                                   # canonical types: collection|entity|content|media|action-point|nav
         uses: { query: q_recent }                          # per-type contract (see §2.6.2)
         empty_state: "No content yet"                      # optional
-    actions:                                               # first-class mutations
+    actions:                                               # first-class mutations (see §4)
       - id: submit_contact
         intent: "Store inquiry and notify staff"
         operation: create          # enum: [create, update, delete, publish, custom]
         on: "supportRequest"       # content type id or "custom"
         input:
           schema_ref: content_model.types.supportRequest   # or null
-          # OR explicit fields if no schema_ref:
-          # fields: [ { id: "email", type: Email, required: true } ]
-        acl: { allowed_roles: ["public","editor","admin"] }
+        acl:
+          allowed_roles: ["public","editor","admin"]
+          # rule: 'input.userId == :user.id'               # optional expression; see §5
         effects:
           writes: ["supportRequest"]                       # resources touched
           revalidate: ["/support/:id"]                     # optional
@@ -191,9 +194,11 @@ pages:
     seo:
       index: true
       title_tmpl: "News – %s"
-      derive_from: "q_post.seo"                            # or "type.field"
+      derive_from: "q_post.seo"                            # or "type.field" (see note below)
     acl:                                                   # OPTIONAL (see §5 for inheritance)
       visibility: ["public"]                               # or ["authenticated"] or role IDs
+      # Optional visibility expression (no content.* here):
+      # visibility_rule: '"editor" in :user.roles || "admin" in :user.roles'
       actions:
         visit: ["public","editor","admin"]
         use_action: { submit_contact: ["public","editor","admin"] }  # per-action gate
@@ -201,32 +206,52 @@ pages:
     metrics:                                               # analytics goals (behavioral)
       - id: m-newslist-bounce
         event: "bounce_rate"                               # GA4 or custom event name
-        target: "<=40%"                                    # comparator literal, e.g. "<=40%" or ">=90s"
+        target: "<=40%"
         source: "GA4|custom"
         segment: "all|organic|<segment_id>"                # optional
         window: "30d"
 ```
 
-#### 2.6.2 Block Taxonomy & `uses` Shapes
+**SEO `derive_from` note:** may reference `queryId.fieldPath` (e.g., `q_post.seo`) or a content field path literal `type.field` (used when the page’s canonical entity is obvious).
 
-* **`list`** — render many entries
-  `uses: { query: <query_id> }` *(query `mode` SHOULD be `many` or `count|aggregate` for summaries)*
+#### 2.6.2 Block Semantics (Contracts & When to Use)
 
-* **`detail`** — render one entry
-  `uses: { query: <query_id> }` *(query `mode` MUST be `one`)*
+> Blocks are **semantic outputs**—they describe *what the page should deliver*, not specific UI widgets.
 
-* **`content`** — static copy or settings content
-  `uses: { source: "settings.<path>" | text: "<inline>" }`
+* **`collection`** — render a set of items.
 
-* **`media`** — hero, gallery, or single **file**
-  `uses: { query: <query_id>, field: "<fileFieldPath>" }` **or** `uses: { from: "<query_id.fieldPath>" }`
+  * **Contract:** `uses: { query: <query_id> }` *(query `mode` SHOULD be `many` or `count|aggregate` for summaries)*
+  * **Validations:** bound query exists; `mode ∈ [many,count,aggregate]`.
+  * **When:** lists, feeds, tables, grids, archives.
 
-* **`form`** — user input; must map to `actions.<id>`
-  `action_id: <action_id>`
-  Optional: `prefill: { query: <query_id> }`, `success_state`, `error_state`
+* **`entity`** — render a single item.
 
-* **`cta`** — navigational/action triggers
-  `uses: { route: "<path>" }` **or** `uses: { action_id: "<action_id>" }`
+  * **Contract:** `uses: { query: <query_id> }` *(query `mode` MUST be `one`)*
+  * **Validations:** query `mode=one`.
+  * **When:** detail pages, single-record views.
+
+* **`content`** — static copy or settings content.
+
+  * **Contract:** `uses: { source: "settings.<path>" | text: "<inline>" }`
+  * **When:** headings, legal text, footers, banners, labels.
+
+* **`media`** — file output (image/video/document).
+
+  * **Contract:** `uses: { query: <query_id>, field: "<fileFieldPath>" }` **or** `uses: { from: "<query_id.fieldPath>" }`
+  * **When:** hero images, galleries, attachments.
+
+* **`action-point`** — interaction surface that can collect input and invoke an action.
+
+  * **Contract:** `action_id: <action_id>`; optional `prefill: { query: <query_id> }`, `success_state`, `error_state`.
+  * **Validations:** referenced action exists.
+  * **When:** forms, buttons that submit data, multi-step inputs.
+
+* **`nav`** — navigation or action trigger without data entry.
+
+  * **Contract:** `uses: { route: "<path>" }` **or** `uses: { action_id: "<action_id>" }`
+  * **When:** CTAs, next/prev, simple triggers.
+
+**Deprecated names removed in v3.0.0:** `list`, `detail`, `form`, `cta`.
 
 ---
 
@@ -248,13 +273,15 @@ layouts:
           - { type: content, uses: { text: "Unit Website" } }
       sidebar:
         blocks:
-          - { type: list, uses: { query: q_recent_news } }
+          - { type: collection, uses: { query: q_recent_news } }
       outlet: {}                         # REQUIRED: where the nested page renders
       footer:
         blocks:
           - { type: content, uses: { text: "© Unit" } }
     acl:                                 # optional guard for all pages using this layout
       visibility: ["public"]
+      # Optional visibility expression (no content.* here):
+      # visibility_rule: '"public" in :user.roles || :role == "public"'
     metrics:                             # optional; same grammar as §7
       - { id: m-layout-nav-CTR, event: "nav_click", target: ">=3%", source: "GA4", window: "30d" }
 ```
@@ -262,15 +289,14 @@ layouts:
 **Rules**
 
 * Every layout MUST declare an `outlet` slot.
-* `data.queries` & `blocks` follow §3 and §2.6.2; query ids are **scoped to the layout** (pages can’t reference layout queries directly).
+* `data.queries` & `blocks` follow §3 and §2.6.2; query ids are **scoped to the layout** (pages can’t reference layout queries).
 * **Attach via `sitemap.layout`**; order = outer→inner. The page renders inside the last layout’s `outlet`.
 * **Inheritance:** Children inherit parent layouts unless they provide their own `layout` (which replaces the chain).
-* **ACL:** Layout `acl` uses **visibility** only. It constrains all nested pages (see §5).
-* Keep ≤ 3 layout-level metrics (80/20).
+* **ACL:** Layout `acl` uses **visibility** (and optional `visibility_rule`) only. It constrains all nested pages (see §5).
 
 ---
 
-## 3) Data Query Grammar (Detailed)
+## 3) Data Query Grammar (Formal)
 
 ```yaml
 data:
@@ -278,27 +304,95 @@ data:
     q_example:
       mode: many             # enum: [one, many, count, aggregate]
       type: "content_type_id"
-      by: slug               # enum: [id, slug]
-      where:                  # array => AND
+      by: slug               # enum: [id, slug] (sugar for equality on sys.id or slug)
+      where:                  # AND-list by default; see §3.1 for grouped boolean logic
         - field: "slug"
-          op: eq             # enum: [eq, ne, in, gt, lt, contains, matches]
-          value: ":param"
+          op: eq             # enum: see §3.1
+          value: ":param.slug"
       sort: "-publishedAt"
       limit: 10
       offset: 0
-      select: ["title","slug"]
-      include: ["author"]     # expand relations
-      locale: "th-TH"
-      # aggregate: { func: count, field: "views" }  # only when mode=aggregate
+      select: ["title","slug"]       # whitelist of fields
+      include: ["author"]            # expand relations
+      includeDepth: 1                # optional (default 1, max 2 recommended)
+      locale: "th-TH"                # optional
+      # aggregate (only when mode=aggregate)
+      # aggregate:
+      #   measures: [ { func: count, field: "*" }, { func: sum, field: "views" } ]
+      #   group_by: ["unit.id"]
+      #   having:
+      #     - { field: "count", op: gt, value: 0 }
 ```
 
-**Rules**
+### 3.1 Formal Mini-Grammar (concise)
 
-* Applies to both `pages[].data` and `layouts[].data`. Query ids are scoped to their owner.
-* `mode=one` SHOULD yield exactly one entry (enforced by `where/by`).
-* `by` is syntactic sugar for a single `where` on `sys.id` or `slug`.
-* `include` expands declared **relations** and embeds related entries in the result.
-* Placeholders allowed in `value`: `:slug` (from route), `:now`, etc.
+```
+query := {
+  mode: one|many|count|aggregate,
+  type: <content_type_id>,
+  by?: id|slug,
+  where?: predicates | logic,
+  sort?: "<field>" | "-<field>",
+  limit?: int, offset?: int,
+  select?: string[],
+  include?: string[], includeDepth?: 1|2,
+  locale?: string,
+  aggregate?: {
+    measures: {func: count|sum|avg|min|max, field: string|"*"}[],
+    group_by?: string[],
+    having?: predicates | logic
+  }
+}
+
+# Predicates and boolean logic
+predicates := [ predicate, ... ]          # implicit AND
+logic := { and?: (predicate|logic)[], or?: (predicate|logic)[], not?: (predicate|logic) }
+
+predicate := {
+  field: string,                          # field path
+  op: op,
+  value?: literal | placeholder | array
+  quantifier?: any|all                    # optional: for array/relation fields
+}
+
+op := eq|ne|gt|gte|lt|lte|in|nin|contains|starts_with|ends_with|matches|exists|between
+
+literal := string | number | boolean | null | datetime
+array := [ literal | placeholder, ... ]
+```
+
+**Notes**
+
+* A top-level `where: []` means no filter (i.e., all).
+* `quantifier` applies when the `field` is an array or relation collection.
+* `matches` is an engine-regex match (implementation-defined syntax).
+* `mode=one` SHOULD yield exactly 1 entry; otherwise it’s a spec error.
+* If both `by` and `where` are present, they must be consistent.
+
+### 3.2 Placeholder Variables (canonical)
+
+Allowed everywhere a `value` appears:
+
+* `:now` — current server time (ISO-8601)
+* `:locale` — effective locale (BCP 47)
+* `:role` — primary role id of current principal
+* `:user.id` — authenticated user id (or `null`)
+* `:user.roles[]` — array of role ids for the current user (may be empty)
+* `:param.<name>` — route param value from `sitemap.path`
+* `:query.<id>.<fieldPath>` — value from an earlier query in the **same** page/layout scope
+
+**Disallowed:** `:env.*` (implementation-specific; excluded)
+
+**Validation**
+
+* Unknown placeholder prefixes → error.
+* `:query.*` cannot create cycles; must reference an earlier query id in declaration order.
+
+### 3.3 Sorting, Pagination, Locales
+
+* **Sorting:** `sort` is a single key ascending (`"field"`) or descending (`"-field"`). For stable pagination, include a deterministic tiebreaker in your schema (e.g., `createdAt` + primary key).
+* **Pagination:** `limit`/`offset` only. (**No cursor paging** in v3.0.0.)
+* **Locales:** precedence is query-level `locale` > page/layout default (if provided) > system default.
 
 ---
 
@@ -312,10 +406,10 @@ actions:
     on: "supportRequest"     # content type id or "custom"
     input:
       schema_ref: content_model.types.supportRequest
-      # OR use fields instead of schema_ref:
-      # fields: [ { id: "email", type: Email, required: true } ]
+      # OR: fields: [ { id: "email", type: Email, required: true } ]
     acl:
       allowed_roles: ["public","editor","admin"]
+      # rule: 'input.userId == :user.id'   # optional expression; see §5
     effects:
       writes: ["supportRequest"]
       revalidate: ["/support/:id"]
@@ -325,31 +419,119 @@ actions:
     rate_limit: { window: "1m", max: 5 }
 ```
 
-**Form binding:** A `form` block MUST reference a valid `actions.<id>` via `action_id`.
+**Form binding (via block):** An `action-point` block MUST reference a valid `actions.<id>` via `action_id`.
 
 ---
 
-## 5) ACL Model
+## 5) ACL Model (Roles + Optional Expressions)
+
+**Overview**
 
 * **Roles registry:** `roles[].id` is the only source of truth for role names.
-* **Layouts ACL:** optional `visibility` list; constrains all nested pages that attach the layout (directly or via inheritance).
-* **Pages ACL (optional):**
+* **Two layers:** (1) Role lists, (2) Optional expression rules. If both are present for the same check, **both must pass** (logical AND).
 
-  * If `pages[].acl` is **omitted**, the page **inherits** visibility from the attached layout chain (outer→inner) — i.e., effective visibility equals the **intersection** of all attached layouts’ `acl.visibility`.
-  * If `pages[].acl` is **present**, effective visibility equals the **intersection** of all attached layouts’ `acl.visibility` and the page’s `acl.visibility` (stricter wins).
-  * `actions` (e.g., `visit`, `use_action`, `manage_modules`) are optional; when not specified, defaults are:
+### 5.1 Layouts & Pages
 
-    * `visit`: the page’s effective visibility list.
-    * `use_action`: allowed roles are the **intersection** of the page’s `visit` roles and each action’s `acl.allowed_roles` (from §4). If page ACL omitted, use the inherited `visit` roles from layouts.
-* **Content types ACL (`content_model.types[].acl`):**
+```yaml
+layouts[].acl:
+  visibility?: ["public" | "authenticated" | <roleId> ...]
+  visibility_rule?: <expr>             # optional; no content.* context
 
-  * `read`, `create`, `update`, `publish`: arrays of roles.
-* **Actions ACL:** `actions[].acl.allowed_roles` always applies.
+pages[].acl:
+  visibility?: ["public" | "authenticated" | <roleId> ...]
+  visibility_rule?: <expr>             # optional; no content.* context
+  actions?:                            # optional fine-grained
+    visit?: <roleId[]>
+    use_action?: { <actionId>: <roleId[]> }
+    manage_modules?: <roleId[]>
+```
 
-**Validation Rules**
+**Inheritance & Effective Visibility**
 
-* Every role referenced MUST exist in `roles`.
-* `pages[].acl.use_action` keys MUST reference declared `actions[].id` on the same page.
+* If `pages[].acl` is omitted, the page inherits visibility from attached layouts (outer→inner). Effective visibility = **intersection** of all attached layouts’ visibility (and layout `visibility_rule` if present).
+* If `pages[].acl` is present, effective visibility = intersection of attached layouts’ visibility (and rules) **and** the page’s `visibility` (and rule, if present).
+
+**Page/Layout expression context**
+
+* Allowed refs: `:user.id`, `:user.roles`, `:role`, `:locale`, `:now`, `:param.<name>`.
+* **Forbidden:** `content.*` (no record context at page/layout visibility).
+
+### 5.2 Content Types
+
+```yaml
+content_model.types[].acl:
+  read?:   <roleId[]>
+  create?: <roleId[]>
+  update?: <roleId[]>
+  publish?:<roleId[]>
+  rule?:   # optional per-operation expressions
+    read?:    <expr>
+    create?:  <expr>
+    update?:  <expr>
+    publish?: <expr>
+```
+
+**Content expression context**
+
+* Allowed refs: `content.<fieldPath>`, `:user.id`, `:user.roles`, `:role`, `:locale`, `:now`, `:param.<name>`.
+* **Semantics:** A request must satisfy the role list **and** the operation’s rule if both are present.
+
+### 5.3 Actions
+
+```yaml
+actions[].acl:
+  allowed_roles?: <roleId[]>
+  rule?: <expr>    # may reference input.<fieldPath>
+```
+
+**Action expression context**
+
+* Allowed refs: `input.<fieldPath>`, `:user.id`, `:user.roles`, `:role`, `:locale`, `:now`, `:param.<name>`.
+* **Semantics:** Both `allowed_roles` and `rule` must pass if both provided.
+
+### 5.4 Expression Grammar (minimal, deterministic)
+
+```
+expr     := orExpr
+orExpr   := andExpr { "||" andExpr }
+andExpr  := unaryExpr { "&&" unaryExpr }
+unaryExpr:= [ "!" ] primary
+primary  := literal | ref | "(" expr ")" | call
+literal  := string | number | boolean | null | datetime
+ref      := contentRef | userRef | paramRef | specialRef | inputRef
+contentRef:= "content." fieldPath          # only in content type rules
+userRef  := ":user.id" | ":user.roles"
+paramRef := ":param." ident
+specialRef:= ":role" | ":locale" | ":now"
+inputRef := "input." fieldPath             # only in action rules
+call     := ident "(" args? ")"
+args     := expr { "," expr }
+ops      := "==" "!=" ">" ">=" "<" "<=" "in" "nin" "contains" "starts_with" "ends_with"
+builtins := exists(fieldPath) | length(value)
+```
+
+**Examples**
+
+```yaml
+# Content rule: public read only when published or after embargo
+rule:
+  read: 'content.published == true || :now >= content.embargoAt'
+
+# Content rule: only owner or admin can update
+rule:
+  update: 'content.owner == :user.id || "admin" in :user.roles'
+
+# Page visibility: editors or admins
+visibility_rule: '"editor" in :user.roles || "admin" in :user.roles'
+
+# Action rule: caller can only update their own profile
+rule: 'input.userId == :user.id'
+```
+
+**Validation**
+
+* Unknown identifiers or context-forbidden refs → error.
+* String ops require string operands; `in`/`nin` require RHS array/set.
 
 ---
 
@@ -374,6 +556,9 @@ content_model:
         create: ["editor","admin"]
         update: ["editor","admin"]
         publish: ["editor","admin"]
+        rule:
+          read: 'content.published == true || :now >= content.embargoAt'
+          update: 'content.owner == :user.id || "admin" in :user.roles'
 
     - id: unit
       name: "Unit"
@@ -449,7 +634,7 @@ content_model:
     inverse: "<fieldId>"                             # optional, documentation-only
   ```
 * **`array`**:
-  `items: { type: <primitive> }` where \*\*primitive ∈ { text, varchar, int, float, boolean, datetime, enum }\`
+  `items: { type: <primitive> }` where **primitive ∈ { text, varchar, int, float, boolean, datetime, enum }**
 * **`json`**: free-form; optional `shape` (documentation-only)
 
 ---
@@ -479,17 +664,26 @@ metrics:
 * **Routes → pages:** every `sitemap.page_id` exists in `pages[].id`.
 * **Sitemap → layouts:** all `sitemap[].layout` refs exist in `layouts[].id`; chains are acyclic.
 * **Layouts:** every `layouts[].slots` contains `outlet`.
-* **Page queries:** `blocks[].uses.query` references `data.queries.<id>`.
+* **Page queries:** `blocks[].uses.query` references `data.queries.<id>` in the same page; layout queries are not referenceable by pages.
 * **Block contracts:**
 
-  * `detail` → bound query `mode=one`.
-  * `list` → bound query `mode=many|count|aggregate`.
-  * `form` → has valid `action_id`.
+  * `entity` → bound query `mode=one`.
+  * `collection` → bound query `mode ∈ many|count|aggregate`.
+  * `action-point` → has valid `action_id`.
   * `media` → has `field` or `from`.
-* **Roles:** all ACL role IDs exist in `roles`.
-* **Actions:** `use_action` keys exist in `actions[].id`.
-* **ACL effective visibility:** computed as intersection of attached layouts’ `visibility`, and page `visibility` if provided.
-* **Field types & options:**
+* **Placeholders:** only allowed set (§3.2). `:query.*` is acyclic and references earlier queries.
+* **Queries:**
+
+  * If `mode=one`, result cardinality must be exactly 1.
+  * If `by` is present with `where`, they must be consistent.
+  * `limit`/`offset` only; **no cursor**.
+* **ACL:**
+
+  * All role ids used exist in `roles`.
+  * Page/layout `visibility_rule` must not reference `content.*`.
+  * Content rules may reference `content.*`.
+  * When both roles and rule exist, both must pass.
+* **Content model fields:**
 
   * `enum.values` non-empty; all distinct lowercase strings.
   * When `type: varchar`, `max_length` present (default 255 if omitted).
@@ -542,7 +736,7 @@ pages:
       queries:
         q_recent: { mode: many, type: newsArticle, sort: "-publishedAt", limit: 3 }
     blocks:
-      - { type: list, uses: { query: q_recent } }
+      - { type: collection, uses: { query: q_recent } }
     seo: { index: true, title_tmpl: "%s – Unit" }
     metrics:
       - { id: m-home-news-CTR, event: "click_news_teaser", target: ">=3.5%", source: "GA4", window: "28d" }
@@ -556,10 +750,10 @@ pages:
           mode: one
           type: newsArticle
           by: slug
-          where: [{ field: "slug", op: eq, value: ":slug" }]
+          where: [{ field: "slug", op: eq, value: ":param.slug" }]
           include: ["author"]
     blocks:
-      - { type: detail, uses: { query: q_post } }
+      - { type: entity, uses: { query: q_post } }
       - { type: media,  uses: { from: "q_post.heroImage" } }
     seo: { derive_from: "q_post.seo" }
     metrics:
@@ -582,6 +776,9 @@ content_model:
         create: ["editor","admin"]
         update: ["editor","admin"]
         publish: ["editor","admin"]
+        rule:
+          read: 'content.published == true || :now >= content.embargoAt'
+          update: 'content.owner == :user.id || "admin" in :user.roles'
 ```
 
 ---
@@ -590,7 +787,7 @@ content_model:
 
 * **Add a new feature:** add to `features[]` with `success[]`.
 * **Infer types/routes/layouts:** design `content_model.types[]`, `sitemap[]`, and `layouts[]`.
-* **Define a page:** write outcomes → declare `data.queries` → add `blocks` → wire `actions` (if needed) → (optional) set `acl` → add `metrics`.
+* **Define a page:** write outcomes → declare `data.queries` → add **semantic** `blocks` (`collection|entity|content|media|action-point|nav`) → wire `actions` (if needed) → (optional) set `acl`/`visibility_rule` → add `metrics`.
 * **Attach a layout:** define `layouts[]` with an `outlet`, then reference it via `sitemap.layout` (array order = outer→inner).
 * **Lint:** run checks per §8; ensure all references resolve.
 
@@ -629,3 +826,29 @@ content_model:
 - Replace `Asset` fields with `file` using the documented file object shape and validations.
 - Replace `Reference { to: [...] }` with `relation { to: <typeId>, cardinality: ..., on_delete: ... }`.
 - Ensure `array.items.type` is a primitive (`text|varchar|int|float|boolean|datetime|enum`).
+
+
+## 3.0.0 — 2025-09-10
+
+### Summary
+Major spec refresh emphasizing semantic blocks, formalized queries, and a minimal but expressive ACL model.
+
+### Changes
+- **Blocks:** Introduced canonical semantic block types: `collection`, `entity`, `content`, `media`, `action-point`, `nav`.
+- **Queries (§3):** Added a concise formal grammar with boolean logic (`and/or/not`), extended operators (`eq, ne, gt, gte, lt, lte, in, nin, contains, starts_with, ends_with, matches, exists, between`), and optional `quantifier: any|all` for arrays/relations. Kept `limit`/`offset` pagination only.
+- **Placeholders (§3.2):** Canonicalized allowed placeholders (`:now`, `:locale`, `:role`, `:user.id`, `:user.roles[]`, `:param.<name>`, `:query.<id>.<fieldPath>`). **Removed `:env.*`.**
+- **Layouts (§2.7):** Clarified schema parity with pages and scoping of layout queries.
+- **ACL (§5):** Added optional expression rules for pages/layouts (visibility rules, no `content.*`) and for content types (rules may reference `content.*`). Added action rules with `input.*`. Roles and rules compose with logical AND.
+
+### Breaking Changes
+- Removed deprecated block names: **`list`, `detail`, `form`, `cta`**. Use `collection`, `entity`, `action-point`, `nav`.
+- Page/layout ACL expressions **cannot** reference `content.*`.
+
+### Not Added
+- No cursor paging; only `limit`/`offset`.
+- No computed `select` expressions.
+
+### Migration Notes
+- Replace old block names with canonical ones.
+- Remove any use of `:env.*` placeholders.
+- If relying on complex page-level content logic, move it into content-type ACL `rule` expressions where `content.*` is available, or into queries and page data.
