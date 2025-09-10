@@ -1,7 +1,7 @@
 ---
 title: Contentful Website Spec Reference
 description: A single-file, YAML "source of truth" for a Contentful-backed website with an admin panel.
-version: 1.0.1
+version: 2.0.0
 ---
 
 ## 0) Conventions
@@ -165,7 +165,7 @@ pages:
           limit: 12
           offset: 0
           select: ["title","slug","seo"]                   # optional projection
-          include: ["author","unit"]                       # expand refs
+          include: ["author","unit"]                       # expand relations
           locale: "th-TH"                                  # optional
     blocks:                                                # semantic, not visual
       - type: list                                         # enum: [list, detail, content, media, form, cta]
@@ -218,8 +218,8 @@ pages:
 * **`content`** — static copy or settings content
   `uses: { source: "settings.<path>" | text: "<inline>" }`
 
-* **`media`** — hero, gallery, or single asset
-  `uses: { query: <query_id>, field: "<assetFieldPath>" }` **or** `uses: { from: "<query_id.fieldPath>" }`
+* **`media`** — hero, gallery, or single **file**
+  `uses: { query: <query_id>, field: "<fileFieldPath>" }` **or** `uses: { from: "<query_id.fieldPath>" }`
 
 * **`form`** — user input; must map to `actions.<id>`
   `action_id: <action_id>`
@@ -287,7 +287,7 @@ data:
       limit: 10
       offset: 0
       select: ["title","slug"]
-      include: ["author"]
+      include: ["author"]     # expand relations
       locale: "th-TH"
       # aggregate: { func: count, field: "views" }  # only when mode=aggregate
 ```
@@ -297,6 +297,7 @@ data:
 * Applies to both `pages[].data` and `layouts[].data`. Query ids are scoped to their owner.
 * `mode=one` SHOULD yield exactly one entry (enforced by `where/by`).
 * `by` is syntactic sugar for a single `where` on `sys.id` or `slug`.
+* `include` expands declared **relations** and embeds related entries in the result.
 * Placeholders allowed in `value`: `:slug` (from route), `:now`, etc.
 
 ---
@@ -361,13 +362,13 @@ content_model:
       name: "News Article"
       localized: true
       fields:
-        - { id: title,       type: ShortText, required: true, localized: true }
-        - { id: slug,        type: Slug, unique: true }
-        - { id: excerpt,     type: LongText, localized: true }
-        - { id: body,        type: RichText, localized: true }
-        - { id: heroImage,   type: Asset, validations: [{ mime_group: "image" }] }
-        - { id: publishedAt, type: DateTime, required: true }
-        - { id: seo,         type: Object, shape: { title: ShortText, ogImage: Asset } }
+        - { id: title,       type: varchar, required: true, localized: true, max_length: 255 }
+        - { id: slug,        type: varchar, unique: true, max_length: 255 } # optional: pattern validation
+        - { id: excerpt,     type: text, localized: true }
+        - { id: body,        type: text, localized: true, format: "markdown" }
+        - { id: heroImage,   type: file, validations: { mime_types: ["image/*"], max_size: 5242880 } }
+        - { id: publishedAt, type: datetime, required: true, default: ":now" }
+        - { id: seo,         type: json, shape: { title: "varchar", ogImage: "file" } }
       acl:
         read: ["public"]
         create: ["editor","admin"]
@@ -377,8 +378,12 @@ content_model:
     - id: unit
       name: "Unit"
       fields:
-        - { id: name,   type: ShortText, required: true }
-        - { id: parent, type: Reference, to: ["unit"] }     # self-reference
+        - { id: name,   type: varchar, required: true, max_length: 255 }
+        - id: parent
+          type: relation
+          to: "unit"
+          cardinality: many-to-one
+          on_delete: nullify
       acl:
         read: ["public"]
         create: ["admin"]
@@ -388,11 +393,15 @@ content_model:
     - id: person
       name: "Person"
       fields:
-        - { id: name,     type: ShortText, required: true }
-        - { id: rank,     type: ShortText }
-        - { id: role,     type: ShortText }
-        - { id: portrait, type: Asset }
-        - { id: unit,     type: Reference, to: ["unit"] }
+        - { id: name,     type: varchar, required: true, max_length: 255 }
+        - { id: rank,     type: varchar, max_length: 255 }
+        - { id: role,     type: varchar, max_length: 255 }
+        - { id: portrait, type: file, validations: { mime_types: ["image/*"] } }
+        - id: unit
+          type: relation
+          to: "unit"
+          cardinality: many-to-one
+          on_delete: restrict
       acl:
         read: ["public"]
         create: ["admin"]
@@ -400,11 +409,48 @@ content_model:
         publish: ["admin"]
 ```
 
-**Field Types (enum):** `ShortText | LongText | RichText | Slug | Asset | Reference | Array | DateTime | Object | Boolean | Integer | Float | JSON`
-**For `Reference`:** `to: ["<typeId>", ...]`
-**For `Array`:** `items: { type: <FieldType>, ... }`
-**For `Object`:** `shape: { <field>: <FieldType>, ... }`
-**Validations (examples):** `matches`, `mime_group`, `min`, `max`, `enum`, `unique`.
+**Field Types (enum):** `text | varchar | int | float | boolean | datetime | enum | file | relation | array | json`
+
+**Global Field Options (unless noted):**
+
+* `required: boolean`
+* `unique: boolean`
+* `default: <literal | expression>` (e.g., `":now"` for `datetime`)
+* `nullable: boolean` (optional)
+* `index: boolean` (optional)
+
+**Type-Specific Options & Shapes:**
+
+* **`varchar`**: `max_length` (default **255** if omitted)
+* **`text`**: optional `format` (e.g., `"markdown"`)
+* **`int` / `float`**: `min`, `max`
+* **`datetime`**: ISO-8601 date-time with timezone; `default` may be `":now"`
+* **`enum`**: `values: ["a","b","c"]` (distinct, lowercase strings)
+* **`file`**: object shape
+
+  ```yaml
+  file:
+    id: string
+    filename: string
+    url: string
+    size: number
+    mimeType: string
+    createdAt: datetime
+  ```
+
+  Validations: `mime_types: ["image/*", "application/pdf", ...]`, `max_size: <bytes>`
+* **`relation`**:
+
+  ```yaml
+  relation:
+    to: "<typeId>"
+    cardinality: "one-to-one" | "one-to-many" | "many-to-one" | "many-to-many"
+    on_delete: "restrict" | "cascade" | "nullify"   # optional
+    inverse: "<fieldId>"                             # optional, documentation-only
+  ```
+* **`array`**:
+  `items: { type: <primitive> }` where \*\*primitive ∈ { text, varchar, int, float, boolean, datetime, enum }\`
+* **`json`**: free-form; optional `shape` (documentation-only)
 
 ---
 
@@ -443,6 +489,14 @@ metrics:
 * **Roles:** all ACL role IDs exist in `roles`.
 * **Actions:** `use_action` keys exist in `actions[].id`.
 * **ACL effective visibility:** computed as intersection of attached layouts’ `visibility`, and page `visibility` if provided.
+* **Field types & options:**
+
+  * `enum.values` non-empty; all distinct lowercase strings.
+  * When `type: varchar`, `max_length` present (default 255 if omitted).
+  * When `type: relation`, `to` targets an existing `types[].id` and `cardinality` is valid.
+  * When `type: file`, validations (if provided) use supported keys (`mime_types`, `max_size`).
+  * Any `unique: true` field must be indexable (implicit or explicit).
+  * `array.items.type` must be a **primitive** (`text|varchar|int|float|boolean|datetime|enum`).
 
 ---
 
@@ -498,7 +552,12 @@ pages:
     params: ["slug"]
     data:
       queries:
-        q_post: { mode: one, type: newsArticle, by: slug, where: [{ field: "slug", op: eq, value: ":slug" }], include: ["author"] }
+        q_post:
+          mode: one
+          type: newsArticle
+          by: slug
+          where: [{ field: "slug", op: eq, value: ":slug" }]
+          include: ["author"]
     blocks:
       - { type: detail, uses: { query: q_post } }
       - { type: media,  uses: { from: "q_post.heroImage" } }
@@ -512,12 +571,12 @@ content_model:
       name: "News Article"
       localized: true
       fields:
-        - { id: title,       type: ShortText, required: true, localized: true }
-        - { id: slug,        type: Slug, unique: true }
-        - { id: body,        type: RichText, localized: true }
-        - { id: heroImage,   type: Asset, validations: [{ mime_group: "image" }] }
-        - { id: publishedAt, type: DateTime, required: true }
-        - { id: seo,         type: Object, shape: { title: ShortText, ogImage: Asset } }
+        - { id: title,       type: varchar, required: true, localized: true, max_length: 255 }
+        - { id: slug,        type: varchar, unique: true, max_length: 255 }
+        - { id: body,        type: text, localized: true, format: "markdown" }
+        - { id: heroImage,   type: file, validations: { mime_types: ["image/*"] } }
+        - { id: publishedAt, type: datetime, required: true, default: ":now" }
+        - { id: seo,         type: json, shape: { title: "varchar", ogImage: "file" } }
       acl:
         read: ["public"]
         create: ["editor","admin"]
@@ -548,3 +607,25 @@ content_model:
   - Quoted dotted paths and placeholders where necessary.
   - No schema/semantic changes to the reference itself; examples only.
 
+## v2.0.0 - Content model definition refinement
+
+### Changed
+- Replaced field type system with: text, varchar, int, float, boolean, datetime, enum, file, relation, array, json.
+- Added global Field Options (required, unique, default, nullable, index) and type-specific options.
+- Defined `file` object shape (id, filename, url, size, mimeType, createdAt: datetime).
+- Introduced `relation` with explicit cardinality and optional on_delete/inverse.
+- Clarified query language: `include` now expands relations.
+- Updated examples and block/docs text from Asset/Reference/Object/DateTime to File/Relation/JSON/Datetime equivalents.
+
+### Breaking Changes
+- `Asset` → `file`; `Reference` → `relation`; `Object` → `json`; `DateTime` → `datetime`.
+- Removed legacy types (`Slug`, `ShortText`, `LongText`, `RichText`, `Integer`, `Float`, `Boolean`) in favor of new set.
+- Media block wording now references files instead of assets.
+
+### Migration Notes
+- Replace `Slug` with `varchar` + `unique: true` (+ optional `pattern` validation).
+- Map `RichText` to `text` (e.g., `format: "markdown"`) unless a structured editor is required (use `json`).
+- Convert `DateTime` fields to `datetime` (ISO-8601 timestamp); keep `default: ":now"` where applicable.
+- Replace `Asset` fields with `file` using the documented file object shape and validations.
+- Replace `Reference { to: [...] }` with `relation { to: <typeId>, cardinality: ..., on_delete: ... }`.
+- Ensure `array.items.type` is a primitive (`text|varchar|int|float|boolean|datetime|enum`).
