@@ -1,7 +1,36 @@
 ---
 title: Contentful Website Spec Reference
 description: A single-file, YAML "source of truth" for a Contentful-backed website with an admin panel.
-version: 3.0.0
+version: 4.0.0
+---
+
+## Introduction
+
+> **Purpose:** A single-file, YAML “source of truth” for a Contentful-backed website with an admin panel.  
+> **Order of truth:** 1) `features` (upstream, outcome-based) → 2) infer `content_model`, `sitemap`, and `layouts` → 3) define `pages` (blocks, data, ACL, metrics).
+
+This document is organized into the following sections:
+
+0. **Conventions** — global rules for IDs, enums, dates, placeholders, layouts, and auth modeling.  
+1. **Top-Level Structure** — overview of the YAML file and its root keys.  
+2. **Sections** — detailed grammar and examples for each top-level key:  
+   - `meta`  
+   - `context`  
+   - ~~`roles`~~ (removed in v4.0.0)  
+   - `features`  
+   - `sitemap`  
+   - `pages`  
+   - `layouts`  
+   - `content_model`  
+3. **Data Query Grammar** — formal specification of query syntax and placeholders.  
+4. **Actions/Mutations Grammar** — definitions for first-class mutations.  
+5. **ACL Model (Auth Classes)** — `public` vs `authenticated`, inheritance, and grammar.  
+6. **Content Model** — schema definition for Contentful types and fields.  
+7. **Metrics** — per-page analytics goals and targets.  
+8. **Validation Checklist** — rules for linting and consistency checks.  
+9. **Minimal Working Example** — trimmed YAML showing a complete spec.  
+10. **Quick How-To** — step-by-step guide for defining features, pages, layouts, and validations.  
+
 ---
 
 ## 0) Conventions
@@ -11,6 +40,11 @@ version: 3.0.0
 * **Dates/Windows:** ISO-8601 dates; reporting windows like `"30d"`.
 * **Placeholders in values:** only the canonical set in §3.2.
 * **Layouts:** `layouts[].id` uses `kebab-case`. Every layout MUST declare an `outlet` slot. Layouts share the same schema as pages for `params`, `data`, `blocks`, `acl`, and `metrics`, but are **not routes**.
+* **Auth & User Modeling (strict):**
+  - The authentication **user** entity is **external & pre-seeded** by the platform (not modeled in `content_model`).
+  - **Do NOT** define `content_model.types` with ids `user` or `authUser` (validator error).
+  - When the app needs per-user fields, define a separate **profile** type with a **1:1 link** to the external auth user (see §6 “Auth-Linked Profile Pattern”).
+  - Use `:user.id` (see §3.2) to reference the current authenticated user.
 
 ---
 
@@ -19,7 +53,6 @@ version: 3.0.0
 ```yaml
 meta: {}           # object
 context: {}        # object
-roles: []          # array of role objects
 features: []       # array of feature objects; upstream, outcome-based; no refs to pages/types
 sitemap: []        # array of route nodes
 layouts: []        # array of layouts; shared, nestable wrappers with slots
@@ -44,7 +77,7 @@ meta:
   version: 0.1.0                # string (semver suggested)
   source_brief: 
      path: docs/PRODUCT_BRIEF.md  # optional string
-     version: 0.1.0              # optional string
+     version: 0.1.0               # optional string
   metrics:                      # optional global KPIs (few, high-level)
     - id: kpi-post-cadence
       desc: "≥ 4 posts/month"
@@ -63,25 +96,15 @@ meta:
 context:
   goals: ["Inform public", "Editors publish without dev help"]
   non_goals: ["No e-commerce v1"]
-  audiences: ["public", "press", "staff"]
+  audiences: ["public", "authenticated"]
   locales: ["th-TH","en-US"]
 ```
 
 ---
 
-### 2.3 `roles`
+### ~~2.3 `roles`~~ (removed in v4.0.0)
 
-**Purpose:** System roles, referenced by ACLs.
-
-```yaml
-roles:
-  - id: admin
-    desc: "Full control incl. schema & publish"
-  - id: editor
-    desc: "Create/edit/publish content"
-  - id: public
-    desc: "Anonymous visitor"
-```
+**Rationale:** The spec operates without custom roles. Only **auth classes** are supported: `public` (anonymous) and `authenticated` (signed-in). See §5.
 
 ---
 
@@ -161,54 +184,47 @@ pages:
           by: slug                   # enum: [id, slug]
           where:                     # AND of predicates by default; see boolean logic in §3.1
             - field: "publishedAt"
-              op: lt                 # enum: §3.1
+              op: lt
               value: ":now"
           sort: "-publishedAt"
           limit: 12
           offset: 0
-          select: ["title","slug","seo"]                   # optional projection
-          include: ["author","unit"]                       # expand relations
-          includeDepth: 1                                   # optional; default 1 (max 2 recommended)
-          locale: "th-TH"                                  # optional
+          select: ["title","slug","seo"]
+          include: ["author","unit"]
+          includeDepth: 1
+          locale: "th-TH"
     blocks:                                                # semantic, not visual (see §2.6.2)
       - type: collection                                   # canonical types: collection|entity|content|media|action-point|nav
         uses: { query: q_recent }                          # per-type contract (see §2.6.2)
-        empty_state: "No content yet"                      # optional
+        empty_state: "No content yet"
     actions:                                               # first-class mutations (see §4)
       - id: submit_contact
         intent: "Store inquiry and notify staff"
-        operation: create          # enum: [create, update, delete, publish, custom]
-        on: "supportRequest"       # content type id or "custom"
+        operation: create
+        on: "supportRequest"
         input:
-          schema_ref: content_model.types.supportRequest   # or null
+          schema_ref: content_model.types.supportRequest
         acl:
-          allowed_roles: ["public","editor","admin"]
-          # rule: 'input.userId == :user.id'               # optional expression; see §5
+          allowed_roles: ["public","authenticated"]        # only these two are valid
         effects:
-          writes: ["supportRequest"]                       # resources touched
-          revalidate: ["/support/:id"]                     # optional
-          webhooks: ["notifyOps"]                          # optional
+          writes: ["supportRequest"]
+          revalidate: ["/support/:id"]
+          webhooks: ["notifyOps"]
         success: ["Entry created", "Notification sent"]
         failure: ["Validation error surfaced"]
-        rate_limit: { window: "1m", max: 5 }               # optional
+        rate_limit: { window: "1m", max: 5 }
     seo:
       index: true
       title_tmpl: "News – %s"
-      derive_from: "q_post.seo"                            # or "type.field" (see note below)
+      derive_from: "q_post.seo"
     acl:                                                   # OPTIONAL (see §5 for inheritance)
-      visibility: ["public"]                               # or ["authenticated"] or role IDs
-      # Optional visibility expression (no content.* here):
-      # visibility_rule: '"editor" in :user.roles || "admin" in :user.roles'
-      actions:
-        visit: ["public","editor","admin"]
-        use_action: { submit_contact: ["public","editor","admin"] }  # per-action gate
-        manage_modules: ["admin"]
-    metrics:                                               # analytics goals (behavioral)
+      visibility: ["public"]                               # or ["authenticated"]
+    metrics:
       - id: m-newslist-bounce
-        event: "bounce_rate"                               # GA4 or custom event name
+        event: "bounce_rate"
         target: "<=40%"
         source: "GA4|custom"
-        segment: "all|organic|<segment_id>"                # optional
+        segment: "all|organic|<segment_id>"
         window: "30d"
 ```
 
@@ -267,7 +283,7 @@ layouts:
     data:                                # same grammar as §3 (scoped to this layout)
       queries:
         q_recent_news: { mode: many, type: newsArticle, sort: "-publishedAt", limit: 5 }
-    slots:                               # named regions rendered around the child page
+    slots:
       header:
         blocks:
           - { type: content, uses: { text: "Unit Website" } }
@@ -279,10 +295,8 @@ layouts:
         blocks:
           - { type: content, uses: { text: "© Unit" } }
     acl:                                 # optional guard for all pages using this layout
-      visibility: ["public"]
-      # Optional visibility expression (no content.* here):
-      # visibility_rule: '"public" in :user.roles || :role == "public"'
-    metrics:                             # optional; same grammar as §7
+      visibility: ["public"]             # or ["authenticated"]
+    metrics:
       - { id: m-layout-nav-CTR, event: "nav_click", target: ">=3%", source: "GA4", window: "30d" }
 ```
 
@@ -292,7 +306,7 @@ layouts:
 * `data.queries` & `blocks` follow §3 and §2.6.2; query ids are **scoped to the layout** (pages can’t reference layout queries).
 * **Attach via `sitemap.layout`**; order = outer→inner. The page renders inside the last layout’s `outlet`.
 * **Inheritance:** Children inherit parent layouts unless they provide their own `layout` (which replaces the chain).
-* **ACL:** Layout `acl` uses **visibility** (and optional `visibility_rule`) only. It constrains all nested pages (see §5).
+* **ACL:** Layout `acl` constrains all nested pages (see §5).
 
 ---
 
@@ -307,15 +321,15 @@ data:
       by: slug               # enum: [id, slug] (sugar for equality on sys.id or slug)
       where:                  # AND-list by default; see §3.1 for grouped boolean logic
         - field: "slug"
-          op: eq             # enum: see §3.1
+          op: eq
           value: ":param.slug"
       sort: "-publishedAt"
       limit: 10
       offset: 0
-      select: ["title","slug"]       # whitelist of fields
-      include: ["author"]            # expand relations
-      includeDepth: 1                # optional (default 1, max 2 recommended)
-      locale: "th-TH"                # optional
+      select: ["title","slug"]
+      include: ["author"]
+      includeDepth: 1
+      locale: "th-TH"
       # aggregate (only when mode=aggregate)
       # aggregate:
       #   measures: [ { func: count, field: "*" }, { func: sum, field: "views" } ]
@@ -349,10 +363,10 @@ predicates := [ predicate, ... ]          # implicit AND
 logic := { and?: (predicate|logic)[], or?: (predicate|logic)[], not?: (predicate|logic) }
 
 predicate := {
-  field: string,                          # field path
+  field: string,
   op: op,
   value?: literal | placeholder | array
-  quantifier?: any|all                    # optional: for array/relation fields
+  quantifier?: any|all
 }
 
 op := eq|ne|gt|gte|lt|lte|in|nin|contains|starts_with|ends_with|matches|exists|between
@@ -375,13 +389,11 @@ Allowed everywhere a `value` appears:
 
 * `:now` — current server time (ISO-8601)
 * `:locale` — effective locale (BCP 47)
-* `:role` — primary role id of current principal
 * `:user.id` — authenticated user id (or `null`)
-* `:user.roles[]` — array of role ids for the current user (may be empty)
 * `:param.<name>` — route param value from `sitemap.path`
 * `:query.<id>.<fieldPath>` — value from an earlier query in the **same** page/layout scope
 
-**Disallowed:** `:env.*` (implementation-specific; excluded)
+**Removed in v4.0.0:** `:role`, `:user.roles[]`.
 
 **Validation**
 
@@ -391,7 +403,7 @@ Allowed everywhere a `value` appears:
 ### 3.3 Sorting, Pagination, Locales
 
 * **Sorting:** `sort` is a single key ascending (`"field"`) or descending (`"-field"`). For stable pagination, include a deterministic tiebreaker in your schema (e.g., `createdAt` + primary key).
-* **Pagination:** `limit`/`offset` only. (**No cursor paging** in v3.0.0.)
+* **Pagination:** `limit`/`offset` only. (**No cursor paging** in v3+.)
 * **Locales:** precedence is query-level `locale` > page/layout default (if provided) > system default.
 
 ---
@@ -403,13 +415,12 @@ actions:
   - id: submit_contact
     intent: "Store inquiry and notify staff"
     operation: create        # enum: [create, update, delete, publish, custom]
-    on: "supportRequest"     # content type id or "custom"
+    on: "supportRequest"
     input:
       schema_ref: content_model.types.supportRequest
-      # OR: fields: [ { id: "email", type: Email, required: true } ]
     acl:
-      allowed_roles: ["public","editor","admin"]
-      # rule: 'input.userId == :user.id'   # optional expression; see §5
+      allowed_roles: ["public","authenticated"]   # only these two allowed
+      # rule?: <expr>  # optional; may reference input.*, :user.id, :now, :param.*
     effects:
       writes: ["supportRequest"]
       revalidate: ["/support/:id"]
@@ -419,31 +430,44 @@ actions:
     rate_limit: { window: "1m", max: 5 }
 ```
 
+**Canonical “update current profile” example:**
+
+```yaml
+actions:
+  - id: update_profile
+    intent: "Update current user profile"
+    operation: update
+    on: "userProfile"
+    input:
+      schema_ref: content_model.types.userProfile
+    acl:
+      allowed_roles: ["authenticated"]
+      rule: 'input.authUserId == :user.id'
+    effects:
+      writes: ["userProfile"]
+```
+
 **Form binding (via block):** An `action-point` block MUST reference a valid `actions.<id>` via `action_id`.
 
 ---
 
-## 5) ACL Model (Roles + Optional Expressions)
+## 5) ACL Model (Auth Classes)
 
 **Overview**
 
-* **Roles registry:** `roles[].id` is the only source of truth for role names.
-* **Two layers:** (1) Role lists, (2) Optional expression rules. If both are present for the same check, **both must pass** (logical AND).
+* **Auth classes only:** `public` (anonymous) and `authenticated` (signed-in).
+* Two layers remain: (1) Allowed auth classes lists, (2) Optional expression rules. If both are present for the same check, **both must pass** (logical AND).
 
 ### 5.1 Layouts & Pages
 
 ```yaml
 layouts[].acl:
-  visibility?: ["public" | "authenticated" | <roleId> ...]
+  visibility?: ["public"] | ["authenticated"]
   visibility_rule?: <expr>             # optional; no content.* context
 
 pages[].acl:
-  visibility?: ["public" | "authenticated" | <roleId> ...]
+  visibility?: ["public"] | ["authenticated"]
   visibility_rule?: <expr>             # optional; no content.* context
-  actions?:                            # optional fine-grained
-    visit?: <roleId[]>
-    use_action?: { <actionId>: <roleId[]> }
-    manage_modules?: <roleId[]>
 ```
 
 **Inheritance & Effective Visibility**
@@ -453,17 +477,17 @@ pages[].acl:
 
 **Page/Layout expression context**
 
-* Allowed refs: `:user.id`, `:user.roles`, `:role`, `:locale`, `:now`, `:param.<name>`.
-* **Forbidden:** `content.*` (no record context at page/layout visibility).
+* Allowed refs: `:user.id`, `:locale`, `:now`, `:param.<name>`.
+* **Forbidden:** `content.*` (no record context at page/layout visibility), `:user.roles`, `:role`.
 
 ### 5.2 Content Types
 
 ```yaml
 content_model.types[].acl:
-  read?:   <roleId[]>
-  create?: <roleId[]>
-  update?: <roleId[]>
-  publish?:<roleId[]>
+  read?:   ["public"] | ["authenticated"]
+  create?: ["authenticated"]
+  update?: ["authenticated"]
+  publish?:["authenticated"]
   rule?:   # optional per-operation expressions
     read?:    <expr>
     create?:  <expr>
@@ -473,23 +497,18 @@ content_model.types[].acl:
 
 **Content expression context**
 
-* Allowed refs: `content.<fieldPath>`, `:user.id`, `:user.roles`, `:role`, `:locale`, `:now`, `:param.<name>`.
-* **Semantics:** A request must satisfy the role list **and** the operation’s rule if both are present.
+* Allowed refs: `content.<fieldPath>`, `:user.id`, `:locale`, `:now`, `:param.<name>`.
+* **Semantics:** A request must satisfy the allowed auth class list **and** the operation’s rule if both are present.
 
 ### 5.3 Actions
 
 ```yaml
 actions[].acl:
-  allowed_roles?: <roleId[]>
-  rule?: <expr>    # may reference input.<fieldPath>
+  allowed_roles?: ["public"] | ["authenticated"]
+  rule?: <expr>    # may reference input.<fieldPath>, :user.id, :locale, :now, :param.*
 ```
 
-**Action expression context**
-
-* Allowed refs: `input.<fieldPath>`, `:user.id`, `:user.roles`, `:role`, `:locale`, `:now`, `:param.<name>`.
-* **Semantics:** Both `allowed_roles` and `rule` must pass if both provided.
-
-### 5.4 Expression Grammar (minimal, deterministic)
+**Expression Grammar (minimal, deterministic)**
 
 ```
 expr     := orExpr
@@ -500,9 +519,9 @@ primary  := literal | ref | "(" expr ")" | call
 literal  := string | number | boolean | null | datetime
 ref      := contentRef | userRef | paramRef | specialRef | inputRef
 contentRef:= "content." fieldPath          # only in content type rules
-userRef  := ":user.id" | ":user.roles"
+userRef  := ":user.id"
 paramRef := ":param." ident
-specialRef:= ":role" | ":locale" | ":now"
+specialRef:= ":locale" | ":now"
 inputRef := "input." fieldPath             # only in action rules
 call     := ident "(" args? ")"
 args     := expr { "," expr }
@@ -517,15 +536,9 @@ builtins := exists(fieldPath) | length(value)
 rule:
   read: 'content.published == true || :now >= content.embargoAt'
 
-# Content rule: only owner or admin can update
+# Content rule: only owner can update (no roles concept)
 rule:
-  update: 'content.owner == :user.id || "admin" in :user.roles'
-
-# Page visibility: editors or admins
-visibility_rule: '"editor" in :user.roles || "admin" in :user.roles'
-
-# Action rule: caller can only update their own profile
-rule: 'input.userId == :user.id'
+  update: 'content.owner == :user.id'
 ```
 
 **Validation**
@@ -553,12 +566,12 @@ content_model:
         - { id: seo,         type: json, shape: { title: "varchar", ogImage: "file" } }
       acl:
         read: ["public"]
-        create: ["editor","admin"]
-        update: ["editor","admin"]
-        publish: ["editor","admin"]
+        create: ["authenticated"]
+        update: ["authenticated"]
+        publish: ["authenticated"]
         rule:
           read: 'content.published == true || :now >= content.embargoAt'
-          update: 'content.owner == :user.id || "admin" in :user.roles'
+          update: 'content.owner == :user.id'
 
     - id: unit
       name: "Unit"
@@ -571,9 +584,9 @@ content_model:
           on_delete: nullify
       acl:
         read: ["public"]
-        create: ["admin"]
-        update: ["admin"]
-        publish: ["admin"]
+        create: ["authenticated"]
+        update: ["authenticated"]
+        publish: ["authenticated"]
 
     - id: person
       name: "Person"
@@ -589,14 +602,50 @@ content_model:
           on_delete: restrict
       acl:
         read: ["public"]
-        create: ["admin"]
-        update: ["admin"]
-        publish: ["admin"]
+        create: ["authenticated"]
+        update: ["authenticated"]
+        publish: ["authenticated"]
 ```
 
-**Field Types (enum):** `text | varchar | int | float | boolean | datetime | enum | file | relation | array | json`
+### Auth-Linked Profile Pattern (MUST)
 
-**Global Field Options (unless noted):**
+When you need per-user fields, define a **profile** type that maps **1:1** to the external auth user:
+
+```yaml
+content_model:
+  types:
+    - id: userProfile
+      name: "User Profile"
+      fields:
+        - { id: authUserId, type: varchar, required: true, unique: true, max_length: 255 } # FK to auth user
+        - { id: displayName, type: varchar, max_length: 255 }
+        - { id: photo,       type: file, validations: { mime_types: ["image/*"] } }
+        - { id: preferences, type: json }
+      acl:
+        read: ["authenticated"]
+        create: ["authenticated"]
+        update: ["authenticated"]
+        rule:
+          update: 'content.authUserId == :user.id'
+```
+
+**Query example (page or layout):**
+
+```yaml
+data:
+  queries:
+    q_me:
+      mode: one
+      type: userProfile
+      where:
+        - { field: "authUserId", op: eq, value: ":user.id" }
+```
+
+### Field Types (enum)
+
+`text | varchar | int | float | boolean | datetime | enum | file | relation | array | json`
+
+### Global Field Options (unless noted)
 
 * `required: boolean`
 * `unique: boolean`
@@ -604,13 +653,18 @@ content_model:
 * `nullable: boolean` (optional)
 * `index: boolean` (optional)
 
-**Type-Specific Options & Shapes:**
+### Type-Specific Options & Shapes
 
 * **`varchar`**: `max_length` (default **255** if omitted)
+
 * **`text`**: optional `format` (e.g., `"markdown"`)
+
 * **`int` / `float`**: `min`, `max`
+
 * **`datetime`**: ISO-8601 date-time with timezone; `default` may be `":now"`
+
 * **`enum`**: `values: ["a","b","c"]` (distinct, lowercase strings)
+
 * **`file`**: object shape
 
   ```yaml
@@ -624,6 +678,7 @@ content_model:
   ```
 
   Validations: `mime_types: ["image/*", "application/pdf", ...]`, `max_size: <bytes>`
+
 * **`relation`**:
 
   ```yaml
@@ -633,8 +688,10 @@ content_model:
     on_delete: "restrict" | "cascade" | "nullify"   # optional
     inverse: "<fieldId>"                             # optional, documentation-only
   ```
+
 * **`array`**:
   `items: { type: <primitive> }` where **primitive ∈ { text, varchar, int, float, boolean, datetime, enum }**
+
 * **`json`**: free-form; optional `shape` (documentation-only)
 
 ---
@@ -644,10 +701,10 @@ content_model:
 ```yaml
 metrics:
   - id: m-news-time
-    event: "avg_engaged_time"           # GA4 metric or custom
-    target: ">=90s"                     # comparator + value (%, s, count)
+    event: "avg_engaged_time"
+    target: ">=90s"
     source: "GA4|custom"
-    segment: "all|organic|<segment_id>" # optional
+    segment: "all|organic|<segment_id>"
     window: "30d"
 ```
 
@@ -671,26 +728,28 @@ metrics:
   * `collection` → bound query `mode ∈ many|count|aggregate`.
   * `action-point` → has valid `action_id`.
   * `media` → has `field` or `from`.
-* **Placeholders:** only allowed set (§3.2). `:query.*` is acyclic and references earlier queries.
+* **Placeholders:**
+
+  * Allowed: `:now`, `:locale`, `:user.id`, `:param.*`, `:query.*` (acyclic).
+  * **Errors:** `:role`, `:user.roles[]`, unknown prefixes.
 * **Queries:**
 
   * If `mode=one`, result cardinality must be exactly 1.
   * If `by` is present with `where`, they must be consistent.
   * `limit`/`offset` only; **no cursor**.
-* **ACL:**
+* **ACL (Auth Classes):**
 
-  * All role ids used exist in `roles`.
+  * Any ACL lists must be a subset of `{ "public", "authenticated" }`.
   * Page/layout `visibility_rule` must not reference `content.*`.
-  * Content rules may reference `content.*`.
-  * When both roles and rule exist, both must pass.
-* **Content model fields:**
+  * Content rules may reference `content.*` and `:user.id`.
+* **Auth modeling:**
 
-  * `enum.values` non-empty; all distinct lowercase strings.
-  * When `type: varchar`, `max_length` present (default 255 if omitted).
-  * When `type: relation`, `to` targets an existing `types[].id` and `cardinality` is valid.
-  * When `type: file`, validations (if provided) use supported keys (`mime_types`, `max_size`).
-  * Any `unique: true` field must be indexable (implicit or explicit).
-  * `array.items.type` must be a **primitive** (`text|varchar|int|float|boolean|datetime|enum`).
+  * **Error** to define `content_model.types[].id` as `user` or `authUser`.
+  * If a profile type exists, it **must** contain a unique FK to the auth user (e.g., `authUserId: varchar, unique: true`).
+* **Examples sanity:**
+
+  * Replace legacy role examples (`admin`/`editor`) with auth classes.
+  * Profile queries filtering on `:user.id` SHOULD use `mode: one`.
 
 ---
 
@@ -701,13 +760,8 @@ meta: { spec_id: "web-001", name: "Unit Website", version: "0.1.0", source_brief
 
 context:
   goals: ["Inform public", "Editors publish without dev help"]
-  audiences: ["public","staff"]
+  audiences: ["public","authenticated"]
   locales: ["th-TH","en-US"]
-
-roles:
-  - { id: admin,  desc: "All permissions" }
-  - { id: editor, desc: "Create/edit/publish" }
-  - { id: public, desc: "Anonymous" }
 
 features:
   - id: news
@@ -773,12 +827,12 @@ content_model:
         - { id: seo,         type: json, shape: { title: "varchar", ogImage: "file" } }
       acl:
         read: ["public"]
-        create: ["editor","admin"]
-        update: ["editor","admin"]
-        publish: ["editor","admin"]
+        create: ["authenticated"]
+        update: ["authenticated"]
+        publish: ["authenticated"]
         rule:
           read: 'content.published == true || :now >= content.embargoAt'
-          update: 'content.owner == :user.id || "admin" in :user.roles'
+          update: 'content.owner == :user.id'
 ```
 
 ---
@@ -787,8 +841,9 @@ content_model:
 
 * **Add a new feature:** add to `features[]` with `success[]`.
 * **Infer types/routes/layouts:** design `content_model.types[]`, `sitemap[]`, and `layouts[]`.
-* **Define a page:** write outcomes → declare `data.queries` → add **semantic** `blocks` (`collection|entity|content|media|action-point|nav`) → wire `actions` (if needed) → (optional) set `acl`/`visibility_rule` → add `metrics`.
+* **Define a page:** write outcomes → declare `data.queries` → add **semantic** `blocks` (`collection|entity|content|media|action-point|nav`) → wire `actions` (if needed) → (optional) set `acl` (public/authenticated) → add `metrics`.
 * **Attach a layout:** define `layouts[]` with an `outlet`, then reference it via `sitemap.layout` (array order = outer→inner).
+* **Model users:** never define a `user` type; use `userProfile` with a unique `authUserId` and gate updates with `:user.id`.
 * **Lint:** run checks per §8; ensure all references resolve.
 
 ---
@@ -852,3 +907,30 @@ Major spec refresh emphasizing semantic blocks, formalized queries, and a minima
 - Replace old block names with canonical ones.
 - Remove any use of `:env.*` placeholders.
 - If relying on complex page-level content logic, move it into content-type ACL `rule` expressions where `content.*` is available, or into queries and page data.
+
+
+## [4.0.0] - 2025-09-12
+
+### Changed
+- **SPEC_REF.md**: Adopted **auth classes** model (no custom roles). All ACLs now accept only `["public"]` or `["authenticated"]`.
+- Added **Auth & User Modeling (strict)** in Conventions: the auth user entity is external/pre-seeded; **do not** model `user`/`authUser`.
+- §6: Introduced **Auth-Linked Profile Pattern** (`userProfile` 1:1 with `authUserId`) + query example.
+- §4: Added canonical `update_profile` action example.
+- §3.2: **Removed placeholders** `:role` and `:user.roles[]`; clarified `:user.id`.
+- §5: Renamed to **ACL Model (Auth Classes)** and updated grammar/examples.
+- §8: Added validation rules enforcing the above.
+
+### Removed
+- `roles` top-level section and any references to custom roles (editor/admin/etc.).
+- Any examples using role-based checks; replaced with `public`/`authenticated` or `:user.id` logic.
+
+### Breaking Changes
+- Defining `content_model.types` with ids `user` or `authUser` is now a **validator error**.
+- Any ACL lists must be a subset of `{ "public", "authenticated" }`; other role ids are invalid.
+- Placeholders `:role` and `:user.roles[]` are **invalid**.
+- The `roles:` top-level key is no longer recognized by the spec.
+
+### Migration Notes
+- Replace legacy `roles:` definitions and role references with `public`/`authenticated`.
+- For per-user fields, create `userProfile` with unique `authUserId` and rewrite rules to use `:user.id`.
+- Update action/page/layout ACLs to the new auth classes lists; remove role-based expressions.
