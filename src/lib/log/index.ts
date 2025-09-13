@@ -21,6 +21,9 @@ export interface Logger {
   error(message: string, ...args: any[]): void;
 }
 
-export const logger: Logger = createPinoLogger(
-  import.meta.env.DEV ? "debug" : "info",
-);
+const logger: null | Logger = null;
+export const getLogger = (): Logger => {
+  if (logger) return logger;
+  const level = process.env.LOG_LEVEL || "info";
+  return createPinoLogger(level);
+};
