@@ -1,0 +1,827 @@
+meta:
+  spec_id: web-mtb16-v1
+  name: "16th Military Circle Public Website"
+  version: "0.2.0"
+  source_brief:
+    path: "/PRODUCT_BRIEF.md"
+    version: "0.1.0"
+  metrics:
+    - id: kpi-muv
+      desc: "Monthly unique visitors"
+      target: ">=3000"
+      source: "GA4"
+      window: "30d"
+    - id: kpi-news-open
+      desc: "News open rate (list→detail)"
+      target: ">=30%"
+      source: "GA4"
+      window: "30d"
+    - id: kpi-annc-open
+      desc: "Announcements open rate (list→detail)"
+      target: ">=35%"
+      source: "GA4"
+      window: "30d"
+
+context:
+  goals:
+    - "Provide authoritative, timely, readable public information in Thai"
+    - "Publish procurement listings (open/closed) with official attachments"
+    - "Centralize contact info and a network directory"
+    - "Enable simple admin publishing via a single published flag"
+    - "Support an optional homepage alert popup (image-only)"
+    - "Offer advanced directory filtering and partner profile pages"
+  non_goals:
+    - "Scheduling or multi-role approvals for publishing (v1)"
+    - "News/events registration, calendars, tagging (v1)"
+    - "Deep org charts or long biographies (v1)"
+    - "Chat/inbox/ticketing for Contact (v1)"
+    - "Multiple queued or scheduled alerts (v1)"
+  audiences:
+    - "public"
+    - "partners-contractors-ngos"
+    - "prospective-recruits-students"
+    - "internal-readonly"
+    - "cms-admins"
+  locales:
+    - "th-TH"
+
+features:
+  - id: announcements
+    label: "Announcements"
+    intent: "Publish authoritative notices the public can scan and open for details"
+    priority: must
+    constraints:
+      - "Thai UI/content"
+      - "Manual publish via single `published` flag (no scheduling/approvals)"
+      - "Attachments allowed (official files)"
+      - "Preview image supported"
+      - "Category tags (fixed enum) for selective display across the site; not end-user filters"
+    success:
+      - "Admin can create/update and toggle publish"
+      - "Public sees reverse-chronological list with pagination"
+      - "Detail view shows body, preview image, and attached files"
+      - "Site can render curated subsets by category (e.g., emergency, public-notice)"
+      - "Open rate list→detail is measured"
+
+  - id: news
+    label: "Activity Updates (News)"
+    intent: "Share unit activities/outcomes; public can browse and read concise updates"
+    priority: must
+    constraints:
+      - "Thai UI/content"
+      - "No separate 'event' model; all are activity updates"
+      - "Manual publish via `published` flag"
+      - "Rich image supported; body is concise"
+    success:
+      - "Admin can create/update and toggle publish"
+      - "List paginates (>=12 per page) and sorts by published date"
+      - "Detail view supports hero image and short caption/excerpt"
+      - "Open rate list→detail is measured"
+
+  - id: about_commanders
+    label: "About & Commanders"
+    intent: "Explain mission/roles and present leadership hierarchy"
+    priority: must
+    constraints:
+      - "Commander card fields: headshot, name, rank, role"
+      - "Thai UI/content"
+    success:
+      - "Public can view mission/overview content"
+      - "Leadership hierarchy renders with required fields"
+      - "Org info can reference a static org chart asset"
+
+  - id: network_directory
+    label: "Network Directory"
+    intent: "Enable discovery of sub-units, partners/NGOs/contractors, parent unit, and Army references"
+    priority: must
+    constraints:
+      - "Thai UI/content"
+      - "Optional image per entry"
+      - "No public search/filter UI; internal filters/presets for selective rendering across pages/blocks"
+      - "No public profile/detail pages for entries"
+    success:
+      - "Site can render curated subsets (e.g., by entry type/affiliation) in relevant sections"
+      - "Admins can add/edit entries (name, type, contact/links, optional image) and toggle publish"
+
+  - id: procurement
+    label: "Procurement (Current + Archive)"
+    intent: "Provide transparent access to open opportunities and archived records with official documents"
+    priority: must
+    constraints:
+      - "Statuses: open | closed"
+      - "Included document types: Annual Plan, Invitation/Announcement (สอบราคา/e-bidding), Price Disclosure, Winner Declaration"
+      - "Compliance disclaimer visible on list & detail"
+      - "Attachments are official files only"
+      - "No end-user filters; templates can render subsets (e.g., status/year) for selective display"
+    success:
+      - "Public can browse open items and access attached files"
+      - "Closed items visible in archive with dates/status"
+      - "Admins can upload docs and set status/publish"
+
+  - id: contact
+    label: "Contact"
+    intent: "Provide official contact channels and location information"
+    priority: must
+    constraints:
+      - "Thai UI/content"
+      - "No chat/inbox/ticketing"
+    success:
+      - "Public can view address, map/location hint, and official social links"
+      - "Admins can update channels without code changes"
+
+  - id: homepage_alert
+    label: "Homepage Alert Popup"
+    intent: "Show a single image alert with alt text and optional outbound link"
+    priority: must
+    constraints:
+      - "Once per visitor per 24h"
+      - "Manual on/off"
+      - "Image + alt text; optional link"
+    success:
+      - "Admin can enable/disable and replace the image"
+      - "Public sees alert once within 24h window"
+      - "Click-throughs are measurable"
+
+  - id: common_content
+    label: "Common Content & Site Settings"
+    intent: "Allow admins to manage shared content/settings without code"
+    priority: must
+    constraints:
+      - "Editable via CMS; used across layouts/pages (Thai UI/content)"
+      - "Large text should reference `content.yaml` paths (e.g., content.yaml:unit_slogan.th)"
+    success:
+      - "Admins can update shared assets/text and changes reflect site-wide"
+      - "No code deploy required for routine updates"
+      - "Scope includes: unit identity, homepage hero, social links, contact block, homepage alert config"
+
+content_model:
+  types:
+    - id: site-settings
+      name: "Site Settings"
+      localized: false
+      fields:
+        - { id: unit_name_th,            type: varchar, required: true,  max_length: 255 }
+        - { id: unit_name_en,            type: varchar,                   max_length: 255 }
+        - id: logo
+          type: file
+          validations: { mime_types: ["image/*"] }
+        - { id: footer_copyright,        type: varchar,                   max_length: 255 }
+        - { id: welcome_text,            type: text }
+        - id: hero_fallback_image
+          type: file
+          validations: { mime_types: ["image/*"] }
+        - { id: facebook_official,       type: varchar,                   max_length: 255 }
+        - { id: facebook_news,           type: varchar,                   max_length: 255 }
+        - { id: tiktok,                  type: varchar,                   max_length: 255 }
+        - { id: address_th,              type: text }
+        - { id: phone,                   type: varchar,                   max_length: 255 }
+        - { id: email,                   type: varchar,                   max_length: 255 } # optional: pattern/email
+        - { id: map_embed,               type: text }
+        - { id: homepage_alert_enabled,  type: boolean }
+        - id: homepage_alert_image
+          type: file
+          validations: { mime_types: ["image/*"] }
+        - { id: homepage_alert_alt,      type: varchar,                   max_length: 255 }
+        - { id: homepage_alert_link,     type: varchar,                   max_length: 255 }
+      acl:
+        read: ["public"]
+        create: ["authenticated"]
+        update: ["authenticated"]
+        publish: ["authenticated"]
+
+    - id: announcement
+      name: "Announcement"
+      localized: false
+      fields:
+        - { id: title,          type: varchar,  required: true, max_length: 255 }
+        - { id: slug,           type: varchar,  unique: true,   max_length: 255 }
+        - { id: body,           type: text }
+        - id: preview_image
+          type: file
+          validations: { mime_types: ["image/*"] }
+        - id: category
+          type: enum
+          values: ["emergency","public-notice","policy","general"]
+        - id: tags
+          type: array
+          items: { type: varchar }   # free text tags for selective display
+        - id: attachments
+          type: json
+          shape:
+            files: "file[]"          # documentation-only; array of file objects
+        - { id: published_at,   type: datetime, required: true, default: ":now" }
+        - id: seo
+          type: json
+          shape: { title: "varchar", ogImage: "file" }
+      acl:
+        read: ["public"]
+        create: ["authenticated"]
+        update: ["authenticated"]
+        publish: ["authenticated"]
+
+    - id: activity-update
+      name: "Activity Update (News)"
+      localized: false
+      fields:
+        - { id: title,         type: varchar,  required: true, max_length: 255 }
+        - { id: slug,          type: varchar,  unique: true,   max_length: 255 }
+        - { id: caption,       type: varchar,                   max_length: 255 }
+        - { id: body,          type: text,                      format: "markdown" }
+        - id: hero_image
+          type: file
+          validations: { mime_types: ["image/*"] }
+        - { id: published_at,  type: datetime, required: true, default: ":now" }
+        - id: seo
+          type: json
+          shape: { title: "varchar", ogImage: "file" }
+      acl:
+        read: ["public"]
+        create: ["authenticated"]
+        update: ["authenticated"]
+        publish: ["authenticated"]
+
+    - id: procurement
+      name: "Procurement"
+      localized: false
+      fields:
+        - { id: title,                     type: varchar,  required: true, max_length: 255 }
+        - { id: slug,                      type: varchar,  unique: true,   max_length: 255 }
+        - id: status
+          type: enum
+          values: ["open","closed"]
+        - { id: date,                      type: datetime, required: true }
+        - { id: year,                      type: int,      min: 2000, max: 2100 }
+        - { id: details,                   type: text }
+        - id: annual_plan_docs
+          type: json
+          shape: { files: "file[]" }
+        - id: invitation_docs
+          type: json
+          shape: { files: "file[]" }
+        - id: price_disclosure_docs
+          type: json
+          shape: { files: "file[]" }
+        - id: winner_declaration_docs
+          type: json
+          shape: { files: "file[]" }
+      acl:
+        read: ["public"]
+        create: ["authenticated"]
+        update: ["authenticated"]
+        publish: ["authenticated"]
+
+    - id: directory-entry
+      name: "Directory Entry"
+      localized: false
+      fields:
+        - { id: name,     type: varchar, required: true, max_length: 255 }
+        - { id: tag,      type: varchar,                 max_length: 255 }   # free text
+        - id: image
+          type: file
+          validations: { mime_types: ["image/*"] }
+        - { id: link,     type: varchar,                 max_length: 255 }
+        - { id: phone,    type: varchar,                 max_length: 255 }
+        - { id: email,    type: varchar,                 max_length: 255 }   # optional: pattern/email
+        - { id: notes,    type: text }
+        - { id: order,    type: int }
+      acl:
+        read: ["public"]
+        create: ["authenticated"]
+        update: ["authenticated"]
+        publish: ["authenticated"]
+
+    - id: unit
+      name: "Unit"
+      localized: false
+      fields:
+        - { id: name,   type: varchar, required: true, max_length: 255 }
+        - id: parent
+          type: relation
+          to: "unit"
+          cardinality: many-to-one
+          on_delete: nullify
+      acl:
+        read: ["public"]
+        create: ["authenticated"]
+        update: ["authenticated"]
+        publish: ["authenticated"]
+
+    - id: person
+      name: "Person"
+      localized: false
+      fields:
+        - { id: name,     type: varchar, required: true, max_length: 255 }
+        - { id: rank,     type: varchar,                 max_length: 255 }
+        - { id: role,     type: varchar,                 max_length: 255 }
+        - id: portrait
+          type: file
+          validations: { mime_types: ["image/*"] }
+        - id: unit
+          type: relation
+          to: "unit"
+          cardinality: many-to-one
+          on_delete: restrict
+        - { id: order,    type: int }
+        - { id: bio,      type: text }
+      acl:
+        read: ["public"]
+        create: ["authenticated"]
+        update: ["authenticated"]
+        publish: ["authenticated"]
+
+sitemap:
+  - page_id: home
+    path: "/"
+    layout: ["base","public"]
+    children:
+      - { page_id: announcements-list, path: "/announcements" }
+      - { page_id: news-list,          path: "/news" }
+      - { page_id: procurement,        path: "/procurement" }
+      - { page_id: directory-list,     path: "/directory" }
+      - { page_id: about,              path: "/about" }
+      - { page_id: contact,            path: "/contact" }
+
+  - page_id: announcement-detail
+    path: "/announcements/:slug"
+    layout: ["base","public"]
+
+  - page_id: news-detail
+    path: "/news/:slug"
+    layout: ["base","public"]
+
+  - page_id: admin
+    path: "/admin"
+    layout: ["base","admin"]
+    children:
+      - { page_id: admin-announcements, path: "/admin/announcements" }
+      - { page_id: admin-news,          path: "/admin/news" }
+      - { page_id: admin-procurement,   path: "/admin/procurement" }
+      - { page_id: admin-directory,     path: "/admin/directory" }
+      - { page_id: admin-site-settings, path: "/admin/site-settings" }
+
+pages:
+  - id: home
+    purpose: "Public quickly orients to unit identity and finds latest notices, news, procurement, commander, and key links."
+    outcomes:
+      - "User reaches a relevant detail page within 2 clicks."
+    data:
+      queries:
+        q_settings: { mode: one, type: "site-settings" }
+        q_recent_ann:
+          mode: many
+          type: "announcement"
+          where: [{ field: "published_at", op: lt, value: ":now" }]
+          sort: "-published_at"
+          limit: 5
+        q_recent_news:
+          mode: many
+          type: "activity-update"
+          where: [{ field: "published_at", op: lt, value: ":now" }]
+          sort: "-published_at"
+          limit: 6
+        q_open_proc:
+          mode: many
+          type: "procurement"
+          where: [{ field: "status", op: eq, value: "open" }]
+          sort: "-date"
+          limit: 5
+        q_commander:
+          mode: one
+          type: "person"
+          where: [{ field: "order", op: eq, value: 1 }]
+        q_parent_dir:
+          mode: many
+          type: "directory-entry"
+          where: [{ field: "tag", op: contains, value: "parent" }]
+          sort: "order"
+          limit: 10
+    blocks:
+      - { type: media,    uses: { from: "q_settings.hero_fallback_image" }, empty_state: "" }
+      - { type: content,  uses: { source: "settings.welcome_text" }, empty_state: "" }
+      - { type: content,  uses: { text: "Unit slogan → content.yaml:unit_slogan.th" } }
+      - { type: content,  uses: { text: "Royal Thai Army slogan → content.yaml:thai_arm_slogan.th" } }
+      - { type: entity,   uses: { query: q_commander }, empty_state: "ยังไม่มีข้อมูลผู้บังคับบัญชา" }
+      - { type: collection, uses: { query: q_recent_ann },  empty_state: "ยังไม่มีประกาศ" }
+      - { type: collection, uses: { query: q_recent_news }, empty_state: "ยังไม่มีกิจกรรม" }
+      - { type: collection, uses: { query: q_open_proc },   empty_state: "ยังไม่มีประกาศจัดซื้อ/จัดจ้างที่เปิดอยู่" }
+      - { type: collection, uses: { query: q_parent_dir },  empty_state: "ยังไม่มีหน่วยเหนือ/ต้นสังกัด" }
+      - { type: nav,      uses: { route: "/procurement" } }
+      - { type: nav,      uses: { route: "/contact" } }
+    seo:
+      index: true
+      title_tmpl: "%s – มณฑลทหารบกที่ 16"
+    metrics:
+      - { id: m-home-card-CTR, event: "card_click", target: ">=3.5%", source: "GA4", window: "30d" }
+
+  - id: announcements-list
+    purpose: "Public scans authoritative notices in reverse-chronological order."
+    data:
+      queries:
+        q_ann:
+          mode: many
+          type: "announcement"
+          sort: "-published_at"
+          limit: 12
+          offset: 0
+    blocks:
+      - { type: collection, uses: { query: q_ann }, empty_state: "ยังไม่มีประกาศ" }
+    seo: { index: true, title_tmpl: "ประกาศ – %s" }
+    metrics:
+      - { id: m-ann-list-open, event: "list_to_detail_open_rate", target: ">=35%", source: "GA4", window: "30d" }
+
+  - id: announcement-detail
+    purpose: "User reads a single announcement with preview image and official attachments."
+    params: ["slug"]
+    data:
+      queries:
+        q_item:
+          mode: one
+          type: "announcement"
+          by: slug
+          where: [{ field: "slug", op: eq, value: ":param.slug" }]
+    blocks:
+      - { type: entity, uses: { query: q_item } }
+      - { type: media,  uses: { from: "q_item.preview_image" }, empty_state: "" }
+      - { type: media,  uses: { from: "q_item.attachments.files" }, empty_state: "" }
+    seo:
+      index: true
+      derive_from: "q_item.seo"
+      title_tmpl: "ประกาศ – %s"
+    metrics:
+      - { id: m-ann-read-time, event: "avg_engaged_time", target: ">=60s", source: "GA4", window: "30d" }
+
+  - id: news-list
+    purpose: "Public browses concise activity updates with images."
+    data:
+      queries:
+        q_news:
+          mode: many
+          type: "activity-update"
+          sort: "-published_at"
+          limit: 12
+          offset: 0
+    blocks:
+      - { type: collection, uses: { query: q_news }, empty_state: "ยังไม่มีกิจกรรม" }
+    seo: { index: true, title_tmpl: "ข่าวกิจกรรม – %s" }
+    metrics:
+      - { id: m-news-list-open, event: "list_to_detail_open_rate", target: ">=30%", source: "GA4", window: "30d" }
+
+  - id: news-detail
+    purpose: "User reads a single activity update with hero image and short caption."
+    params: ["slug"]
+    data:
+      queries:
+        q_post:
+          mode: one
+          type: "activity-update"
+          by: slug
+          where: [{ field: "slug", op: eq, value: ":param.slug" }]
+    blocks:
+      - { type: entity, uses: { query: q_post } }
+      - { type: media,  uses: { from: "q_post.hero_image" }, empty_state: "" }
+    seo:
+      derive_from: "q_post.seo"
+      index: true
+      title_tmpl: "ข่าวกิจกรรม – %s"
+    metrics:
+      - { id: m-news-time, event: "avg_engaged_time", target: ">=90s", source: "GA4", window: "30d" }
+
+  - id: procurement
+    purpose: "Public sees open procurement opportunities and reviews closed records with official files."
+    data:
+      queries:
+        q_open:
+          mode: many
+          type: "procurement"
+          where: [{ field: "status", op: eq, value: "open" }]
+          sort: "-date"
+          limit: 20
+        q_closed:
+          mode: many
+          type: "procurement"
+          where: [{ field: "status", op: eq, value: "closed" }]
+          sort: "-date"
+          limit: 20
+    blocks:
+      - { type: content,    uses: { text: "หมายเหตุ: แสดงเฉพาะเอกสารทางการ พร้อมสถานะและวันที่" } }
+      - { type: content,    uses: { text: "กำลังเปิดรับ (Open)" } }
+      - { type: collection, uses: { query: q_open },   empty_state: "ยังไม่มีรายการที่เปิดอยู่" }
+      - { type: content,    uses: { text: "คลังข้อมูล (Closed/Archive)" } }
+      - { type: collection, uses: { query: q_closed }, empty_state: "ยังไม่มีรายการในคลังข้อมูล" }
+    seo: { index: true, title_tmpl: "จัดซื้อ/จัดจ้าง – %s" }
+    metrics:
+      - { id: m-proc-doc-dl, event: "doc_downloads_per_view", target: ">=1.2", source: "GA4", window: "30d" }
+
+  - id: directory-list
+    purpose: "Public discovers curated directory entries with quick preset filters (no free-form search)."
+    data:
+      queries:
+        q_all:      { mode: many, type: "directory-entry", sort: "order", limit: 100 }
+        q_subunit:  { mode: many, type: "directory-entry", where: [{ field: "tag", op: contains, value: "sub-unit" }], sort: "order", limit: 100 }
+        q_partner:  { mode: many, type: "directory-entry", where: [{ field: "tag", op: contains, value: "partner" }],  sort: "order", limit: 100 }
+        q_ngo:      { mode: many, type: "directory-entry", where: [{ field: "tag", op: contains, value: "ngo" }],      sort: "order", limit: 100 }
+        q_parent:   { mode: many, type: "directory-entry", where: [{ field: "tag", op: contains, value: "parent" }],   sort: "order", limit: 100 }
+    blocks:
+      - { type: nav,       uses: { route: "/directory#all" } }
+      - { type: nav,       uses: { route: "/directory#sub-unit" } }
+      - { type: nav,       uses: { route: "/directory#partner" } }
+      - { type: nav,       uses: { route: "/directory#ngo" } }
+      - { type: nav,       uses: { route: "/directory#parent" } }
+      - { type: content,   uses: { text: "ทั้งหมด (All) — #all" } }
+      - { type: collection, uses: { query: q_all },     empty_state: "ยังไม่มีข้อมูล" }
+      - { type: content,   uses: { text: "หน่วยรอง (Sub-units) — #sub-unit" } }
+      - { type: collection, uses: { query: q_subunit }, empty_state: "ยังไม่มีข้อมูลหน่วยรอง" }
+      - { type: content,   uses: { text: "พันธมิตร (Partners) — #partner" } }
+      - { type: collection, uses: { query: q_partner }, empty_state: "ยังไม่มีข้อมูลพันธมิตร" }
+      - { type: content,   uses: { text: "องค์กรเอกชน/NGO — #ngo" } }
+      - { type: collection, uses: { query: q_ngo },     empty_state: "ยังไม่มีข้อมูล NGO" }
+      - { type: content,   uses: { text: "หน่วยเหนือ/ต้นสังกัด (Parent) — #parent" } }
+      - { type: collection, uses: { query: q_parent },  empty_state: "ยังไม่มีข้อมูลหน่วยเหนือ" }
+    seo: { index: true, title_tmpl: "สารบบเครือข่าย – %s" }
+
+  - id: about
+    purpose: "Explain mission/roles and present leadership hierarchy."
+    data:
+      queries:
+        q_people:
+          mode: many
+          type: "person"
+          sort: "order"
+          limit: 50
+          include: ["unit"]
+    blocks:
+      - { type: content, uses: { text: "Mission → content.yaml:about_us.mission.thai" } }
+      - { type: content, uses: { text: "History → content.yaml:about_us.history.thai" } }
+      - { type: content, uses: { text: "Organization chart (YAML) → content.yaml:organization_chart.yaml_file" } }
+      - { type: collection, uses: { query: q_people }, empty_state: "ยังไม่มีข้อมูลผู้บังคับบัญชา" }
+    seo: { index: true, title_tmpl: "เกี่ยวกับหน่วย – %s" }
+
+  - id: contact
+    purpose: "Provide official contact channels and location information."
+    data:
+      queries:
+        q_settings: { mode: one, type: "site-settings" }
+    blocks:
+      - { type: content, uses: { source: "settings.address_th" },  empty_state: "" }
+      - { type: content, uses: { source: "settings.phone" },       empty_state: "" }
+      - { type: content, uses: { source: "settings.email" },       empty_state: "" }
+      - { type: content, uses: { source: "settings.map_embed" },   empty_state: "" }
+      - { type: content, uses: { source: "settings.facebook_official" }, empty_state: "" }
+      - { type: content, uses: { source: "settings.tiktok" },      empty_state: "" }
+    seo: { index: true, title_tmpl: "ติดต่อเรา – %s" }
+
+  # --- Admin Console (inherits layout: ["base","admin"]) ---
+
+  - id: admin
+    purpose: "Landing dashboard for content operations."
+    blocks:
+      - { type: content, uses: { text: "Admin Console" } }
+      - { type: nav,     uses: { route: "/admin/announcements" } }
+      - { type: nav,     uses: { route: "/admin/news" } }
+      - { type: nav,     uses: { route: "/admin/procurement" } }
+      - { type: nav,     uses: { route: "/admin/directory" } }
+      - { type: nav,     uses: { route: "/admin/site-settings" } }
+
+  - id: admin-announcements
+    purpose: "Create/update/publish announcements."
+    data:
+      queries:
+        q_list: { mode: many, type: "announcement", sort: "-published_at", limit: 50 }
+    actions:
+      - id: create_announcement
+        intent: "Create announcement draft"
+        operation: create
+        on: "announcement"
+        input: { schema_ref: content_model.types.announcement }
+        acl: { allowed_roles: ["authenticated"] }
+        effects:
+          writes: ["announcement"]
+          revalidate: ["/announcements"]
+        success: ["Entry created"]
+      - id: update_announcement
+        intent: "Update announcement"
+        operation: update
+        on: "announcement"
+        input: { schema_ref: content_model.types.announcement }
+        acl: { allowed_roles: ["authenticated"] }
+        effects:
+          writes: ["announcement"]
+          revalidate: ["/announcements", "/announcements/:slug"]
+        success: ["Entry updated"]
+      - id: publish_announcement
+        intent: "Publish/unpublish announcement"
+        operation: publish
+        on: "announcement"
+        input: { schema_ref: content_model.types.announcement }
+        acl: { allowed_roles: ["authenticated"] }
+        effects:
+          writes: ["announcement"]
+          revalidate: ["/announcements", "/announcements/:slug"]
+        success: ["Visibility toggled"]
+    blocks:
+      - { type: collection,   uses: { query: q_list }, empty_state: "ยังไม่มีประกาศ" }
+      - { type: action-point, action_id: create_announcement }
+      - { type: nav,          uses: { action_id: update_announcement } }
+      - { type: nav,          uses: { action_id: publish_announcement } }
+
+  - id: admin-news
+    purpose: "Create/update/publish activity updates."
+    data:
+      queries:
+        q_list: { mode: many, type: "activity-update", sort: "-published_at", limit: 50 }
+    actions:
+      - id: create_news
+        intent: "Create news draft"
+        operation: create
+        on: "activity-update"
+        input: { schema_ref: content_model.types.activity-update }
+        acl: { allowed_roles: ["authenticated"] }
+        effects:
+          writes: ["activity-update"]
+          revalidate: ["/news"]
+        success: ["Entry created"]
+      - id: update_news
+        intent: "Update news"
+        operation: update
+        on: "activity-update"
+        input: { schema_ref: content_model.types.activity-update }
+        acl: { allowed_roles: ["authenticated"] }
+        effects:
+          writes: ["activity-update"]
+          revalidate: ["/news", "/news/:slug"]
+        success: ["Entry updated"]
+      - id: publish_news
+        intent: "Publish/unpublish news"
+        operation: publish
+        on: "activity-update"
+        input: { schema_ref: content_model.types.activity-update }
+        acl: { allowed_roles: ["authenticated"] }
+        effects:
+          writes: ["activity-update"]
+          revalidate: ["/news", "/news/:slug"]
+        success: ["Visibility toggled"]
+    blocks:
+      - { type: collection,   uses: { query: q_list }, empty_state: "ยังไม่มีกิจกรรม" }
+      - { type: action-point, action_id: create_news }
+      - { type: nav,          uses: { action_id: update_news } }
+      - { type: nav,          uses: { action_id: publish_news } }
+
+  - id: admin-procurement
+    purpose: "Create/update procurement records and manage attachments."
+    data:
+      queries:
+        q_list: { mode: many, type: "procurement", sort: "-date", limit: 50 }
+    actions:
+      - id: create_proc
+        intent: "Create procurement item"
+        operation: create
+        on: "procurement"
+        input: { schema_ref: content_model.types.procurement }
+        acl: { allowed_roles: ["authenticated"] }
+        effects:
+          writes: ["procurement"]
+          revalidate: ["/procurement"]
+        success: ["Item created"]
+      - id: update_proc
+        intent: "Update procurement item"
+        operation: update
+        on: "procurement"
+        input: { schema_ref: content_model.types.procurement }
+        acl: { allowed_roles: ["authenticated"] }
+        effects:
+          writes: ["procurement"]
+          revalidate: ["/procurement"]
+        success: ["Item updated"]
+      - id: publish_proc
+        intent: "Publish/unpublish procurement item"
+        operation: publish
+        on: "procurement"
+        input: { schema_ref: content_model.types.procurement }
+        acl: { allowed_roles: ["authenticated"] }
+        effects:
+          writes: ["procurement"]
+          revalidate: ["/procurement"]
+        success: ["Visibility toggled"]
+    blocks:
+      - { type: collection,   uses: { query: q_list }, empty_state: "ยังไม่มีรายการ" }
+      - { type: action-point, action_id: create_proc }
+      - { type: nav,          uses: { action_id: update_proc } }
+      - { type: nav,          uses: { action_id: publish_proc } }
+
+  - id: admin-directory
+    purpose: "Manage directory entries."
+    data:
+      queries:
+        q_list: { mode: many, type: "directory-entry", sort: "order", limit: 100 }
+    actions:
+      - id: create_dir_entry
+        intent: "Create directory entry"
+        operation: create
+        on: "directory-entry"
+        input: { schema_ref: content_model.types.directory-entry }
+        acl: { allowed_roles: ["authenticated"] }
+        effects:
+          writes: ["directory-entry"]
+          revalidate: ["/directory"]
+        success: ["Entry created"]
+      - id: update_dir_entry
+        intent: "Update directory entry"
+        operation: update
+        on: "directory-entry"
+        input: { schema_ref: content_model.types.directory-entry }
+        acl: { allowed_roles: ["authenticated"] }
+        effects:
+          writes: ["directory-entry"]
+          revalidate: ["/directory"]
+        success: ["Entry updated"]
+      - id: publish_dir_entry
+        intent: "Publish/unpublish directory entry"
+        operation: publish
+        on: "directory-entry"
+        input: { schema_ref: content_model.types.directory-entry }
+        acl: { allowed_roles: ["authenticated"] }
+        effects:
+          writes: ["directory-entry"]
+          revalidate: ["/directory"]
+        success: ["Visibility toggled"]
+    blocks:
+      - { type: collection,   uses: { query: q_list }, empty_state: "ยังไม่มีรายการ" }
+      - { type: action-point, action_id: create_dir_entry }
+      - { type: nav,          uses: { action_id: update_dir_entry } }
+      - { type: nav,          uses: { action_id: publish_dir_entry } }
+
+  - id: admin-site-settings
+    purpose: "Update site-wide settings (identity, social links, contact, homepage alert)."
+    actions:
+      - id: update_settings
+        intent: "Update Site Settings"
+        operation: update
+        on: "site-settings"
+        input: { schema_ref: content_model.types.site-settings }
+        acl: { allowed_roles: ["authenticated"] }
+        effects:
+          writes: ["site-settings"]
+          revalidate: ["/", "/contact"]
+        success: ["Settings updated"]
+    blocks:
+      - { type: action-point, action_id: update_settings }
+
+layouts:
+  - id: base
+    purpose: "Minimal HTML shell (no chrome); wraps all routes"
+    params: []
+    slots:
+      outlet: {}
+
+  - id: public
+    purpose: "Public chrome: header/nav/footer; Thai UI; optional homepage alert banner"
+    params: []
+    data:
+      queries:
+        q_settings:
+          mode: one
+          type: "site-settings"
+    slots:
+      banner:
+        blocks:
+          - { type: media,    uses: { from: "q_settings.homepage_alert_image" }, empty_state: "" }
+          - { type: content,  uses: { source: "settings.homepage_alert_alt" },   empty_state: "" }
+      header:
+        blocks:
+          - { type: content,  uses: { source: "settings.unit_name_th" } }
+      nav:
+        blocks:
+          - { type: nav, uses: { route: "/announcements" } }
+          - { type: nav, uses: { route: "/news" } }
+          - { type: nav, uses: { route: "/procurement" } }
+          - { type: nav, uses: { route: "/directory" } }
+          - { type: nav, uses: { route: "/about" } }
+          - { type: nav, uses: { route: "/contact" } }
+      outlet: {}
+      footer:
+        blocks:
+          - { type: content, uses: { source: "settings.footer_copyright" } }
+          - { type: content, uses: { source: "settings.facebook_official" } }
+          - { type: content, uses: { source: "settings.tiktok" } }
+    acl:
+      visibility: ["public"]
+    metrics:
+      - { id: m-public-nav-CTR, event: "nav_click", target: ">=3%", source: "GA4", window: "30d" }
+
+  - id: admin
+    purpose: "Admin chrome: scoped tools for content ops"
+    params: []
+    slots:
+      header:
+        blocks:
+          - { type: content, uses: { text: "Admin Console" } }
+      nav:
+        blocks:
+          - { type: nav, uses: { route: "/admin/announcements" } }
+          - { type: nav, uses: { route: "/admin/news" } }
+          - { type: nav, uses: { route: "/admin/procurement" } }
+          - { type: nav, uses: { route: "/admin/directory" } }
+          - { type: nav, uses: { route: "/admin/site-settings" } }
+      outlet: {}
+    acl:
+      visibility: ["authenticated"]
