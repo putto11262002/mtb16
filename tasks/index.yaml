@@ -19,11 +19,11 @@ phases:
       - id: action-directory-update_dir_entry
         done: false
       - id: action-news-create_news
-        done: false
+        done: true
       - id: action-news-publish_news
-        done: false
+        done: true
       - id: action-news-update_news
-        done: false
+        done: true
       - id: action-procurement-create_proc
         done: false
       - id: action-procurement-publish_proc

@@ -14,7 +14,7 @@ import {
 import { relations, sql } from "drizzle-orm";
 
 // Types
-type Seo = { title?: string; description?: string; keywords?: string[] };
+type Seo = { title?: string; ogImage?: string };
 type Attachments = { name: string; url: string; mimeType?: string }[];
 type Docs = { name: string; url: string }[];
 
@@ -62,71 +62,84 @@ export const siteSettings = pgTable("site_settings", {
     .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
 });
 
-export const announcements = pgTable("announcements", {
-  id: uuid("id")
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  title: varchar("title", { length: 255 }).notNull(),
-  body: text("body"),
-  previewImage: text("preview_image"),
-  category: announcementCategory("category"),
-  tags: text("tags").array(),
-  attachments: jsonb("attachments").$type<Attachments>(),
-  publishedAt: timestamp("published_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  seo: jsonb("seo").$type<Seo>(),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
-});
+export const announcements = pgTable(
+  "announcements",
+  {
+    id: uuid("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    title: varchar("title", { length: 255 }).notNull(),
+    slug: varchar("slug", { length: 255 }),
+    body: text("body"),
+    previewImage: text("preview_image"),
+    category: announcementCategory("category"),
+    tags: text("tags").array(),
+    attachments: jsonb("attachments").$type<Attachments>(),
+    publishedAt: timestamp("published_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    seo: jsonb("seo").$type<Seo>(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
+  },
+  (t) => [uniqueIndex("announcements_slug_idx").on(t.slug)],
+);
 
-export const news = pgTable("news", {
-  id: uuid("id")
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  title: varchar("title", { length: 255 }).notNull(),
-  caption: varchar("caption", { length: 255 }),
-  body: text("body"),
-  heroImage: text("hero_image"),
-  publishedAt: timestamp("published_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  seo: jsonb("seo").$type<Seo>(),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
-});
+export const news = pgTable(
+  "news",
+  {
+    id: uuid("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    title: varchar("title", { length: 255 }).notNull(),
+    slug: varchar("slug", { length: 255 }),
+    caption: varchar("caption", { length: 255 }),
+    body: text("body"),
+    heroImage: text("hero_image"),
+    publishedAt: timestamp("published_at", { withTimezone: true }),
+    seo: jsonb("seo").$type<Seo>(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
+  },
+  (t) => [uniqueIndex("news_slug_idx").on(t.slug)],
+);
 
-export const procurements = pgTable("procurements", {
-  id: uuid("id")
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  title: varchar("title", { length: 255 }).notNull(),
-  status: procurementStatus("status"),
-  date: timestamp("date", { withTimezone: true }).notNull(),
-  year: integer("year").notNull(),
-  details: text("details"),
-  annualPlanDocs: jsonb("annual_plan_docs").$type<Docs>(),
-  invitationDocs: jsonb("invitation_docs").$type<Docs>(),
-  priceDisclosureDocs: jsonb("price_disclosure_docs").$type<Docs>(),
-  winnerDeclarationDocs: jsonb("winner_declaration_docs").$type<Docs>(),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
-});
+export const procurements = pgTable(
+  "procurements",
+  {
+    id: uuid("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    title: varchar("title", { length: 255 }).notNull(),
+    slug: varchar("slug", { length: 255 }),
+    status: procurementStatus("status"),
+    date: timestamp("date", { withTimezone: true }).notNull(),
+    year: integer("year").notNull(),
+    details: text("details"),
+    annualPlanDocs: jsonb("annual_plan_docs").$type<Docs>(),
+    invitationDocs: jsonb("invitation_docs").$type<Docs>(),
+    priceDisclosureDocs: jsonb("price_disclosure_docs").$type<Docs>(),
+    winnerDeclarationDocs: jsonb("winner_declaration_docs").$type<Docs>(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
+  },
+  (t) => [uniqueIndex("procurements_slug_idx").on(t.slug)],
+);
 
 export const directoryEntries = pgTable("directory_entries", {
   id: uuid("id")

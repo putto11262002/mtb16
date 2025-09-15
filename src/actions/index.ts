@@ -1,1 +1,3 @@
-export const server = {};
+import { news } from "./news/action";
+
+export const server = { news };
