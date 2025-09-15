@@ -1,0 +1,20 @@
+id: action-announcements-publish_announcement
+feature: announcements
+layers:
+  - application
+tags:
+  - server-action
+  - validation
+  - db-access
+  - auth
+spec_refs:
+  - pages.admin-announcements.actions.publish_announcement
+needs:
+  - cm-schema
+done_checklist:
+  - Function exists in src/actions/announcements/action.ts
+  - Input schema validated using Zod from src/actions/announcements/schema.ts
+  - ACL enforced for authenticated users
+  - Database write performed for announcement entity
+  - Revalidation triggered for /announcements and /announcements/:slug
+  - Errors handled appropriately

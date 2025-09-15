@@ -1,0 +1,20 @@
+id: action-directory-create_dir_entry
+feature: directory
+layers:
+  - application
+tags:
+  - server-action
+  - validation
+  - db-access
+  - auth
+spec_refs:
+  - pages.admin-directory.actions.create_dir_entry
+needs:
+  - cm-schema
+done_checklist:
+  - Function exists in src/actions/directory/action.ts
+  - Input schema validated using Zod from src/actions/directory/schema.ts
+  - ACL enforced for authenticated users
+  - Database write performed for directory-entry entity
+  - Revalidation triggered for /directory
+  - Errors handled appropriately

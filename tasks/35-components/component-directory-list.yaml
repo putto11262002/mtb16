@@ -1,0 +1,24 @@
+id: component-directory-list
+title: Implement DirectoryListCard shared component
+layers: ["interface"]
+tags: ["component", "frontend"]
+spec_refs:
+  - spec:pages.home.blocks[8]
+  - spec:pages.directory-list.blocks[6]
+  - spec:pages.directory-list.blocks[8]
+  - spec:pages.directory-list.blocks[10]
+  - spec:pages.directory-list.blocks[12]
+  - spec:pages.directory-list.blocks[14]
+  - spec:pages.about.blocks[3]
+  - spec:pages.admin-directory.blocks[0]
+feature: directory
+needs:
+  - action-directory-create_dir_entry
+  - action-directory-publish_dir_entry
+  - action-directory-update_dir_entry
+checklist:
+  - Component renders directory entry cards using ShadCN Card and Avatar primitives
+  - Props typed with DirectoryEntry[] from directory content model
+  - Each card displays entry name, type, contact info, and profile image
+  - Empty state message is displayed when no entries
+  - Component integrated into home, directory-list, about, and admin-directory pages

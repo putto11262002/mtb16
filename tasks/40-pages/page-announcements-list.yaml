@@ -1,0 +1,16 @@
+id: page-announcements-list
+title: Implement announcements-list page
+layers: ["interface"]
+tags: ["page", "frontend", "route", "seo"]
+spec_refs: ["spec:pages.announcements-list", "spec:sitemap.announcements-list"]
+needs:
+  - layout-base
+  - layout-public
+  - component-announcements-list
+checklist:
+  - Page route /announcements implemented in src/pages/announcements/index.astro
+  - Layouts integrated in rendering order: base, public
+  - Query logic wired via server actions for q_ann
+  - Shared component component-announcements-list used
+  - ACL visibility respected (public)
+  - SEO metadata present from spec

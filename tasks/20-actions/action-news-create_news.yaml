@@ -1,0 +1,20 @@
+id: action-news-create_news
+feature: news
+layers:
+  - application
+tags:
+  - server-action
+  - validation
+  - db-access
+  - auth
+spec_refs:
+  - pages.admin-news.actions.create_news
+needs:
+  - cm-schema
+done_checklist:
+  - Function exists in src/actions/news/action.ts
+  - Input schema validated using Zod from src/actions/news/schema.ts
+  - ACL enforced for authenticated users
+  - Database write performed for activity-update entity
+  - Revalidation triggered for /news
+  - Errors handled appropriately

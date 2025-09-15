@@ -1,0 +1,19 @@
+id: component-news-list
+title: Implement NewsListCard shared component
+layers: ["interface"]
+tags: ["component", "frontend"]
+spec_refs:
+  - spec:pages.home.blocks[6]
+  - spec:pages.news-list.blocks[0]
+  - spec:pages.admin-news.blocks[0]
+feature: news
+needs:
+  - action-news-create_news
+  - action-news-publish_news
+  - action-news-update_news
+checklist:
+  - Component renders news cards using ShadCN Card and Button primitives
+  - Props typed with News[] from news content model
+  - Each card displays news title, date, and links to detail page
+  - Empty state message is displayed when no news
+  - Component integrated into home, news-list, and admin-news pages
