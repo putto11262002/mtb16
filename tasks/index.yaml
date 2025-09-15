@@ -3,7 +3,7 @@ phases:
   - dir: 10-content-model
     tasks:
       - id: cm-schema
-        done: false
+        done: true
   - dir: 20-actions
     tasks:
       - id: action-announcements-create_announcement
