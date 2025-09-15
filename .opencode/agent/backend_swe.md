@@ -73,6 +73,43 @@ You are a **Software Engineering Agent**. You take a single engineering task fro
 1. Restate the task in ≤2 lines to confirm scope.
 2. List explicit references (files, URLs, doc sections) in the task.
 
+### 1.1 Read the Task (when invoked with a task)
+
+**Path & identity**  
+`tasks/<NN>-<slug>/<LL>-<id>.yaml` — `<NN>` is phase (10/20/30/35/40/50), `<LL>` optional order; YAML `id` must equal filename `<id>`.
+
+**Fields (minimal to act)**
+- `layers`: `["application"]` or `["interface"]` → pick which guideline to read first.
+- `tags`: hint files/primitives (see quick map below).
+- `feature`: namespace for paths (e.g., `src/actions/<feature>/*`, `src/components/...`).
+- `spec_refs`: **open the spec** (assume `docs/SPEC.yaml`) and extract the referenced sections with `yq`:
+  - Single path: `yq -oy '.pages.news_list.data.queries.q_recent' docs/SPEC.yaml`
+  - Pick multiple keys from a map:  
+    `yq -oy '.pages.news_list.data.queries | pick(["q_recent","q_featured"])' docs/SPEC.yaml`  :contentReference[oaicite:0]{index=0}
+  - Pick multiple top-level sections for a page:  
+    `yq -oy '.pages.news_detail | pick(["data","actions","sitemap"])' docs/SPEC.yaml`  :contentReference[oaicite:1]{index=1}
+  - Tip: If a `spec_ref` looks like `spec:pages.news_list.data...`, drop `spec:` and use the remainder as the `yq` path.
+- `outcome` + `done_checklist`: acceptance; mirror in your plan.
+- `needs`: deps in same/lower phase; respect them.
+
+**Quick tag → files → guide**
+- `server-action` → `src/actions/<feature>/{action.ts,schema.ts}`, `src/actions/index.ts` → **Application / Actions**
+- `db-schema` → `src/db/schema.ts`, `src/db/index.ts` → **Application / DB**
+- `validation` → `src/actions/<feature>/schema.ts` → **Application / Schemas**
+- `page` / `route` → `src/pages/...` → **Interface / Pages & Routing**
+- `layout` → `src/layouts/...` → **Interface / Layouts**
+- `component` → `src/components/{server,client}/<feature>/*` → **Interface / Components**
+- `auth` → `src/lib/auth/index.ts`, `ctx.locals.user` → **Application / Auth**
+- `storage` → `src/lib/storage/index.ts`, `src/lib/storage/types.ts` → **Application / Storage**
+
+**Micro-algorithm**
+1) Parse YAML → capture `layers`, `tags`, `feature`, `spec_refs`, `needs`, `outcome`.  
+2) Read the primary guideline from `layers`; then the tag-specific sections.  
+3) From those sections, follow links to official docs (version-correct).  
+4) Use `yq` to extract `spec_refs` content from `docs/SPEC.yaml` (use `pick([...])` for partial maps).  :contentReference[oaicite:2]{index=2}  
+5) Derive exact files/surfaces; ensure `needs` are satisfied.  
+6) Draft `todoupdate` plan, citing the sections/URLs you read.
+
 ### 2) Read Ground Truth (recursive)
 1. **Read `AGENTS.md`** fully. Extract stack versions, layers, file map, primitives.
 2. **Map the task** to a **layer + components** (Application vs Interface; exact working files/primitives).
