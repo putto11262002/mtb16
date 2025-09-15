@@ -73,13 +73,13 @@ layouts: []        # array of shared, nestable wrappers with slots
 
 ```yaml
 meta:
-  spec_id: web-001
-  name: "Unit Website"
-  version: 0.1.0
-  source_brief:
-    path: docs/PRODUCT_BRIEF.md
-    version: 0.1.0
-  metrics:
+  spec_id: web-001              # string
+  name: "Unit Website"          # string
+  version: 0.1.0                # string (semver suggested)
+  source_brief: 
+     path: docs/PRODUCT_BRIEF.md  # optional string
+     version: 0.1.0               # optional string
+  metrics:                      # optional global KPIs (few, high-level)
     - id: kpi-post-cadence
       desc: "≥ 4 posts/month"
       target: ">=4/mo"
@@ -136,7 +136,7 @@ content_model:
       localized: true
       fields:
         - { id: title,       type: varchar, required: true, localized: true, max_length: 255 }
-        - { id: slug,        type: varchar, unique: true, max_length: 255 }
+        - { id: slug,        type: varchar, unique: true, max_length: 255 } # optional: pattern validation
         - { id: excerpt,     type: text, localized: true }
         - { id: body,        type: text, localized: true, format: "markdown" }
         - { id: heroImage,   type: file, validations: { mime_types: ["image/*"], max_size: 5242880 } }
@@ -232,18 +232,20 @@ sitemap:
 ```yaml
 pages:
   - id: news_list
-    purpose: "Users discover recent updates easily"
-    outcomes:
+    purpose: "Users discover recent updates easily"        # outcome statement
+    outcomes:                                              # optional, specific outcomes
       - "Users find a relevant post within 2 clicks"
-    params: []
-    data:
+    params: []                                             # route params if any
+    data:                                                  # declarative queries (see §3)
       queries:
         q_recent:
-          mode: many
+          mode: many                 # enum: [one, many, count, aggregate]
           type: "newsArticle"
-          by: slug
-          where:
-            - { field: "publishedAt", op: lt, value: ":now" }
+          by: slug                   # enum: [id, slug]
+          where:                     # AND of predicates by default; see boolean logic in §3.1
+            - field: "publishedAt"
+              op: lt
+              value: ":now"
           sort: "-publishedAt"
           limit: 12
           offset: 0
@@ -251,45 +253,79 @@ pages:
           include: ["author","unit"]
           includeDepth: 1
           locale: "th-TH"
-    blocks:                                   # semantic, not visual (see §2.6.2)
-      - type: collection                      # collection|entity|content|media|action-point|nav
-        uses: { query: q_recent }
+    blocks:                                                # semantic, not visual (see §2.6.2)
+      - type: collection                                   # canonical types: collection|entity|content|media|action-point|nav
+        uses: { query: q_recent }                          # per-type contract (see §2.6.2)
         empty_state: "No content yet"
-    actions:                                   # see §4
+    actions:                                               # first-class mutations (see §4)
       - id: submit_contact
         intent: "Store inquiry and notify staff"
-        operation: create
-        on: "supportRequest"
-        input: { schema_ref: content_model.types.supportRequest }
-        acl: { allowed_roles: ["public","authenticated"] }
+        operation: create          # enum: [create, update, delete, publish, custom]
+        on: "supportRequest"       # content type id or "custom"
+        input:
+          schema_ref: content_model.types.supportRequest   # or null
+        acl:
+          allowed_roles: ["public","authenticated"]        # only these two are valid
         effects:
-          writes: ["supportRequest"]
-          revalidate: ["/support/:id"]
-          webhooks: ["notifyOps"]
+          writes: ["supportRequest"]                       # resources touched
+          revalidate: ["/support/:id"]                     # optional
+          webhooks: ["notifyOps"]                          # optional
         success: ["Entry created", "Notification sent"]
         failure: ["Validation error surfaced"]
-        rate_limit: { window: "1m", max: 5 }
+        rate_limit: { window: "1m", max: 5 }               # optional
     seo:
       index: true
       title_tmpl: "News – %s"
-      derive_from: "q_post.seo"
-    acl: { visibility: ["public"] }           # or ["authenticated"]
-    metrics:
-      - { id: m-newslist-bounce, event: "bounce_rate", target: "<=40%", source: "GA4|custom", segment: "all", window: "30d" }
+      derive_from: "q_post.seo"                            # or "type.field" (see note below)
+    acl:                                                   # OPTIONAL (see §5 for inheritance)
+      visibility: ["public"]                               # or ["authenticated"]
+    metrics:                                               # analytics goals (behavioral)
+      - id: m-newslist-bounce
+        event: "bounce_rate"                               # GA4 or custom event name
+        target: "<=40%"
+        source: "GA4|custom"
+        segment: "all|organic|<segment_id>"                # optional
+        window: "30d"
 ```
 
-**SEO `derive_from` note:** may reference `queryId.fieldPath` (e.g., `q_post.seo`) or a content field path literal `type.field`.
+**SEO `derive_from` note:** may reference `queryId.fieldPath` (e.g., `q_post.seo`) or a content field path literal `type.field` (used when the page’s canonical entity is obvious).
 
 #### 2.6.2 Block Semantics (Contracts & When to Use)
 
 > Blocks are **semantic outputs**—they describe *what the page should deliver*, not specific UI widgets.
 
-* **`collection`** — render a set of items. Contract: `uses: { query: <query_id> }`; `mode ∈ [many,count,aggregate]`.
-* **`entity`** — render a single item. Contract: `mode=one`.
-* **`content`** — static copy or settings content. Contract: `uses: { source: "settings.<path>" | text: "<inline>" }`.
-* **`media`** — file output. Contract: `uses: { query, field }` or `uses: { from: "<query.field>" }`.
-* **`action-point`** — form/interaction; Contract: `action_id: <id>`.
-* **`nav`** — route/action trigger; Contract: `uses: { route | action_id }`.
+* **`collection`** — render a set of items.
+
+  * **Contract:** `uses: { query: <query_id> }` *(query `mode` SHOULD be `many` or `count|aggregate` for summaries)*
+  * **Validations:** bound query exists; `mode ∈ [many,count,aggregate]`.
+  * **When:** lists, feeds, tables, grids, archives.
+
+* **`entity`** — render a single item.
+
+  * **Contract:** `uses: { query: <query_id> }` *(query `mode` MUST be `one`)*
+  * **Validations:** query `mode=one`.
+  * **When:** detail pages, single-record views.
+
+* **`content`** — static copy or settings content.
+
+  * **Contract:** `uses: { source: "settings.<path>" | text: "<inline>" }`
+  * **When:** headings, legal text, footers, banners, labels.
+
+* **`media`** — file output (image/video/document).
+
+  * **Contract:** `uses: { query: <query_id>, field: "<fileFieldPath>" }` **or** `uses: { from: "<query_id.fieldPath>" }`
+  * **When:** hero images, galleries, attachments.
+
+* **`action-point`** — interaction surface that can collect input and invoke an action.
+
+  * **Contract:** `action_id: <action_id>`; optional `prefill: { query: <query_id> }`, `success_state`, `error_state`.
+  * **Validations:** referenced action exists.
+  * **When:** forms, buttons that submit data, multi-step inputs.
+
+* **`nav`** — navigation or action trigger without data entry.
+
+  * **Contract:** `uses: { route: "<path>" }` **or** `uses: { action_id: "<action_id>" }`
+  * **When:** CTAs, next/prev, simple triggers.
 
 **Deprecated names removed in v3.0.0:** `list`, `detail`, `form`, `cta`.
 
@@ -297,29 +333,30 @@ pages:
 
 ### 2.7 `layouts` (Shared chrome & nesting)
 
-**Purpose:** Reusable, nestable wrappers around pages (header/nav/footer/etc.). Layouts follow the same `data` and `blocks` grammar as pages but are **not routes**.
+**Purpose:** Reusable, nestable wrappers around pages (header/nav/footer/etc.). Layouts follow the same `data` and `blocks` grammar as pages but are **not routes**. A layout renders its own blocks and must expose an `outlet` slot where the child page is rendered.
 
 ```yaml
 layouts:
   - id: base
     purpose: "Global chrome: header, nav, footer"
-    params: []
-    data:
+    params: []                           # inherits route params; declare if used in queries
+    data:                                # same grammar as §3 (scoped to this layout)
       queries:
         q_recent_news: { mode: many, type: newsArticle, sort: "-publishedAt", limit: 5 }
-    slots:
+    slots:                               # named regions rendered around the child page
       header:
         blocks:
           - { type: content, uses: { text: "Unit Website" } }
       sidebar:
         blocks:
           - { type: collection, uses: { query: q_recent_news } }
-      outlet: {}                         # REQUIRED
+      outlet: {}                         # REQUIRED: where the nested page renders
       footer:
         blocks:
           - { type: content, uses: { text: "© Unit" } }
-    acl: { visibility: ["public"] }      # or ["authenticated"]
-    metrics:
+    acl:                                 # optional guard for all pages using this layout
+      visibility: ["public"]             # or ["authenticated"]
+    metrics:                             # optional; same grammar as §7
       - { id: m-layout-nav-CTR, event: "nav_click", target: ">=3%", source: "GA4", window: "30d" }
 ```
 
@@ -339,64 +376,429 @@ layouts:
 data:
   queries:
     q_example:
-      mode: many
+      mode: many             # enum: [one, many, count, aggregate]
       type: "content_type_id"
-      by: slug
-      where:
-        - { field: "slug", op: eq, value: ":param.slug" }
+      by: slug               # enum: [id, slug] (sugar for equality on sys.id or slug)
+      where:                  # AND-list by default; see §3.1 for grouped boolean logic
+        - field: "slug"
+          op: eq
+          value: ":param.slug"
       sort: "-publishedAt"
       limit: 10
       offset: 0
-      select: ["title","slug"]
-      include: ["author"]
-      includeDepth: 1
-      locale: "th-TH"
+      select: ["title","slug"]       # whitelist of fields
+      include: ["author"]            # expand relations
+      includeDepth: 1                # optional (default 1, max 2 recommended)
+      locale: "th-TH"                # optional
+      # aggregate (only when mode=aggregate)
+      # aggregate:
+      #   measures: [ { func: count, field: "*" }, { func: sum, field: "views" } ]
+      #   group_by: ["unit.id"]
+      #   having:
+      #     - { field: "count", op: gt, value: 0 }
 ```
 
 ### 3.1 Formal Mini-Grammar (concise)
 
-*(unchanged; omitted here for brevity)*
+```
+query := {
+  mode: one|many|count|aggregate,
+  type: <content_type_id>,
+  by?: id|slug,
+  where?: predicates | logic,
+  sort?: "<field>" | "-<field>",
+  limit?: int, offset?: int,
+  select?: string[],
+  include?: string[], includeDepth?: 1|2,
+  locale?: string,
+  aggregate?: {
+    measures: {func: count|sum|avg|min|max, field: string|"*"}[],
+    group_by?: string[],
+    having?: predicates | logic
+  }
+}
+
+# Predicates and boolean logic
+predicates := [ predicate, ... ]          # implicit AND
+logic := { and?: (predicate|logic)[], or?: (predicate|logic)[], not?: (predicate|logic) }
+
+predicate := {
+  field: string,                          # field path
+  op: op,
+  value?: literal | placeholder | array
+  quantifier?: any|all                    # optional: for array/relation fields
+}
+
+op := eq|ne|gt|gte|lt|lte|in|nin|contains|starts_with|ends_with|matches|exists|between
+
+literal := string | number | boolean | null | datetime
+array := [ literal | placeholder, ... ]
+```
+
+**Notes**
+
+* A top-level `where: []` means no filter (i.e., all).
+* `quantifier` applies when the `field` is an array or relation collection.
+* `matches` is an engine-regex match (implementation-defined syntax).
+* `mode=one` SHOULD yield exactly 1 entry; otherwise it’s a spec error.
+* If both `by` and `where` are present, they must be consistent.
 
 ### 3.2 Placeholder Variables (canonical)
 
-Allowed: `:now`, `:locale`, `:user.id`, `:param.<name>`, `:query.<id>.<fieldPath>`
+Allowed everywhere a `value` appears:
+
+* `:now` — current server time (ISO-8601)
+* `:locale` — effective locale (BCP 47)
+* `:user.id` — authenticated user id (or `null`)
+* `:param.<name>` — route param value from `sitemap.path`
+* `:query.<id>.<fieldPath>` — value from an earlier query in the **same** page/layout scope
+
 **Removed in v4.0.0:** `:role`, `:user.roles[]`.
+
+**Validation**
+
+* Unknown placeholder prefixes → error.
+* `:query.*` cannot create cycles; must reference an earlier query id in declaration order.
+
+### 3.3 Sorting, Pagination, Locales
+
+* **Sorting:** `sort` is a single key ascending (`"field"`) or descending (`"-field"`). For stable pagination, include a deterministic tiebreaker in your schema (e.g., `createdAt` + primary key).
+* **Pagination:** `limit`/`offset` only. (**No cursor paging** in v3+.)
+* **Locales:** precedence is query-level `locale` > page/layout default (if provided) > system default.
 
 ---
 
 ## 4) Actions/Mutations Grammar (Detailed)
 
-*(unchanged aside from public/authenticated examples; see §2.6.1 and prior version for full block.)*
+```yaml
+actions:
+  - id: submit_contact
+    intent: "Store inquiry and notify staff"
+    operation: create        # enum: [create, update, delete, publish, custom]
+    on: "supportRequest"     # content type id or "custom"
+    input:
+      schema_ref: content_model.types.supportRequest
+      # OR: fields: [ { id: "email", type: Email, required: true } ]
+    acl:
+      allowed_roles: ["public","authenticated"]   # only these two allowed
+      # rule: <expr>   # optional; may reference input.*, :user.id, :now, :param.*
+    effects:
+      writes: ["supportRequest"]
+      revalidate: ["/support/:id"]
+      webhooks: ["notifyOps"]
+    success: ["Entry created", "Notification sent"]
+    failure: ["Validation error surfaced"]
+    rate_limit: { window: "1m", max: 5 }
+```
+
+**Canonical “update current profile” example:**
+
+```yaml
+actions:
+  - id: update_profile
+    intent: "Update current user profile"
+    operation: update
+    on: "userProfile"
+    input:
+      schema_ref: content_model.types.userProfile
+    acl:
+      allowed_roles: ["authenticated"]
+      rule: 'input.authUserId == :user.id'
+    effects:
+      writes: ["userProfile"]
+```
+
+**Form binding (via block):** An `action-point` block MUST reference a valid `actions.<id>` via `action_id`.
 
 ---
 
 ## 5) ACL Model (Auth Classes)
 
-*(unchanged; only `public`/`authenticated` are valid.)*
+**Overview**
+
+* **Auth classes only:** `public` (anonymous) and `authenticated` (signed-in).
+* Two layers remain: (1) Allowed auth classes lists, (2) Optional expression rules. If both are present for the same check, **both must pass** (logical AND).
+
+### 5.1 Layouts & Pages
+
+```yaml
+layouts[].acl:
+  visibility?: ["public"] | ["authenticated"]
+  visibility_rule?: <expr>             # optional; no content.* context
+
+pages[].acl:
+  visibility?: ["public"] | ["authenticated"]
+  visibility_rule?: <expr>             # optional; no content.* context
+```
+
+**Inheritance & Effective Visibility**
+
+* If `pages[].acl` is omitted, the page inherits visibility from attached layouts (outer→inner). Effective visibility = **intersection** of all attached layouts’ visibility (and layout `visibility_rule` if present).
+* If `pages[].acl` is present, effective visibility = intersection of attached layouts’ visibility (and rules) **and** the page’s `visibility` (and rule, if present).
+
+**Page/Layout expression context**
+
+* Allowed refs: `:user.id`, `:locale`, `:now`, `:param.<name>`.
+* **Forbidden:** `content.*` (no record context at page/layout visibility), `:user.roles`, `:role`.
+
+### 5.2 Content Types
+
+```yaml
+content_model.types[].acl:
+  read?:   ["public"] | ["authenticated"]
+  create?: ["authenticated"]
+  update?: ["authenticated"]
+  publish?:["authenticated"]
+  rule?:   # optional per-operation expressions
+    read?:    <expr>
+    create?:  <expr>
+    update?:  <expr>
+    publish?: <expr>
+```
+
+**Content expression context**
+
+* Allowed refs: `content.<fieldPath>`, `:user.id`, `:locale`, `:now`, `:param.<name>`.
+* **Semantics:** A request must satisfy the allowed auth class list **and** the operation’s rule if both are present.
+
+### 5.3 Actions
+
+```yaml
+actions[].acl:
+  allowed_roles?: ["public"] | ["authenticated"]
+  rule?: <expr>    # may reference input.<fieldPath>, :user.id, :locale, :now, :param.*
+```
+
+### 5.4 Expression Grammar (minimal, deterministic)
+
+```
+expr     := orExpr
+orExpr   := andExpr { "||" andExpr }
+andExpr  := unaryExpr { "&&" unaryExpr }
+unaryExpr:= [ "!" ] primary
+primary  := literal | ref | "(" expr ")" | call
+literal  := string | number | boolean | null | datetime
+ref      := contentRef | userRef | paramRef | specialRef | inputRef
+contentRef:= "content." fieldPath          # only in content type rules
+userRef  := ":user.id"
+paramRef := ":param." ident
+specialRef:= ":locale" | ":now"
+inputRef := "input." fieldPath             # only in action rules
+call     := ident "(" args? ")"
+args     := expr { "," expr }
+ops      := "==" "!=" ">" ">=" "<" "<=" "in" "nin" "contains" "starts_with" "ends_with"
+builtins := exists(fieldPath) | length(value)
+```
+
+**Examples**
+
+```yaml
+# Content rule: public read only when published or after embargo
+rule:
+  read: 'content.published == true || :now >= content.embargoAt'
+
+# Content rule: only owner can update (no roles concept)
+rule:
+  update: 'content.owner == :user.id'
+```
+
+**Validation**
+
+* Unknown identifiers or context-forbidden refs → error.
+* String ops require string operands; `in`/`nin` require RHS array/set.
 
 ---
 
 ## 6) Content Model (Field Types & Options)
 
-> This section defines the **field taxonomy and options**. For the **profile pattern**, see §2.4.
+**Field Types (enum):**
+`text | varchar | int | float | boolean | datetime | enum | file | relation | array | json`
 
-*(Field type enums, global options, type-specific options, and examples remain as in 4.0.0.)*
+**Global Field Options (unless noted):**
+
+* `required: boolean`
+* `unique: boolean`
+* `default: <literal | expression>` (e.g., `":now"` for `datetime`)
+* `nullable: boolean` (optional)
+* `index: boolean` (optional)
+* `localized: boolean` (only for `text`/`varchar` fields; follows Contentful i18n semantics)
+
+**Type-Specific Options & Shapes:**
+
+* **`varchar`**
+
+  * Options: `max_length` (default **255** if omitted), `localized: boolean`
+  * Example:
+
+    ```yaml
+    - { id: title, type: varchar, required: true, localized: true, max_length: 255 }
+    ```
+
+* **`text`**
+
+  * Options: `format` (e.g., `"markdown" | "plain"`), `localized`
+  * Example:
+
+    ```yaml
+    - { id: body, type: text, localized: true, format: "markdown" }
+    ```
+
+* **`int` / `float`**
+
+  * Options: `min`, `max`
+  * Example:
+
+    ```yaml
+    - { id: views, type: int, min: 0 }
+    - { id: rating, type: float, min: 0, max: 5 }
+    ```
+
+* **`boolean`**
+
+  * Options: none beyond global
+  * Example:
+
+    ```yaml
+    - { id: featured, type: boolean, default: false }
+    ```
+
+* **`datetime`**
+
+  * Options: `default` (e.g., `":now"`), ISO-8601 date-time with timezone
+  * Example:
+
+    ```yaml
+    - { id: publishedAt, type: datetime, required: true, default: ":now" }
+    ```
+
+* **`enum`**
+
+  * Options: `values: ["a","b","c"]` (distinct, lowercase strings)
+  * Example:
+
+    ```yaml
+    - { id: priority, type: enum, values: ["low","medium","high"], default: "low" }
+    ```
+
+* **`file`**
+
+  * Shape:
+
+    ```yaml
+    file:
+      id: string
+      filename: string
+      url: string
+      size: number
+      mimeType: string
+      createdAt: datetime
+    ```
+  * Validations: `mime_types: ["image/*", "application/pdf", ...]`, `max_size: <bytes>`
+  * Example:
+
+    ```yaml
+    - { id: heroImage, type: file, validations: { mime_types: ["image/*"], max_size: 5242880 } }
+    ```
+
+* **`relation`**
+
+  * Shape:
+
+    ```yaml
+    relation:
+      to: "<typeId>"
+      cardinality: "one-to-one" | "one-to-many" | "many-to-one" | "many-to-many"
+      on_delete: "restrict" | "cascade" | "nullify"   # optional
+      inverse: "<fieldId>"                             # optional, documentation-only
+    ```
+  * Example:
+
+    ```yaml
+    - id: unit
+      type: relation
+      to: "unit"
+      cardinality: many-to-one
+      on_delete: restrict
+    ```
+
+* **`array`**
+
+  * Items: `{ type: <primitive> }` where **primitive ∈ { text, varchar, int, float, boolean, datetime, enum }**
+  * Example:
+
+    ```yaml
+    - id: tags
+      type: array
+      items: { type: varchar }
+    ```
+
+* **`json`**
+
+  * Free-form; optional `shape` (documentation-only)
+  * Example:
+
+    ```yaml
+    - { id: seo, type: json, shape: { title: "varchar", ogImage: "file" } }
+    ```
 
 ---
 
 ## 7) Metrics (Per-Page Analytics Goals)
 
-*(unchanged)*
+```yaml
+metrics:
+  - id: m-news-time
+    event: "avg_engaged_time"           # GA4 metric or custom
+    target: ">=90s"                     # comparator + value (%, s, count)
+    source: "GA4|custom"
+    segment: "all|organic|<segment_id>" # optional
+    window: "30d"
+```
+
+**Rules**
+
+* Keep ≤ 3 metrics per page (80/20).
+* Targets are human-readable comparators: `>=`, `<=`, `=`, `%`, `s`, counts.
 
 ---
 
 ## 8) Validation Checklist
 
-*(updated to account for the canonical key order and cross-refs)*
-
 * **Top-level key order:** `meta` → `context` → `features` → `content_model` → `sitemap` → `pages` → `layouts`.
   (Order is normative for readability; validators MAY warn if out of order.)
-* All prior validation items from v4.0.0 remain in effect (auth classes only, no `user`/`authUser` types, etc.).
+* **IDs unique** per scope (`features`, `pages`, `types`, `actions`, `metrics`).
+* **Routes → pages:** every `sitemap.page_id` exists in `pages[].id`.
+* **Sitemap → layouts:** all `sitemap[].layout` refs exist in `layouts[].id`; chains are acyclic.
+* **Layouts:** every `layouts[].slots` contains `outlet`.
+* **Page queries:** `blocks[].uses.query` references `data.queries.<id>` in the same page; layout queries are not referenceable by pages.
+* **Block contracts:**
+
+  * `entity` → bound query `mode=one`.
+  * `collection` → bound query `mode ∈ many|count|aggregate`.
+  * `action-point` → has valid `action_id`.
+  * `media` → has `field` or `from`.
+* **Placeholders:**
+
+  * Allowed: `:now`, `:locale`, `:user.id`, `:param.*`, `:query.*` (acyclic).
+  * **Errors:** `:role`, `:user.roles[]`, unknown prefixes.
+* **Queries:**
+
+  * If `mode=one`, result cardinality must be exactly 1.
+  * If `by` is present with `where`, they must be consistent.
+  * `limit`/`offset` only; **no cursor**.
+* **ACL (Auth Classes):**
+
+  * Any ACL lists must be a subset of `{ "public", "authenticated" }`.
+  * Page/layout `visibility_rule` must not reference `content.*`.
+  * Content rules may reference `content.*` and `:user.id`.
+* **Auth modeling:**
+
+  * **Error** to define `content_model.types[].id` as `user` or `authUser`.
+  * If a profile type exists, it **must** contain a unique FK to the auth user (e.g., `authUserId: varchar, unique: true`).
+* **Examples sanity:**
+
+  * No custom roles. Replace legacy role examples with `public`/`authenticated`.
+  * Profile queries filtering on `:user.id` SHOULD use `mode: one`.
 
 ---
 
@@ -471,13 +873,13 @@ layouts:
 * **Add features first:** define outcomes in `features[]`.
 * **Model data second:** create `content_model.types[]` (use the **profile** pattern if you need per-user fields; never define `user`).
 * **Map routes:** build `sitemap[]` using stable `page_id`s and layout chains.
-* **Define pages:** write outcomes → declare `data.queries` → add **semantic** `blocks` → wire `actions` → (optional) page `acl` (public/authenticated) → add `metrics`.
+* **Define pages:** write outcomes → declare `data.queries` → add **semantic** `blocks` (`collection|entity|content|media|action-point|nav`) → wire `actions` → (optional) page `acl` (`public`/`authenticated`) → add `metrics`.
 * **Compose layouts:** define `layouts[]` with an `outlet`; reference via `sitemap.layout` (outer→inner).
 * **Lint:** run checks per §8; ensure references resolve.
 
 ---
 
-# Changelog
+# CATALOG
 
 - **v1.0.0 — Initial publication**
   - Imported the initial draft of the Contentful Website Spec Reference.
