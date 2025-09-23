@@ -1,3 +1,3 @@
-import { news } from "./news/action";
+import { announcement } from "./announcement";
 
-export const server = { news };
+export const server = { announcement };
