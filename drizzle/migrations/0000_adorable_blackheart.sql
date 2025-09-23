@@ -1,41 +1,14 @@
-CREATE TYPE "public"."announcement_category" AS ENUM('emergency', 'public-notice', 'policy', 'general');--> statement-breakpoint
 CREATE TYPE "public"."procurement_status" AS ENUM('open', 'closed');--> statement-breakpoint
-CREATE TABLE "announcements" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"title" varchar(255) NOT NULL,
-	"body" text,
-	"preview_image" text,
-	"category" "announcement_category",
-	"tags" text[],
-	"attachments" jsonb,
-	"published_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"seo" jsonb,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
 CREATE TABLE "directory_entries" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar(255) NOT NULL,
 	"tag" varchar(255),
-	"image" text,
+	"image" jsonb,
 	"link" varchar(255),
 	"phone" varchar(255),
 	"email" varchar(255),
 	"notes" text,
 	"order" integer,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE "news" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"title" varchar(255) NOT NULL,
-	"caption" varchar(255),
-	"body" text,
-	"hero_image" text,
-	"published_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"seo" jsonb,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
@@ -53,6 +26,20 @@ CREATE TABLE "persons" (
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "posts" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"title" varchar(255) NOT NULL,
+	"body" text,
+	"preview_image" jsonb,
+	"tags" text[],
+	"attachments" jsonb[],
+	"published_at" timestamp with time zone,
+	"type" varchar(50) NOT NULL,
+	"seo" jsonb,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "procurements" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"title" varchar(255) NOT NULL,
@@ -60,10 +47,11 @@ CREATE TABLE "procurements" (
 	"date" timestamp with time zone NOT NULL,
 	"year" integer NOT NULL,
 	"details" text,
-	"annual_plan_docs" jsonb,
+	"annual_plan" jsonb,
 	"invitation_docs" jsonb,
 	"price_disclosure_docs" jsonb,
 	"winner_declaration_docs" jsonb,
+	"attachments" jsonb[],
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
@@ -94,7 +82,11 @@ CREATE TABLE "site_settings" (
 CREATE TABLE "units" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar(255) NOT NULL,
+	"image" jsonb,
+	"description" text,
 	"parent_id" uuid,
+	"leader" uuid,
+	"order" integer,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
@@ -149,5 +141,8 @@ CREATE TABLE "verification" (
 --> statement-breakpoint
 ALTER TABLE "persons" ADD CONSTRAINT "persons_unit_id_units_id_fk" FOREIGN KEY ("unit_id") REFERENCES "public"."units"("id") ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "units" ADD CONSTRAINT "units_parent_id_units_id_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."units"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "units" ADD CONSTRAINT "units_leader_persons_id_fk" FOREIGN KEY ("leader") REFERENCES "public"."persons"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+CREATE INDEX "posts_published_at_idx" ON "posts" USING btree ("published_at");--> statement-breakpoint
+CREATE INDEX "posts_type_idx" ON "posts" USING btree ("type");

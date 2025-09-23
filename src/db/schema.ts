@@ -1,35 +1,37 @@
+import { relations, sql } from "drizzle-orm";
 import {
-  pgTable,
-  uuid,
-  text,
-  varchar,
-  timestamp,
-  integer,
   boolean,
+  index,
+  integer,
   jsonb,
   pgEnum,
-  uniqueIndex,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+  varchar,
   type AnyPgColumn,
 } from "drizzle-orm/pg-core";
-import { relations, sql } from "drizzle-orm";
 
 // Types
 type Seo = { title?: string; ogImage?: string };
-type Attachments = { name: string; url: string; mimeType?: string }[];
+type FileMeta = { id: string; mimeType?: string };
 type Docs = { name: string; url: string }[];
-
-// Enums
-export const announcementCategory = pgEnum("announcement_category", [
-  "emergency",
-  "public-notice",
-  "policy",
-  "general",
-]);
 
 export const procurementStatus = pgEnum("procurement_status", [
   "open",
   "closed",
 ]);
+
+export const timestamps = {
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
+};
 
 // Tables
 export const siteSettings = pgTable("site_settings", {
@@ -53,93 +55,59 @@ export const siteSettings = pgTable("site_settings", {
   homepageAlertImage: text("homepage_alert_image"),
   homepageAlertAlt: varchar("homepage_alert_alt", { length: 255 }),
   homepageAlertLink: varchar("homepage_alert_link", { length: 255 }),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
+  ...timestamps,
 });
 
-export const announcements = pgTable(
-  "announcements",
+type Attachment = {
+  id: string;
+  file: FileMeta;
+  label: string;
+};
+
+export const posts = pgTable(
+  "posts",
   {
     id: uuid("id")
       .primaryKey()
       .default(sql`gen_random_uuid()`),
     title: varchar("title", { length: 255 }).notNull(),
-    slug: varchar("slug", { length: 255 }),
     body: text("body"),
-    previewImage: text("preview_image"),
-    category: announcementCategory("category"),
+    previewImage: jsonb("preview_image").$type<FileMeta | undefined>(),
     tags: text("tags").array(),
-    attachments: jsonb("attachments").$type<Attachments>(),
-    publishedAt: timestamp("published_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-    seo: jsonb("seo").$type<Seo>(),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .notNull()
-      .defaultNow()
-      .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
-  },
-  (t) => [uniqueIndex("announcements_slug_idx").on(t.slug)],
-);
-
-export const news = pgTable(
-  "news",
-  {
-    id: uuid("id")
-      .primaryKey()
-      .default(sql`gen_random_uuid()`),
-    title: varchar("title", { length: 255 }).notNull(),
-    slug: varchar("slug", { length: 255 }),
-    caption: varchar("caption", { length: 255 }),
-    body: text("body"),
-    heroImage: text("hero_image"),
+    attachments: jsonb("attachments").array().$type<Attachment[]>(),
     publishedAt: timestamp("published_at", { withTimezone: true }),
+    type: varchar("type", { length: 50 }).notNull(),
     seo: jsonb("seo").$type<Seo>(),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .notNull()
-      .defaultNow()
-      .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
+    ...timestamps,
   },
-  (t) => [uniqueIndex("news_slug_idx").on(t.slug)],
+  (table) => {
+    return {
+      publishedIdx: index("posts_published_at_idx").on(table.publishedAt),
+      typeIdx: index("posts_type_idx").on(table.type),
+    };
+  },
 );
 
-export const procurements = pgTable(
-  "procurements",
-  {
-    id: uuid("id")
-      .primaryKey()
-      .default(sql`gen_random_uuid()`),
-    title: varchar("title", { length: 255 }).notNull(),
-    slug: varchar("slug", { length: 255 }),
-    status: procurementStatus("status"),
-    date: timestamp("date", { withTimezone: true }).notNull(),
-    year: integer("year").notNull(),
-    details: text("details"),
-    annualPlanDocs: jsonb("annual_plan_docs").$type<Docs>(),
-    invitationDocs: jsonb("invitation_docs").$type<Docs>(),
-    priceDisclosureDocs: jsonb("price_disclosure_docs").$type<Docs>(),
-    winnerDeclarationDocs: jsonb("winner_declaration_docs").$type<Docs>(),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .notNull()
-      .defaultNow()
-      .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
-  },
-  (t) => [uniqueIndex("procurements_slug_idx").on(t.slug)],
-);
+export const procurements = pgTable("procurements", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  title: varchar("title", { length: 255 }).notNull(),
+  status: procurementStatus("status"),
+  date: timestamp("date", { withTimezone: true }).notNull(),
+  year: integer("year").notNull(),
+  details: text("details"),
+  // แผนการจัดซื้อจัดจ้าง
+  annualPlan: jsonb("annual_plan").$type<Docs>(),
+  // ประกาศเชิญชวน
+  invitation: jsonb("invitation_docs").$type<FileMeta[]>(),
+  // เอกสารประกวดราคา/สอบราคา
+  priceDisclosure: jsonb("price_disclosure_docs").$type<FileMeta[]>(),
+  // ประกาศผู้ชนะ
+  winnerDeclaration: jsonb("winner_declaration_docs").$type<FileMeta[]>(),
+  attachments: jsonb("attachments").array().$type<Attachment[]>(),
+  ...timestamps,
+});
 
 export const directoryEntries = pgTable("directory_entries", {
   id: uuid("id")
@@ -147,19 +115,13 @@ export const directoryEntries = pgTable("directory_entries", {
     .default(sql`gen_random_uuid()`),
   name: varchar("name", { length: 255 }).notNull(),
   tag: varchar("tag", { length: 255 }),
-  image: text("image"),
+  image: jsonb("image").$type<FileMeta | undefined>(),
   link: varchar("link", { length: 255 }),
   phone: varchar("phone", { length: 255 }),
   email: varchar("email", { length: 255 }),
   notes: text("notes"),
   order: integer("order"),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
+  ...timestamps,
 });
 
 export const units = pgTable("units", {
@@ -167,16 +129,16 @@ export const units = pgTable("units", {
     .primaryKey()
     .default(sql`gen_random_uuid()`),
   name: varchar("name", { length: 255 }).notNull(),
+  image: jsonb("image").$type<FileMeta | undefined>(),
+  description: text("description"),
   parentId: uuid("parent_id").references((): AnyPgColumn => units.id, {
     onDelete: "set null",
   }),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
+  leader: uuid("leader").references((): AnyPgColumn => persons.id, {
+    onDelete: "set null",
+  }),
+  order: integer("order"),
+  ...timestamps,
 });
 
 export const persons = pgTable("persons", {
@@ -190,13 +152,7 @@ export const persons = pgTable("persons", {
   unitId: uuid("unit_id").references(() => units.id, { onDelete: "restrict" }),
   order: integer("order"),
   bio: text("bio"),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
+  ...timestamps,
 });
 
 // Relations
@@ -219,10 +175,8 @@ export const personsRelations = relations(persons, ({ one }) => ({
 // Exported types
 export type SiteSettings = typeof siteSettings.$inferSelect;
 export type SiteSettingsInsert = typeof siteSettings.$inferInsert;
-export type Announcement = typeof announcements.$inferSelect;
-export type AnnouncementInsert = typeof announcements.$inferInsert;
-export type News = typeof news.$inferSelect;
-export type NewsInsert = typeof news.$inferInsert;
+export type Post = typeof posts.$inferSelect;
+export type PostInsert = typeof posts.$inferInsert;
 export type Procurement = typeof procurements.$inferSelect;
 export type ProcurementInsert = typeof procurements.$inferInsert;
 export type DirectoryEntry = typeof directoryEntries.$inferSelect;
