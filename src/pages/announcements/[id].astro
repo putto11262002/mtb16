@@ -1,0 +1,131 @@
+---
+export const prerender = false;
+
+import PublicLayout from "@/layouts/PublicLayout.astro";
+import { annouyncementsUsecase } from "@/core/announcement/usecase";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Image } from "astro:assets";
+import { Config } from "@/config";
+import AttachmentListItem from "@/components/attachment/attachment-item.astro";
+
+const { id } = Astro.params;
+
+if (!id) {
+  return Astro.redirect("/404");
+}
+
+const announcement = await annouyncementsUsecase.getById(id);
+
+if (!announcement || !announcement.publishedAt) {
+  return Astro.redirect("/404");
+}
+
+// SEO metadata
+const title = announcement.seo?.title || `ประกาศ – ${announcement.title}`;
+const description = announcement.seo?.ogImage
+  ? `ประกาศ: ${announcement.title}`
+  : undefined;
+const ogImage = announcement.seo?.ogImage
+  ? `/api/files/${announcement.seo.ogImage}`
+  : undefined;
+---
+
+<PublicLayout>
+  <Fragment slot="head">
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:type" content="article" />
+    <link rel="canonical" href={new URL(`/announcements/${id}`, Astro.url)} />
+  </Fragment>
+
+  <main slot="body" class="container mx-auto px-4 py-8">
+    <article class="max-w-4xl mx-auto">
+      <header class="mb-8">
+        <div class="flex items-center justify-between mb-4">
+          <Button variant="ghost" size="sm" asChild>
+            <a href="/announcements" class="flex items-center gap-2">
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 19l-7-7 7-7"></path>
+              </svg>
+              กลับไปประกาศทั้งหมด
+            </a>
+          </Button>
+        </div>
+        <h1 class="text-3xl md:text-4xl font-bold leading-tight mb-2">
+          {announcement.title}
+        </h1>
+        {
+          announcement.publishedAt && (
+            <p class="text-lg text-muted-foreground mb-3">
+              เผยแพร่เมื่อ{" "}
+              {new Date(announcement.publishedAt).toLocaleDateString("th-TH")}
+            </p>
+          )
+        }
+
+        {
+          announcement.tags && announcement.tags.length > 0 && (
+            <div class="flex flex-wrap gap-2">
+              {announcement.tags.map((tag) => (
+                <Badge key={tag} variant="secondary">
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          )
+        }
+      </header>
+
+      {
+        announcement.previewImage && (
+          <figure class="mb-8">
+            <Image
+              src={Config.getFileURL(announcement.previewImage.id)}
+              alt={announcement.title}
+              class="w-full h-auto"
+              width={800}
+              height={450}
+            />
+          </figure>
+        )
+      }
+
+      {
+        announcement.body && (
+          <div class="prose prose-lg max-w-none mb-8">
+            <div class="whitespace-pre-wrap text-foreground leading-relaxed">
+              {announcement.body}
+            </div>
+          </div>
+        )
+      }
+
+      {
+        announcement.attachments && announcement.attachments.length > 0 && (
+          <section class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">เอกสารแนบ</h2>
+            <div class="space-y-3">
+              {announcement.attachments.map((attachment) => (
+                <AttachmentListItem attachment={attachment} />
+              ))}
+            </div>
+          </section>
+        )
+      }
+    </article>
+  </main>
+</PublicLayout>
+

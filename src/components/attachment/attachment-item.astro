@@ -1,0 +1,43 @@
+---
+import { Button } from "@/components/ui/button";
+import { Config } from "@/config";
+import { File, Download } from "lucide-react";
+
+interface Props {
+  attachment: {
+    id: string;
+    file: { id: string; mimeType?: string };
+    label: string;
+  };
+}
+
+const { attachment } = Astro.props;
+---
+
+<div class="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+  <div class="flex items-center gap-3">
+    <File className="w-6 h-6 text-muted-foreground" />
+    <div>
+      <span class="font-medium">{attachment.label}</span>
+      {
+        attachment.file.mimeType && (
+          <p class="text-sm text-muted-foreground">
+            {attachment.file.mimeType}
+          </p>
+        )
+      }
+    </div>
+  </div>
+  <Button variant="outline" size="sm" asChild>
+    <a
+      href={Config.getFileURL(attachment.file.id)}
+      target="_blank"
+      rel="noopener noreferrer"
+      download
+      class="flex items-center gap-2"
+    >
+      <Download className="w-4 h-4" />
+      ดาวน์โหลด
+    </a>
+  </Button>
+</div>
