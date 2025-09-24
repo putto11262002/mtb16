@@ -1,0 +1,26 @@
+---
+import Navbar from "./nav-bar";
+import { Image } from "astro:assets";
+import logo from "../../../assets/logo.png";
+---
+
+<header class="sticky top-0 z-50 w-full border-b bg-background">
+  <div class="container mx-auto px-4 flex h-16 items-center">
+    {/* Logo */}
+    <a href="/" class="flex items-center shrink-0">
+      <Image
+        src={logo}
+        alt="16th Military Circle Logo"
+        class="h-10 w-auto mr-3"
+        loading="eager"
+      />
+      <h1 class="text-sm font-bold flex flex-col">
+        มณฑลทหารบกที่ 16
+        <span class="text-xs text-muted-foreground">16th Military Circle</span>
+      </h1>
+    </a>
+    <div class="ml-auto">
+      <Navbar client:load />
+    </div>
+  </div>
+</header>

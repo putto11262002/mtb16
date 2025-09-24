@@ -1,11 +1,7 @@
 ---
 // src/pages/signin.astro
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import BaseLayout from "@/layouts/BaseLayout.astro";
-import { actions } from "astro:actions";
-import { Button } from "@/components/ui/button";
-import { SigninForm } from "@/components/islands/client/SigninForm";
+import BaseLayout from "@/layouts/base-layout.astro";
+import { LoginForm } from "@/components/auth/signin-form";
 
 export const prerender = false;
 
@@ -13,18 +9,19 @@ export const prerender = false;
 if (Astro.locals.user) {
   return Astro.redirect("/secure");
 }
-
-const result = Astro.getActionResult(actions.auth.signin);
-if (result && !result.error) {
-return Astro.redirect("/secure");
-}
 ---
+
 <BaseLayout>
   <Fragment slot="head">
-    <title>Sign In</title>
-    <meta name="description" content="Sign in to your account" />
+    <title>เข้าสู่ระบบ</title>
+    <meta name="description" content="เข้าสู่ระบบบัญชีของคุณ" />
   </Fragment>
-  <main slot="body" class="max-w-md mx-auto my-10 p-6 bg-white rounded-lg shadow-md">
-	  <SigninForm client:load />
+  <main
+    slot="body"
+    class="flex min-h-svh w-full items-center justify-center p-6 md:p-10"
+  >
+    <div class="w-full max-w-sm">
+      <LoginForm client:load />
+    </div>
   </main>
 </BaseLayout>

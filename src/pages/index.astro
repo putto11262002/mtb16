@@ -1,7 +1,5 @@
 ---
-// src/pages/index.astro
-import GreetingPopupIsland from "@/components/GreetingPopupIsland.astro";
-import AnimatedSloganSectionIsland from "@/components/AnimatedSloganSectionIsland.astro";
+import { Slogan } from "./_components/slogan";
 import {
   Card,
   CardContent,
@@ -13,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Image } from "astro:assets";
 import backgroundSvg from "@/assets/hero-background4.png";
-import PublicSiteLayout from "@/layouts/PublicSiteLayout.astro";
+import PublicLayout from "@/layouts/public-layout.astro";
 import { Separator } from "@/components/ui/separator";
 
 // Placeholder data
@@ -158,7 +156,7 @@ const quickLinks: { title: string; href: string; description: string }[] = [
 ];
 ---
 
-<PublicSiteLayout>
+<PublicLayout>
   <Fragment slot="head">
     <title>วงรอบทหารที่ 16 - หน้าแรก</title>
     <meta
@@ -168,7 +166,6 @@ const quickLinks: { title: string; href: string; description: string }[] = [
   </Fragment>
   <Fragment slot="body">
     <main class="min-h-screen bg-background">
-      <GreetingPopupIsland />
       <!-- Hero Section -->
       <section
         class="relative min-h-[calc(100vh-4rem)] md:min-h-0 flex flex-col items-center bg-cover bg-center pt-24 pb-44"
@@ -340,7 +337,7 @@ const quickLinks: { title: string; href: string; description: string }[] = [
               </p>
             </div>
             <div class="mb-12">
-              <AnimatedSloganSectionIsland />
+		    <Slogan client:visible />
             </div>
           </div>
         </section>
@@ -412,7 +409,7 @@ const quickLinks: { title: string; href: string; description: string }[] = [
               }
             </div>
             <div class="text-center mt-8">
-              <Button size="lg" class="px-8">
+              <Button size="lg" className="px-8">
                 <a href="/announcements">ดูประกาศเพิ่มเติม</a>
               </Button>
             </div>
@@ -481,7 +478,7 @@ const quickLinks: { title: string; href: string; description: string }[] = [
               }
             </div>
             <div class="text-center mt-8">
-              <Button size="lg" class="px-8">
+              <Button size="lg" className="px-8">
                 <a href="/news">ดูข่าวเพิ่มเติม</a>
               </Button>
             </div>
@@ -490,4 +487,4 @@ const quickLinks: { title: string; href: string; description: string }[] = [
       </section>
     </main>
   </Fragment>
-</PublicSiteLayout>
+</PublicLayout>

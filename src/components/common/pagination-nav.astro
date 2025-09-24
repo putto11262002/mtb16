@@ -1,0 +1,35 @@
+---
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import ButtonLink from "./button-link.astro";
+interface Props {
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  basePath: string;
+}
+const searchParams = new URL(Astro.url).searchParams;
+---
+
+<div class="flex justify-start items-center space-x-2">
+  <p class="text-sm">Page {Astro.props.page}</p>
+  <ButtonLink
+    href={Astro.props.page > 1
+      ? `${Astro.props.basePath}?${new URLSearchParams({ ...Object.fromEntries(searchParams), page: (Astro.props.page - 1).toString() }).toString()}`
+      : undefined}
+    variant="outline"
+    size="icon"
+    aria-disabled={Astro.props.page === 1}
+  >
+    <ChevronLeft className="h-4 w-4" />
+  </ButtonLink>
+  <ButtonLink
+    href={Astro.props.page < Astro.props.totalPages
+      ? `${Astro.props.basePath}?${new URLSearchParams({ ...Object.fromEntries(searchParams), page: (Astro.props.page + 1).toString() }).toString()}`
+      : undefined}
+    variant="outline"
+    size="icon"
+    aria-disabled={Astro.props.page === Astro.props.totalPages}
+  >
+    <ChevronRight className="h-4 w-4" />
+  </ButtonLink>
+</div>

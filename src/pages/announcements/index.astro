@@ -1,0 +1,106 @@
+---
+export const prerender = false;
+
+import PublicLayout from "@/layouts/public-layout.astro";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { annouyncementsUsecase } from "@/core/announcement/usecase";
+import PaginationNav from "@/components/common/pagination-nav.astro";
+import { AnnouncementCard } from "@/components/announcement/announcement-card";
+
+const url = new URL(Astro.request.url);
+const searchParams = url.searchParams;
+
+// Parse filter parameters
+const tagsParam = searchParams.get("tags");
+const yearParam = searchParams.get("year");
+const pageParam = searchParams.get("page");
+
+const selectedTags = tagsParam ? tagsParam.split(",").filter(Boolean) : [];
+const selectedYear = yearParam || "";
+const page = pageParam ? parseInt(pageParam, 10) || 1 : 1;
+
+const pageSize = 20;
+
+const allTags = await annouyncementsUsecase.getAllTags();
+
+// Get filtered announcements with pagination
+const result = await annouyncementsUsecase.getMany({
+  published: true,
+  pageSize,
+  page,
+  tags: selectedTags.length > 0 ? selectedTags : undefined,
+  year: selectedYear ? parseInt(selectedYear, 10) : undefined,
+});
+---
+
+<PublicLayout>
+  <Fragment slot="head">
+    <title>ประกาศ – มณฑลทหารบกที่ 16</title>
+    <meta name="description" content="ประกาศและข่าวสารจากมณฑลทหารบกที่ 16" />
+  </Fragment>
+
+  <main slot="body" class="container mx-auto px-4 py-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-foreground mb-2">ประกาศ</h1>
+      <p class="text-muted-foreground">
+        ข่าวสารและประกาศสำคัญจากมณฑลทหารบกที่ 16
+      </p>
+    </div>
+
+    <div class="mb-8">
+      <div class="flex flex-wrap gap-2">
+        <a href="/announcements">
+          <Button
+            size="sm"
+            variant={selectedTags.length === 0 ? "default" : "outline"}
+          >
+            All
+          </Button>
+        </a>
+        {
+          allTags.map((tag) => {
+            const isSelected = selectedTags.includes(tag);
+            const newTags = isSelected ? [] : [tag];
+            const newSearchParams = new URLSearchParams(searchParams);
+            if (newTags.length > 0) {
+              newSearchParams.set("tags", newTags.join(","));
+            } else {
+              newSearchParams.delete("tags");
+            }
+            const href = `${Astro.url.pathname}?${newSearchParams.toString()}`;
+            return (
+              <a href={href}>
+                <Button size="sm" variant={isSelected ? "default" : "outline"}>
+                  {tag}
+                </Button>
+              </a>
+            );
+          })
+        }
+      </div>
+    </div>
+
+    {
+      result.items && result.items.length > 0 ? (
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {result.items.map((announcement) => (
+            <AnnouncementCard announcement={announcement} />
+          ))}
+        </div>
+      ) : (
+        <div class="text-center py-12">
+          <p class="text-lg text-muted-foreground">ยังไม่มีประกาศ</p>
+        </div>
+      )
+    }
+    <div class="mt-8">
+      <PaginationNav
+        basePath="/announcements"
+        page={page}
+        totalPages={result.totalPages}
+        pageSize={pageSize}
+      />
+    </div>
+  </main>
+</PublicLayout>
