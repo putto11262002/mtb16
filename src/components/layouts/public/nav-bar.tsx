@@ -1,27 +1,26 @@
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-} from "@/components/ui/navigation-menu";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+} from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
-import { Image } from "astro:assets";
-import logo from "@/assets/logo.png";
+import { Menu } from "lucide-react";
+import { ModeToggle } from "../../common/mode-toggle";
 
 const navigationItems = [
-  { title: "Home", href: "/" },
-  { title: "News", href: "/news" },
-  { title: "Announcements", href: "/announcements" },
-  { title: "Resources", href: "/resources" },
-  { title: "Commanders Tree", href: "/commanders-tree" },
+  { title: "เกี่ยวกับ", href: "/about" },
+  { title: "ข่าว", href: "/news" },
+  { title: "ประกาศ", href: "/announcements" },
+  { title: "ผู้นำ", href: "/leadership" },
+  { title: "ทรัพยากร", href: "/resources" },
 ];
 
 export function Navbar() {
@@ -42,11 +41,14 @@ export function Navbar() {
               </NavigationMenuLink>
             </NavigationMenuItem>
           ))}
+
+          <ModeToggle />
         </NavigationMenuList>
       </NavigationMenu>
 
       {/* Mobile Navigation */}
       <div className="flex flex-1 items-center justify-end md:hidden">
+        <ModeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon">
@@ -79,4 +81,3 @@ export function Navbar() {
 }
 
 export default Navbar;
-
