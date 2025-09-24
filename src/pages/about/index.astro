@@ -1,0 +1,75 @@
+---
+import PublicLayout from "@/layouts/PublicLayout.astro";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import HistoryTimeline from "./_components/history-timeline";
+import HeroSection from "./_components/hero-section";
+
+const armyProvinceHistoryItems = [
+  {
+    date: "30 เมษายน พ.ศ. 2484",
+    title: "ตั้งขึ้นครั้งแรก",
+    description:
+      "ปรากฏตามข้อบังคับทหารว่าด้วยการแบ่งเขตมณฑลและจังหวัดทหาร (มาตรา 2 ข้อ 5)\n\n→ กำหนด 30 เมษายน ของทุกปี เป็น วันสถาปนา จังหวัดทหารบกราชบุรี",
+  },
+  {
+    date: "5 สิงหาคม พ.ศ. 2531",
+    title: "ปรับการจัดหน่วย",
+    description:
+      "มีการปรับการจัดหน่วยตามอัตราการจัดยุทโธปกรณ์ (อจย. 51-301)\n\n→ จังหวัดทหารบกราชบุรีเป็น หน่วยขึ้นตรงของมณฑลทหารบกที่ 11",
+  },
+  {
+    date: "13 กรกฎาคม พ.ศ. 2541",
+    title: "ย้ายที่ตั้ง",
+    description:
+      "จังหวัดทหารบกราชบุรี ย้ายที่ตั้งจากกรมการทหารช่าง ไปยังที่ตั้งถาวรใหม่\n\nที่ เลขที่ 158 หมู่ 1 ต.โคกหม้อ อ.เมือง จ.ราชบุรี (ริมถนนเพชรเกษมสายเก่า)\n\nพื้นที่ 19 ไร่ 8 ตารางวา",
+  },
+  {
+    date: "1 เมษายน พ.ศ. 2552",
+    title: "แปรสภาพเป็นมณฑลทหารบกที่ 15",
+    description:
+      "กระทรวงกลาโหมออกกฎกระทรวง จัดตั้ง มณฑลทหารบกที่ 15 (แปรสภาพจาก จทบ.พ.บ. ตาม อจย. 51-201)\n\nจทบ.ราชบุรี (จทบ.ร.บ.) ขึ้นตรงกับ มทบ.15\n\nจัดหน่วยตาม อจย. 51-301 (5 ส.ค. 31) เป็น จังหวัดทหารบกชั้น 1\n\nปรับตำแหน่ง ผู้บังคับการจังหวัดทหารบก ราชบุรี (ผบ.จทบ.ร.บ.) จาก พันเอกพิเศษ → พลตรี\n\nพื้นที่รับผิดชอบ: 2 จังหวัด\n\nราชบุรี\n\nสมุทรสงคราม",
+  },
+];
+---
+
+<PublicLayout>
+  <slot slot="head">
+    <title>เกี่ยวกับหน่วย - มณฑลทหารบกที่ 16</title>
+    <meta
+      name="description"
+      content="เรียนรู้เกี่ยวกับมณฑลทหารบกที่ 16 รวมถึงภารกิจ ประวัติ และโครงสร้างองค์กร"
+    />
+  </slot>
+  <slot slot="body">
+    <main class="min-h-screen bg-background">
+      <!-- Hero Section -->
+      <HeroSection client:visible />
+
+      <Separator />
+
+      <!-- History Section -->
+      <section class="py-16 px-4 bg-muted/20">
+        <div class="max-w-4xl mx-auto">
+          <h2 class="text-2xl font-semibold text-center mb-12">ประวัติ</h2>
+          <HistoryTimeline client:visible />
+        </div>
+      </section>
+
+      <Separator />
+
+      <!-- Army Province History Section -->
+      <section class="py-16 px-4 bg-muted/20">
+        <div class="max-w-4xl mx-auto">
+          <HistoryTimeline
+            client:visible
+            title="Army Province History"
+            items={armyProvinceHistoryItems}
+          />
+        </div>
+      </section>
+
+      <Separator />
+    </main>
+  </slot>
+</PublicLayout>
