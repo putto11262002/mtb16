@@ -1,7 +1,7 @@
 ---
 // src/pages/signin.astro
-import BaseLayout from "@/layouts/BaseLayout.astro";
-import { LoginForm } from "@/components/auth/signin-form"
+import BaseLayout from "@/layouts/base-layout.astro";
+import { LoginForm } from "@/components/auth/signin-form";
 
 export const prerender = false;
 
@@ -10,12 +10,16 @@ if (Astro.locals.user) {
   return Astro.redirect("/secure");
 }
 ---
+
 <BaseLayout>
   <Fragment slot="head">
     <title>เข้าสู่ระบบ</title>
     <meta name="description" content="เข้าสู่ระบบบัญชีของคุณ" />
   </Fragment>
-  <main slot="body" class="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+  <main
+    slot="body"
+    class="flex min-h-svh w-full items-center justify-center p-6 md:p-10"
+  >
     <div class="w-full max-w-sm">
       <LoginForm client:load />
     </div>

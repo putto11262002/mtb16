@@ -1,11 +1,10 @@
 ---
 // src/layouts/PublicLayout.astro
-import BaseLayout from "@/layouts/BaseLayout.astro";
+import BaseLayout from "@/layouts/base-layout.astro";
 import Header from "@/components/layouts/public/header.astro";
 import Footer from "@/components/layouts/public/footer.astro";
 import { GreetingPopup } from "@/components/layouts/public/greeting-popup";
 import { Image } from "astro:assets";
-import PopoverImage from "@/assets/test-popover.webp";
 ---
 
 <BaseLayout>
@@ -13,7 +12,7 @@ import PopoverImage from "@/assets/test-popover.webp";
   <Fragment slot="body">
     <GreetingPopup client:load>
       <Image
-        src={PopoverImage}
+        src={""}
         alt="Hero Background"
         class={"w-full h-full object-cover"}
         width={1920}
@@ -26,4 +25,3 @@ import PopoverImage from "@/assets/test-popover.webp";
     <Footer />
   </Fragment>
 </BaseLayout>
-

@@ -1,12 +1,12 @@
 ---
 export const prerender = false;
 
-import PublicLayout from "@/layouts/PublicLayout.astro";
+import PublicLayout from "@/layouts/public-layout.astro";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { annouyncementsUsecase } from "@/core/announcement/usecase";
 import PaginationNav from "@/components/common/pagination-nav.astro";
-import {AnnouncementCard} from "@/components/announcement/announcement-card";
+import { AnnouncementCard } from "@/components/announcement/announcement-card";
 
 const url = new URL(Astro.request.url);
 const searchParams = url.searchParams;
