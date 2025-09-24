@@ -9,6 +9,13 @@
 * This guide standardizes how we build the **Interface layer** (Astro + React + Tailwind + shadcn/ui) and how it interacts with the **Application layer** (server actions).
 * Treat this as the **single source of truth** for frontend conventions. If it’s not here, check **AGENTS.md** or the official docs in §9.
 * Do **not** invent APIs. Use only what’s defined in **AGENTS.md**, action schemas in `src/actions/<feature>/schema.ts`, and shadcn/ui primitives.
+* **Validation & Types (high-level):** Frontend derives validation and action I/O types from **action schemas** at `src/actions/<feature>/schema.ts`. See §5.10 and §5.5.1.
+* **Types policy (shared vs UI-only):**
+
+  * **Shared domain types** (data that exists in both frontend & backend, e.g., `User`, `Product`) are **never re-declared** in the Interface layer. **Import type-only** from `src/db/schema.ts` and **compose** with TS utilities (`Pick`, `Omit`, `Partial`, etc.) as needed.
+    `import type { User } from "@/db/schema"`
+  * **I/O contracts** for actions (request/response) still come from **action schemas** in `src/actions/<feature>/schema.ts`. If an action returns a DTO that differs from the DB shape, **the action schema is the source of truth** for that path.
+  * **UI-only types** (pure presentation or component-internal state that never crosses the frontend boundary) may be defined locally in the Interface layer.
 
 **Interaction Points**
 
@@ -31,13 +38,19 @@
   * `src/components/client/<feature>/*` — client-only (React island roots)
   * `src/components/ui/*` — shadcn/ui primitives (CLI managed)
   * `src/hooks/<feature>/*` — React hooks co-located per feature
+
 * **Imports**
 
   * Use `@/` alias from `src` for local modules.
   * **Client / Islands / `<script>` in `.astro`:** `import { actions } from 'astro:actions'`.
   * **Server (frontmatter or endpoints):** `await Astro.callAction(actions.someAction, input)`.
   * **HTML forms (zero-JS):** `<form method="POST" action={actions.someAction}>` + `Astro.getActionResult(actions.someAction)` for results.
+  * **Shared types:** Import **types only** from `@/db/schema` (`import type { User } from "@/db/schema"`). Do **not** import runtime values from `@/db/schema` into client code.
+  * **Compose, don’t copy:** Extend shared types with TS utilities (`Pick`, `Omit`, `Partial`, `Readonly`, template unions). Do not duplicate shapes in component props or fetching layers.
+  * **UI-only types allowed:** If a type never leaves the Interface layer (e.g., a view model or local sort state), define it locally.
+
 * Use **pnpm** commands as defined in AGENTS.md. Do not add alternate scripts.
+
 * **Schemas used by UI:** `src/actions/<feature>/schema.ts` exports the **canonical Zod input schema** and must be **browser-safe** (pure Zod/types; no server-only imports) so islands can reuse it. If the form shape differs from the action input, define a **local form schema** in the component and **map** it to the action input before calling.
 
 **Examples**
@@ -61,6 +74,15 @@ src/
 import { actions } from 'astro:actions'
 const { data, error } = await Astro.callAction(actions.items.list, { /* input */ })
 ---
+```
+
+```ts
+// src/components/server/users/UserCard.astro (frontmatter TS)
+import type { User } from "@/db/schema"
+
+// Only what the card needs
+type PublicUser = Pick<User, "id" | "name" | "avatarUrl">
+interface UserCardProps { user: Readonly<PublicUser> }
 ```
 
 **References**
@@ -102,9 +124,14 @@ Validate user input → submit via **Action** → handle result (PRG or client t
 
 ### 5.1.1 Rules
 
-* Keep pages **thin**: compose layouts + feature components. Push logic to server/components.
 * Nest layouts for complex shells but always extend `BaseLayout`.
-* `BaseLayout` provides two slots: `head` and `body`. `head` is use to customize per-page metadata (title, description, etc.). `body` is the main content area.
+* Abstract shared chrome (nav, sidebars) into feature-specific layouts under `src/layouts/`.
+* Use Layout to guard routes with common auth/permissions (via middleware).
+* `BaseLayout` exposes **two named slots**: `head` and `body`.
+
+  * **In layouts:** define with `<slot name="head" />` and `<slot name="body" />`.
+  * **In consumers (pages/components):** pass content by setting the **`slot` attribute** on an element: `<div slot="head">…</div>` and `<main slot="body">…</main>`.
+  * Do **not** use `<slot>` tags in a consumer; `<slot>` is only used **inside** the layout component itself.
 * Prefer **static** for static content; switch to dynamic only when required.
 * All pages render within `src/layouts/BaseLayout.astro`.
 
@@ -131,20 +158,35 @@ Validate user input → submit via **Action** → handle result (PRG or client t
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import { actions } from 'astro:actions'
 import List from '@/components/server/items/List.astro'
-const { data, error } = await Astro.callAction(actions.items.list, {})
+const { data } = await Astro.callAction(actions.items.list, {})
 const items = data ?? []
 ---
-<BaseLayout >
-<slot name="head">
+<BaseLayout>
+  <Fragment slot="head">
     <title>Items</title>
     <meta name="description" content="List of items" />
-    </slot>
-    <slot name="body">
-    <main>
-  <List items={items} />
+  </Fragment>
+
+  <main slot="body">
+    <List items={items} />
   </main>
-</slot>
 </BaseLayout>
+```
+
+```astro
+---
+// src/layouts/BaseLayout.astro
+const { title } = Astro.props
+---
+<html lang="en">
+  <head>
+    {title && <title>{title}</title>}
+    <slot name="head" />
+  </head>
+  <body>
+    <slot name="body" />
+  </body>
+</html>
 ```
 
 ### 5.1.4 References
@@ -253,6 +295,7 @@ accordion, alert, alert-dialog, aspect-ratio, avatar, badge, breadcrumb, button,
 * Use action **input/output** types from `src/actions/<feature>/schema.ts`.
 * Prefer **PRG (Post → Redirect → Get)** for mutations/navigation.
 * **Client calls send JSON by default**—do **not** convert to `FormData` unless posting from an HTML `<form>` or uploading files.
+* **Types alignment:** For **action inputs/outputs**, derive types from the **action Zod schemas**. For **entity shapes** rendered by the UI (e.g., component props that represent a `User`), import **shared domain types** from `@/db/schema` and narrow with TS utilities as needed. If an action’s DTO differs from the DB entity, **prefer the action schema type** for that path.
 
 ### 5.5.2 Recipes
 
@@ -406,6 +449,8 @@ export function AppToaster(){ return <Toaster richColors /> }
 * Pasting unreviewed examples without adapting to tokens/layout.
 * Copying shadcn **Next.js** snippets verbatim (e.g., `"use client"` / `"use server"`) — **Astro doesn’t use these directives**. Mount React with Astro **client directives** and call **Astro Actions** instead.
 * Converting values to **FormData** for client calls unnecessarily — **pass JSON** to actions from islands; use `FormData` only for HTML forms or file uploads.
+* Re-declaring `User/Product/...` shapes in UI → **Fix:** `import type { User } from "@/db/schema"` and compose (`Pick`, `Omit`).
+* Using `<slot>` elements inside pages to pass content → **Fix:** put a normal element with `slot="name"` (e.g., `<div slot="head">...</div>`); `<slot>` belongs inside the layout.
 
 ### 5.9.2 Examples
 
@@ -552,7 +597,7 @@ import ItemForm from "@/components/client/items/ItemForm.tsx"
 ---
 <BaseLayout title="New Item">
   <!-- Astro islands: no "use client" -->
-  <ItemForm client:visible />
+  <ItemForm client:visible slot="body" />
 </BaseLayout>
 ```
 
@@ -585,6 +630,8 @@ import ItemForm from "@/components/client/items/ItemForm.tsx"
 * [ ] Types aligned with action schemas; **no `any`**.
 * [ ] Shadcn components installed via CLI; audit checklist passed.
 * [ ] **Forms** use shadcn **Form** + **RHF** + **Zod**; **action schema reused** (or mapped from a local form schema); **client calls send JSON**; field errors handled via `isInputError()`; feedback via **Sonner**.
+* [ ] **Shared types** imported type-only from `@/db/schema`; no duplicated entity shapes in UI.
+* [ ] **Slots**: layouts define with `<slot name="…"/>`; consumers pass with `slot="…"` attribute.
 
 ---
 
@@ -594,6 +641,7 @@ import ItemForm from "@/components/client/items/ItemForm.tsx"
 * **Type everything**: components, props, hooks return types, action usage.
 * **Accessibility**: semantic HTML, labeled controls, keyboard focus order, color contrast.
 * **Layout contract**: all pages render within `src/layouts/BaseLayout.astro`.
+* **Type-only imports:** In client-facing code, import shared types with `import type { … }` to avoid bundling server code.
 
 ---
 
@@ -621,6 +669,7 @@ import ItemForm from "@/components/client/items/ItemForm.tsx"
 * Markdown content — [https://docs.astro.build/en/guides/markdown-content](https://docs.astro.build/en/guides/markdown-content) — *Use when:* MD/MDX content.
 * Configuring Astro — [https://docs.astro.build/en/guides/configuring-astro](https://docs.astro.build/en/guides/configuring-astro) — *Use when:* project-wide config.
 * Syntax highlighting — [https://docs.astro.build/en/guides/syntax-highlighting](https://docs.astro.build/en/guides/syntax-highlighting) — *Use when:* code blocks & themes.
+* **Components & Slots** — [https://docs.astro.build/en/core-concepts/astro-components/#slots](https://docs.astro.build/en/core-concepts/astro-components/#slots) — *Use when:* defining named slots in layouts and passing slot content from pages.
 
 ### React
 
@@ -645,6 +694,10 @@ import ItemForm from "@/components/client/items/ItemForm.tsx"
 * Toast/Sonner — [https://ui.shadcn.com/docs/components/sonner](https://ui.shadcn.com/docs/components/sonner) — *Use when:* notifications.
 * Skeleton — [https://ui.shadcn.com/docs/components/skeleton](https://ui.shadcn.com/docs/components/skeleton) — *Use when:* loading placeholders.
 * Sheet/Drawer — [https://ui.shadcn.com/docs/components/sheet](https://ui.shadcn.com/docs/components/sheet) — *Use when:* off-canvas UI.
+
+### TypeScript
+
+* **Type-only Imports & Exports** — [https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-8.html#type-only-imports-and-export](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-8.html#type-only-imports-and-export) — *Use when:* importing shared types into client code without bundling server modules.
 
 ---
 
@@ -690,4 +743,18 @@ const form = useForm<Inputs>({ resolver: zodResolver(InputSchema) })
 
 ```tsx
 <div className="bg-background/50 text-foreground rounded-[var(--radius)]" />
+```
+
+**Slots quick tip**
+
+```astro
+<!-- consumer -->
+<BaseLayout>
+  <Fragment slot="head"><title>My Page</title></Fragment>
+  <main slot="body">Hello</main>
+</BaseLayout>
+
+<!-- layout -->
+<head><slot name="head" /></head>
+<body><slot name="body" /></body>
 ```
