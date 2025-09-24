@@ -1,5 +1,4 @@
 import { postUsecase } from "@/core/post/usecase";
-import { tagUsecase } from "@/core/tag/usecase";
 import type { Post } from "@/db/schema";
 import type { PaginatedResult } from "../shared/types";
 import type {
@@ -68,10 +67,6 @@ const deleteAnnouncement = async (input: DeleteAnnouncementInput) => {
   await postUsecase.deletePost(input);
 };
 
-const getAllTags = async (): Promise<string[]> => {
-  return await tagUsecase.getTagsByType("announcement");
-};
-
 export const annouyncementsUsecase = {
   publish,
   unpublish,
@@ -83,5 +78,4 @@ export const annouyncementsUsecase = {
   addAttachment,
   removeAttatch,
   deleteAnnouncement,
-  getAllTags,
 };
