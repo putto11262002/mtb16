@@ -1,0 +1,17 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { AdminApp } from "./_index";
+export const prerender = false;
+if (!Astro.locals.session) {
+  return Astro.redirect("/signin");
+}
+---
+
+<BaseLayout>
+  <slot name="head">
+    <title>Admin - MTB16</title>
+  </slot>
+  <slot slot="body">
+    <AdminApp client:load client:only />
+  </slot>
+</BaseLayout>

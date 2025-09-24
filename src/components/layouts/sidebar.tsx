@@ -1,4 +1,10 @@
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
@@ -6,33 +12,25 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
-  SidebarInset,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import type { FC } from "react";
-import {
-  Newspaper,
-  File,
-  Speaker,
-  TableOfContents,
-  Sticker,
-  User2,
-  ChevronUp,
-} from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import type { User } from "better-auth";
 import { signOut } from "@/lib/auth/client";
-import React from "react";
 import { navigate } from "astro:transitions/client";
+import {
+  ChevronUp,
+  File,
+  Newspaper,
+  Speaker,
+  Sticker,
+  TableOfContents,
+  User2,
+} from "lucide-react";
+import React from "react";
+import { Link, Outlet } from "react-router-dom";
 
 const menuItems = [
   {
@@ -72,10 +70,7 @@ const menuItems = [
   },
 ];
 
-export const SidebarLayout: FC<{ children: React.ReactNode; user: User }> = ({
-  user,
-  children,
-}) => {
+export const SidebarLayout = () => {
   const [signingOut, setSigningOut] = React.useState(false);
   const signout = () =>
     signOut({
@@ -109,10 +104,10 @@ export const SidebarLayout: FC<{ children: React.ReactNode; user: User }> = ({
                   {group.items.map((item) => (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton asChild>
-                        <a href={item.url}>
+                        <Link to={item.url}>
                           <item.icon />
                           <span>{item.title}</span>
-                        </a>
+                        </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   ))}
@@ -127,7 +122,7 @@ export const SidebarLayout: FC<{ children: React.ReactNode; user: User }> = ({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <SidebarMenuButton>
-                    <User2 /> {user.name}
+                    <User2 />
                     <ChevronUp className="ml-auto" />
                   </SidebarMenuButton>
                 </DropdownMenuTrigger>
@@ -149,7 +144,9 @@ export const SidebarLayout: FC<{ children: React.ReactNode; user: User }> = ({
         <div className="sticky top-0 z-10 flex h-(--header-height) w-full items-center border-b bg-background px-4 shadow-sm">
           <SidebarTrigger />
         </div>
-        {children}
+        <main className="m-t-( --header-height ) flex-1 w-full p-6">
+          <Outlet />
+        </main>
       </main>
     </SidebarProvider>
   );
