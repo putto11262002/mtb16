@@ -22,19 +22,18 @@ import { signOut } from "@/lib/auth/client";
 import { navigate } from "astro:transitions/client";
 import {
   ChevronUp,
-  File,
+  Folder,
   Newspaper,
   Speaker,
-  Sticker,
-  TableOfContents,
   User2,
+  Users,
 } from "lucide-react";
 import React from "react";
 import { Link, Outlet } from "react-router-dom";
 
 const menuItems = [
   {
-    groupLabel: "คอลเลกชัน",
+    groupLabel: "เนื้อหา",
     items: [
       {
         title: "ข่าวสารและกิจกรรม",
@@ -47,26 +46,20 @@ const menuItems = [
         icon: Speaker,
       },
       {
-        title: "ไฟล์ดาวน์โหลด",
-        url: "/admin/downloads",
-        icon: File,
+        title: "ไดเรกทอรี",
+        url: "/admin/directory",
+        icon: Folder,
+      },
+      {
+        title: "บุคลากร",
+        url: "/admin/persons",
+        icon: Users,
       },
     ],
   },
   {
-    groupLabel: "เนื้อหา",
-    items: [
-      {
-        title: "ป๊อปอัปหน้าแรก",
-        url: "/admin/popups",
-        icon: Sticker,
-      },
-      {
-        title: "เนื้อหาข้อความ",
-        url: "/admin/copies",
-        icon: TableOfContents,
-      },
-    ],
+    groupLabel: "บุคคล",
+    items: [],
   },
 ];
 
