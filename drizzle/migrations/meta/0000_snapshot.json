@@ -1,6 +1,6 @@
 {
-  "id": "7aa46c21-17a7-497d-9d25-b19678829b90",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "0d5322c1-ce55-49c0-9a2b-db6fbcfecd9b",
+  "prevId": "90380dee-6a68-427a-9e53-807becf9f005",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -57,12 +57,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "order": {
-          "name": "order",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp with time zone",
@@ -79,7 +73,21 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "directory_entries_tag_tags_id_fk": {
+          "name": "directory_entries_tag_tags_id_fk",
+          "tableFrom": "directory_entries",
+          "tableTo": "tags",
+          "columnsFrom": [
+            "tag"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -109,6 +117,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "rank_order": {
+          "name": "rank_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "role": {
           "name": "role",
           "type": "varchar(255)",
@@ -127,8 +141,20 @@
           "primaryKey": false,
           "notNull": false
         },
+        "superior": {
+          "name": "superior",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
         "order": {
           "name": "order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "level": {
+          "name": "level",
           "type": "integer",
           "primaryKey": false,
           "notNull": false
@@ -167,6 +193,19 @@
             "id"
           ],
           "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "persons_superior_persons_id_fk": {
+          "name": "persons_superior_persons_id_fk",
+          "tableFrom": "persons",
+          "tableTo": "persons",
+          "columnsFrom": [
+            "superior"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },
@@ -207,7 +246,7 @@
         },
         "tags": {
           "name": "tags",
-          "type": "text[]",
+          "type": "varchar(255)[]",
           "primaryKey": false,
           "notNull": false
         },
@@ -496,6 +535,39 @@
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.tags": {
+      "name": "tags",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(255)",
+          "primaryKey": true,
+          "notNull": true
         },
         "created_at": {
           "name": "created_at",
