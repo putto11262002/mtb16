@@ -1,19 +1,24 @@
 import { db } from "@/db";
 import { posts, tags } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import type {
+  createTagInput,
+  getAllTagsOutput,
+  validateTagsInput,
+} from "./schema";
 
-const create = async (name: string): Promise<void> => {
-  await db.insert(tags).values({ id: name }).onConflictDoNothing();
+const create = async (input: createTagInput): Promise<void> => {
+  await db.insert(tags).values({ id: input.name }).onConflictDoNothing();
 };
 
-const getAllTags = async (): Promise<string[]> => {
+const getAllTags = async (): Promise<getAllTagsOutput> => {
   const result = await db.select({ id: tags.id }).from(tags);
   return result.map((r) => r.id);
 };
 
-const validateTags = async (tags: string[]): Promise<void> => {
-  const uniqueTags = [...new Set(tags)];
-  await Promise.all(uniqueTags.map((name) => create(name)));
+const validateTags = async (input: validateTagsInput): Promise<void> => {
+  const uniqueTags = [...new Set(input)];
+  await Promise.all(uniqueTags.map((name) => create({ name })));
 };
 
 const getTagsByType = async (type: string): Promise<string[]> => {
