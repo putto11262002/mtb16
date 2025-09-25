@@ -1,4 +1,5 @@
 import { z } from "astro:schema";
+import { MAX_IMAGE_SIZE_MB, SUPPORTED_IMAGE_TYPES } from "../shared/constants";
 import { tagSchema } from "../tag/schema";
 
 export const createDirectoryEntryInputSchema = z.object({
@@ -12,7 +13,6 @@ export const createDirectoryEntryInputSchema = z.object({
   phone: z.string().optional(),
   email: z.string().email("Invalid email").optional(),
   notes: z.string().optional(),
-  order: z.number().int().optional(),
 });
 
 export type createDirectoryEntryInput = z.infer<
@@ -32,7 +32,6 @@ export const updateDirectoryEntryInputSchema = z.object({
   phone: z.string().optional(),
   email: z.string().email("Invalid email").optional(),
   notes: z.string().optional(),
-  order: z.number().int().optional(),
 });
 
 export type updateDirectoryEntryInput = z.infer<
@@ -51,8 +50,27 @@ export const getManyDirectoryEntriesInputSchema = z.object({
   page: z.coerce.number().min(1).default(1).optional(),
   pageSize: z.coerce.number().min(1).max(100).default(10).optional(),
   q: z.string().optional(),
+  tag: tagSchema.optional(),
 });
 
 export type getManyDirectoryEntriesInput = z.infer<
   typeof getManyDirectoryEntriesInputSchema
+>;
+
+export const updateDirectoryEntryImageInputSchema = z.object({
+  id: z.string().uuid(),
+  file: z
+    .instanceof(File)
+    .refine(
+      (file) => SUPPORTED_IMAGE_TYPES.includes(file.type),
+      "Unsupported image type",
+    )
+    .refine(
+      (file) => file.size <= MAX_IMAGE_SIZE_MB * 1024 * 1024,
+      `Image size must be less than ${MAX_IMAGE_SIZE_MB} MB`,
+    ),
+});
+
+export type UpdateDirectoryEntryImage = z.infer<
+  typeof updateDirectoryEntryImageInputSchema
 >;

@@ -21,7 +21,7 @@ export const PaginationNav: React.FC<{
       <Button
         variant="outline"
         size="icon"
-        disabled={page === totalPages}
+        disabled={totalPages === 0 || page === totalPages}
         onClick={onNextPage}
       >
         <ChevronRight className="h-4 w-4" />
