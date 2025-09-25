@@ -1,3 +1,4 @@
+import { tagUsecase } from "@/core/tag/usecase";
 import { db } from "@/db";
 import { posts, type Post } from "@/db/schema";
 import { getFileStore } from "@/lib/storage";
@@ -27,6 +28,9 @@ import type {
 } from "./schema";
 
 const create = async (input: createPostInput) => {
+  if (input.tags && input.tags.length > 0) {
+    await tagUsecase.validateTags(input.tags);
+  }
   let previewImageMeta: Post["previewImage"] | undefined;
   let attachmentsMeta: Post["attachments"] = [];
 
@@ -48,6 +52,9 @@ const create = async (input: createPostInput) => {
 const update = async (input: updatePostInput) => {
   if (!(await exist(input.id))) {
     throw new Error("Post not found");
+  }
+  if (input.tags) {
+    await tagUsecase.validateTags(input.tags);
   }
   await db
     .update(posts)
@@ -239,15 +246,6 @@ const deletePost = async (args: DeletePostInput) => {
   await db.delete(posts).where(eq(posts.id, args.id));
 };
 
-const getAllTags = async (type?: string): Promise<string[]> => {
-  const tags = await db
-    .select({ tags: posts.tags })
-    .from(posts)
-    .where(type ? eq(posts.type, type) : undefined)
-    .groupBy(posts.tags);
-  return tags.flatMap((t) => t.tags).filter((tag) => tag !== null);
-};
-
 export const postUsecase = {
   publish,
   unpublish,
@@ -259,5 +257,4 @@ export const postUsecase = {
   addAttachment,
   removeAttachment,
   deletePost,
-  getAllTags,
 };

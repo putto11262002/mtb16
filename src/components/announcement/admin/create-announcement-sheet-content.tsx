@@ -15,39 +15,24 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { TagField } from "@/components/ui/tag-field";
 import { Textarea } from "@/components/ui/textarea";
 import { createAnnouncementInputSchema } from "@/core/announcement/schema";
 import { useCreateAnnouncement } from "@/hooks/announcement/mutation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "astro:schema";
+import type { z } from "astro:schema";
 import { Loader2 } from "lucide-react";
 import React from "react";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { TagsFormField } from "./form/tags-form-field";
+
 const defaultValues = {
   title: "",
   body: "",
   tags: [],
 };
 
-const createAnnouncementFormSchema = createAnnouncementInputSchema
-  .omit({
-    tags: true,
-  })
-  .extend({
-    tags: z
-      .array(
-        z.object({
-          tag: createAnnouncementInputSchema.shape.tags
-            .innerType()
-            .unwrap()
-            .unwrap().element,
-        }),
-      )
-      .optional()
-      .nullable(),
-  });
+const createAnnouncementFormSchema = createAnnouncementInputSchema;
 
 export const CreateAnnouncementSheetContent: React.FC<{
   onClose?: () => void;
@@ -57,29 +42,21 @@ export const CreateAnnouncementSheetContent: React.FC<{
     defaultValues,
   });
 
-  const tags = useFieldArray({ control: form.control, name: "tags" });
-
   const { mutate, isPending } = useCreateAnnouncement();
 
   const createAnnouncement = (
     data: z.infer<typeof createAnnouncementFormSchema>,
   ) =>
-    mutate(
-      {
-        ...data,
-        tags: data.tags?.map((t) => t.tag) || [],
+    mutate(data, {
+      onSuccess: () => {
+        toast.success("สร้างประกาศสำเร็จ");
+        form.reset(defaultValues);
+        onClose?.();
       },
-      {
-        onSuccess: () => {
-          toast.success("สร้างประกาศสำเร็จ");
-          form.reset(defaultValues);
-          onClose?.();
-        },
-        onError: (error) => {
-          toast.error(`สร้างประกาศล้มเหลว: ${error.message}`);
-        },
+      onError: (error) => {
+        toast.error(`สร้างประกาศล้มเหลว: ${error.message}`);
       },
-    );
+    });
 
   return (
     <SheetContent className="w-full sm:w-[480px]">
@@ -122,10 +99,23 @@ export const CreateAnnouncementSheetContent: React.FC<{
               )}
             />
 
-            <TagsFormField
-              tags={tags.fields}
-              onRemove={(idx) => tags.remove(idx)}
-              onAdd={(tag) => tags.append({ tag })}
+            <FormField
+              control={form.control}
+              name="tags"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>แท็ก</FormLabel>
+                  <FormControl>
+                    <TagField
+                      value={field.value || []}
+                      onChange={field.onChange}
+                      multiple={true}
+                      placeholder="เลือกหรือสร้างแท็ก..."
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
           </div>
 

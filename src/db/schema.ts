@@ -73,7 +73,7 @@ export const posts = pgTable(
     title: varchar("title", { length: 255 }).notNull(),
     body: text("body"),
     previewImage: jsonb("preview_image").$type<FileMeta | undefined>(),
-    tags: text("tags").array(),
+    tags: varchar("tags", { length: 255 }).array(),
     attachments: jsonb("attachments").array().$type<Attachment[]>(),
     publishedAt: timestamp("published_at", { withTimezone: true }),
     type: varchar("type", { length: 50 }).notNull(),
@@ -109,12 +109,17 @@ export const procurements = pgTable("procurements", {
   ...timestamps,
 });
 
+export const tags = pgTable("tags", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  ...timestamps,
+});
+
 export const directoryEntries = pgTable("directory_entries", {
   id: uuid("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
   name: varchar("name", { length: 255 }).notNull(),
-  tag: varchar("tag", { length: 255 }),
+  tag: varchar("tag", { length: 255 }).references(() => tags.id),
   image: jsonb("image").$type<FileMeta | undefined>(),
   link: varchar("link", { length: 255 }),
   phone: varchar("phone", { length: 255 }),
@@ -172,6 +177,20 @@ export const personsRelations = relations(persons, ({ one }) => ({
   }),
 }));
 
+export const tagsRelations = relations(tags, ({ many }) => ({
+  directoryEntries: many(directoryEntries),
+}));
+
+export const directoryEntriesRelations = relations(
+  directoryEntries,
+  ({ one }) => ({
+    tag: one(tags, {
+      fields: [directoryEntries.tag],
+      references: [tags.id],
+    }),
+  }),
+);
+
 // Exported types
 export type SiteSettings = typeof siteSettings.$inferSelect;
 export type SiteSettingsInsert = typeof siteSettings.$inferInsert;
@@ -185,5 +204,7 @@ export type Unit = typeof units.$inferSelect;
 export type UnitInsert = typeof units.$inferInsert;
 export type Person = typeof persons.$inferSelect;
 export type PersonInsert = typeof persons.$inferInsert;
+export type Tag = typeof tags.$inferSelect;
+export type TagInsert = typeof tags.$inferInsert;
 
 export * from "@/lib/auth/schema";

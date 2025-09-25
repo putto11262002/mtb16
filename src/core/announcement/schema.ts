@@ -13,7 +13,7 @@ import {
 export type Announcement = Post;
 
 export const createAnnouncementInputSchema = createPostInputSchema
-  .omit({ type: true })
+  .omit({ type: true, title: true, body: true, tags: true })
   .extend({
     title: z
       .string()
