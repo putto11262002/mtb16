@@ -13,7 +13,6 @@ export const createDirectoryEntryInputSchema = z.object({
   phone: z.string().optional(),
   email: z.string().email("Invalid email").optional(),
   notes: z.string().optional(),
-  order: z.number().int().optional(),
 });
 
 export type createDirectoryEntryInput = z.infer<
@@ -33,7 +32,6 @@ export const updateDirectoryEntryInputSchema = z.object({
   phone: z.string().optional(),
   email: z.string().email("Invalid email").optional(),
   notes: z.string().optional(),
-  order: z.number().int().optional(),
 });
 
 export type updateDirectoryEntryInput = z.infer<

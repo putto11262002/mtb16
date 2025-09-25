@@ -2,7 +2,7 @@ import { tagUsecase } from "@/core/tag/usecase";
 import { db } from "@/db";
 import { directoryEntries } from "@/db/schema";
 import { getFileStore } from "@/lib/storage";
-import { and, asc, count, desc, eq, ilike } from "drizzle-orm";
+import { and, count, desc, eq, ilike } from "drizzle-orm";
 import { DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE } from "../shared/constants";
 import type { PaginatedResult } from "../shared/types";
 import { createPaginatedResult } from "../shared/utils";
@@ -93,7 +93,7 @@ const getMany = async ({
       ),
       limit: pageSize,
       offset: (page - 1) * pageSize,
-      orderBy: [asc(directoryEntries.order), desc(directoryEntries.createdAt)],
+      orderBy: [desc(directoryEntries.createdAt)],
     }),
     db
       .select({ count: count() })

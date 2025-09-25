@@ -125,7 +125,6 @@ export const directoryEntries = pgTable("directory_entries", {
   phone: varchar("phone", { length: 255 }),
   email: varchar("email", { length: 255 }),
   notes: text("notes"),
-  order: integer("order"),
   ...timestamps,
 });
 
