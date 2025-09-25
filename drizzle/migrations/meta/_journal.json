@@ -8,6 +8,20 @@
       "when": 1758516422798,
       "tag": "0000_adorable_blackheart",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1758767363751,
+      "tag": "0001_parallel_the_executioner",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1758768254502,
+      "tag": "0002_good_maestro",
+      "breakpoints": true
     }
   ]
 }

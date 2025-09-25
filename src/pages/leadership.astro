@@ -223,115 +223,115 @@ const commanders = [
             แผนผังการบังคับบัญชาที่แสดงถึงสายการบังคับบัญชาและความรับผิดชอบของแต่ละหน่วย
           </p>
 
-          <!-- Commander Tree -->
-          <div class="space-y-8">
-            <!-- Top Level - Army Commander -->
-            <div class="flex justify-center">
-              <Card className="w-80 shadow-xl border-2 border-[var(--primary)]">
-                <CardContent className="p-6 text-center h-full flex flex-col justify-between">
-                  <div>
-                    <div class="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--primary)]/80 flex items-center justify-center text-[var(--primary-foreground)] text-2xl font-bold">
-                      {commanders[0].name.split(' ')[0][0]}{commanders[0].name.split(' ')[1][0]}
-                    </div>
-                    <Badge variant="secondary" className="mb-2">{commanders[0].rank}</Badge>
-                    <h3 class="text-lg font-bold mb-2">{commanders[0].name}</h3>
-                    <p class="text-[var(--primary)] font-semibold mb-2">{commanders[0].role}</p>
-                    <p class="text-sm text-muted-foreground">{commanders[0].unit.name}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+           <!-- Commander Tree -->
+           <div class="space-y-8">
+             <!-- Top Level - Army Commander -->
+             <div class="flex justify-center">
+               <Card className="w-80 shadow-xl border-2 border-[var(--primary)]">
+                 <CardContent className="p-6 text-center h-full flex flex-col justify-between">
+                   <div>
+                     <div class="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--primary)]/80 flex items-center justify-center text-[var(--primary-foreground)] text-2xl font-bold">
+                       {commanders[0].name.split(' ')[0][0]}{commanders[0].name.split(' ')[1][0]}
+                     </div>
+                     <Badge variant="secondary" className="mb-2">{commanders[0].rank}</Badge>
+                     <h3 class="text-lg font-bold mb-2">{commanders[0].name}</h3>
+                     <p class="text-[var(--primary)] font-semibold mb-2">{commanders[0].role}</p>
+                     <p class="text-sm text-muted-foreground">{commanders[0].unit.name}</p>
+                   </div>
+                 </CardContent>
+               </Card>
+             </div>
 
-            <!-- Connector -->
-            <div class="flex justify-center">
-              <div class="w-1 h-12 bg-gradient-to-b from-[var(--primary)] to-[var(--muted)]"></div>
-            </div>
+             <!-- Connector -->
+             <div class="flex justify-center">
+               <div class="w-1 h-12 bg-gradient-to-b from-[var(--primary)] to-[var(--muted)]"></div>
+             </div>
 
-            <!-- Second Level - Circle Commander and Deputy -->
-            <div class="relative group">
-              <div class="flex gap-8 overflow-x-auto scrollbar-hide scroll-smooth" id="level2-scroll">
-                {commanders.slice(1, 3).map((commander) => (
-                  <Card className="flex-shrink-0 w-80 shadow-lg hover:shadow-xl transition-shadow duration-300">
-                    <CardContent className="p-6 text-center h-full flex flex-col justify-between">
-                      <div>
-                        <div class="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-[var(--chart-2)] to-[var(--chart-2)]/80 flex items-center justify-center text-white text-2xl font-bold">
-                          {commander.name.split(' ')[0][0]}{commander.name.split(' ')[1][0]}
-                        </div>
-                        <Badge variant="outline" className="mb-2">{commander.rank}</Badge>
-                        <h3 class="text-lg font-bold mb-2">{commander.name}</h3>
-                        <p class="text-[var(--chart-2)] font-semibold mb-2">{commander.role}</p>
-                        <p class="text-sm text-muted-foreground">{commander.unit.name}</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-              <!-- Scroll Arrows -->
-              <button
-                class="absolute left-0 top-1/2 -translate-y-1/2 bg-[var(--background)]/80 hover:bg-[var(--background)] text-[var(--foreground)] p-2 rounded-full shadow-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
-                onclick="scrollLevel('level2-scroll', -344)"
-                id="level2-left-arrow"
-              >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                </svg>
-              </button>
-              <button
-                class="absolute right-0 top-1/2 -translate-y-1/2 bg-[var(--background)]/80 hover:bg-[var(--background)] text-[var(--foreground)] p-2 rounded-full shadow-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
-                onclick="scrollLevel('level2-scroll', 344)"
-                id="level2-right-arrow"
-              >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-              </button>
-            </div>
+             <!-- Second Level - Circle Commander and Deputy -->
+             <div class="relative group">
+               <div class="flex gap-8 overflow-x-auto scrollbar-hide scroll-smooth" id="level2-scroll">
+                 {commanders.slice(1, 3).map((commander) => (
+                   <Card className="flex-shrink-0 w-80 shadow-lg hover:shadow-xl transition-shadow duration-300">
+                     <CardContent className="p-6 text-center h-full flex flex-col justify-between">
+                       <div>
+                         <div class="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-[var(--chart-2)] to-[var(--chart-2)]/80 flex items-center justify-center text-white text-2xl font-bold">
+                           {commander.name.split(' ')[0][0]}{commander.name.split(' ')[1][0]}
+                         </div>
+                         <Badge variant="outline" className="mb-2">{commander.rank}</Badge>
+                         <h3 class="text-lg font-bold mb-2">{commander.name}</h3>
+                         <p class="text-[var(--chart-2)] font-semibold mb-2">{commander.role}</p>
+                         <p class="text-sm text-muted-foreground">{commander.unit.name}</p>
+                       </div>
+                     </CardContent>
+                   </Card>
+                 ))}
+               </div>
+               <!-- Scroll Arrows -->
+               <button
+                 class="absolute left-0 top-1/2 -translate-y-1/2 bg-[var(--background)]/80 hover:bg-[var(--background)] text-[var(--foreground)] p-2 rounded-full shadow-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
+                 onclick="scrollLevel('level2-scroll', -344)"
+                 id="level2-left-arrow"
+               >
+                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                 </svg>
+               </button>
+               <button
+                 class="absolute right-0 top-1/2 -translate-y-1/2 bg-[var(--background)]/80 hover:bg-[var(--background)] text-[var(--foreground)] p-2 rounded-full shadow-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
+                 onclick="scrollLevel('level2-scroll', 344)"
+                 id="level2-right-arrow"
+               >
+                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                 </svg>
+               </button>
+             </div>
 
-            <!-- Connector -->
-            <div class="flex justify-center">
-              <div class="w-1 h-12 bg-gradient-to-b from-[var(--muted)] to-[var(--chart-3)]"></div>
-            </div>
+             <!-- Connector -->
+             <div class="flex justify-center">
+               <div class="w-1 h-12 bg-gradient-to-b from-[var(--muted)] to-[var(--chart-3)]"></div>
+             </div>
 
-            <!-- Third Level - Department Heads -->
-            <div class="relative group">
-              <div class="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth" id="level3-scroll">
-                {commanders.slice(3).map((commander) => (
-                  <Card className="flex-shrink-0 w-80 shadow-md hover:shadow-lg transition-shadow duration-300">
-                    <CardContent className="p-6 text-center h-full flex flex-col justify-between">
-                      <div>
-                        <div class="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-[var(--chart-3)] to-[var(--chart-3)]/80 flex items-center justify-center text-white text-2xl font-bold">
-                          {commander.name.split(' ')[0][0]}{commander.name.split(' ')[1][0]}
-                        </div>
-                        <Badge variant="outline" className="mb-2">{commander.rank}</Badge>
-                        <h3 class="text-lg font-bold mb-2">{commander.name}</h3>
-                        <p class="text-[var(--chart-3)] font-semibold mb-2">{commander.role}</p>
-                        <p class="text-sm text-muted-foreground">{commander.unit.name}</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-              <!-- Scroll Arrows -->
-              <button
-                class="absolute left-0 top-1/2 -translate-y-1/2 bg-[var(--background)]/80 hover:bg-[var(--background)] text-[var(--foreground)] p-2 rounded-full shadow-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
-                onclick="scrollLevel('level3-scroll', -344)"
-                id="level3-left-arrow"
-              >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                </svg>
-              </button>
-              <button
-                class="absolute right-0 top-1/2 -translate-y-1/2 bg-[var(--background)]/80 hover:bg-[var(--background)] text-[var(--foreground)] p-2 rounded-full shadow-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
-                onclick="scrollLevel('level3-scroll', 344)"
-                id="level3-right-arrow"
-              >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-              </button>
-            </div>
-          </div>
+             <!-- Third Level - Department Heads -->
+             <div class="relative group">
+               <div class="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth" id="level3-scroll">
+                 {commanders.slice(3).map((commander) => (
+                   <Card className="flex-shrink-0 w-80 shadow-md hover:shadow-lg transition-shadow duration-300">
+                     <CardContent className="p-6 text-center h-full flex flex-col justify-between">
+                       <div>
+                         <div class="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-[var(--chart-3)] to-[var(--chart-3)]/80 flex items-center justify-center text-white text-2xl font-bold">
+                           {commander.name.split(' ')[0][0]}{commander.name.split(' ')[1][0]}
+                         </div>
+                         <Badge variant="outline" className="mb-2">{commander.rank}</Badge>
+                         <h3 class="text-lg font-bold mb-2">{commander.name}</h3>
+                         <p class="text-[var(--chart-3)] font-semibold mb-2">{commander.role}</p>
+                         <p class="text-sm text-muted-foreground">{commander.unit.name}</p>
+                       </div>
+                     </CardContent>
+                   </Card>
+                 ))}
+               </div>
+               <!-- Scroll Arrows -->
+               <button
+                 class="absolute left-0 top-1/2 -translate-y-1/2 bg-[var(--background)]/80 hover:bg-[var(--background)] text-[var(--foreground)] p-2 rounded-full shadow-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
+                 onclick="scrollLevel('level3-scroll', -344)"
+                 id="level3-left-arrow"
+               >
+                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                 </svg>
+               </button>
+               <button
+                 class="absolute right-0 top-1/2 -translate-y-1/2 bg-[var(--background)]/80 hover:bg-[var(--background)] text-[var(--foreground)] p-2 rounded-full shadow-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
+                 onclick="scrollLevel('level3-scroll', 344)"
+                 id="level3-right-arrow"
+               >
+                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                 </svg>
+               </button>
+             </div>
+           </div>
         </div>
       </section>
     </main>

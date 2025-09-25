@@ -147,9 +147,14 @@ export const persons = pgTable("persons", {
     .default(sql`gen_random_uuid()`),
   name: varchar("name", { length: 255 }).notNull(),
   rank: varchar("rank", { length: 255 }),
+  rankOrder: integer("rank_order"),
   role: varchar("role", { length: 255 }),
   portrait: text("portrait"),
   unitId: uuid("unit_id").references(() => units.id, { onDelete: "restrict" }),
+  // Not used currently
+  superior: uuid("superior").references((): AnyPgColumn => persons.id, {
+    onDelete: "set null",
+  }),
   order: integer("order"),
   bio: text("bio"),
   ...timestamps,
