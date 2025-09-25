@@ -1,0 +1,122 @@
+---
+export const prerender = false;
+
+import PublicLayout from "@/layouts/public-layout.astro";
+import { newsUsecase } from "@/core/news/usecase";
+import { Button } from "@/components/ui/button";
+import { Image } from "astro:assets";
+import { Config } from "@/config";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+
+const { id } = Astro.params;
+
+if (!id) {
+  return Astro.redirect("/404");
+}
+
+const news = await newsUsecase.getById(id);
+
+if (!news || !news.publishedAt) {
+  return Astro.redirect("/404");
+}
+
+// SEO metadata
+const title = news.seo?.title || `ข่าวสาร – ${news.title}`;
+const description = news.seo?.ogImage ? `ข่าวสาร: ${news.title}` : undefined;
+const ogImage = news.seo?.ogImage
+  ? `/api/files/${news.seo.ogImage}`
+  : undefined;
+---
+
+<PublicLayout>
+  <Fragment slot="head">
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:type" content="article" />
+    <link rel="canonical" href={new URL(`/news/${id}`, Astro.url)} />
+  </Fragment>
+
+  <main slot="body" class="container mx-auto px-4 py-8">
+    <article class="max-w-4xl mx-auto">
+      <header class="mb-8">
+        <div class="flex items-center justify-between mb-4">
+          <Button variant="ghost" size="sm" asChild>
+            <a href="/news" class="flex items-center gap-2">
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 19l-7-7 7-7"></path>
+              </svg>
+              กลับไปข่าวสารทั้งหมด
+            </a>
+          </Button>
+        </div>
+        <h1 class="text-3xl md:text-4xl font-bold leading-tight mb-2">
+          {news.title}
+        </h1>
+        {
+          news.publishedAt && (
+            <p class="text-lg text-muted-foreground mb-3">
+              เผยแพร่เมื่อ{" "}
+              {new Date(news.publishedAt).toLocaleDateString("th-TH")}
+            </p>
+          )
+        }
+      </header>
+
+      {
+        news.previewImage && (
+          <figure class="mb-8">
+            <Image
+              src={Config.getFileURL(news.previewImage.id)}
+              alt={news.title}
+              class="w-full h-auto"
+              width={800}
+              height={450}
+            />
+          </figure>
+        )
+      }
+
+      {
+        news.body && (
+          <div class="prose prose-lg max-w-none mb-8">
+            <div class="whitespace-pre-wrap text-foreground leading-relaxed">
+              {news.body}
+            </div>
+          </div>
+        )
+      }
+
+      {
+        news.attachments && news.attachments.length > 0 && (
+          <section class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">รูปภาพเพิ่มเติม</h2>
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {news.attachments.map((attachment) => (
+                <Image
+                  src={Config.getFileURL(attachment.file.id)}
+                  alt={attachment.label || news.title}
+                  class="object-contain w-full h-auto"
+                  width={400}
+                  height={400}
+                />
+              ))}
+            </div>
+          </section>
+        )
+      }
+    </article>
+  </main>
+</PublicLayout>
+

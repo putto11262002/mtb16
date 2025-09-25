@@ -1,0 +1,63 @@
+---
+export const prerender = false;
+
+import PublicLayout from "@/layouts/public-layout.astro";
+import { newsUsecase } from "@/core/news/usecase";
+import PaginationNav from "@/components/common/pagination-nav.astro";
+import { NewsCard } from "@/components/news/news-card";
+
+const url = new URL(Astro.request.url);
+const searchParams = url.searchParams;
+
+const pageParam = searchParams.get("page");
+const page = pageParam ? parseInt(pageParam, 10) || 1 : 1;
+
+const pageSize = 20;
+
+// Get published news ordered by publishedAt desc
+const result = await newsUsecase.getMany({
+  published: true,
+  pageSize,
+  page,
+  orderBy: "publishedAt",
+  direction: "desc",
+});
+---
+
+<PublicLayout>
+  <Fragment slot="head">
+    <title>ข่าวสาร – มณฑลทหารบกที่ 16</title>
+    <meta name="description" content="ข่าวสารและข้อมูลสำคัญจากมณฑลทหารบกที่ 16" />
+  </Fragment>
+
+  <main slot="body" class="container mx-auto px-4 py-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-foreground mb-2">ข่าวสาร</h1>
+      <p class="text-muted-foreground">
+        ข่าวสารและข้อมูลสำคัญจากมณฑลทหารบกที่ 16
+      </p>
+    </div>
+
+    {
+      result.items && result.items.length > 0 ? (
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {result.items.map((news) => (
+            <NewsCard news={news} />
+          ))}
+        </div>
+      ) : (
+        <div class="text-center py-12">
+          <p class="text-lg text-muted-foreground">ยังไม่มีข่าวสาร</p>
+        </div>
+      )
+    }
+    <div class="mt-8">
+      <PaginationNav
+        basePath="/news"
+        page={page}
+        totalPages={result.totalPages}
+        pageSize={pageSize}
+      />
+    </div>
+  </main>
+</PublicLayout>
