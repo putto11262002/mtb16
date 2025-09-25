@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "astro:schema";
 import { Paperclip, X } from "lucide-react";
 import { memo, useCallback, useRef, useState } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 // Internal components
@@ -26,8 +26,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { TagField } from "@/components/ui/tag-field";
 import { Textarea } from "@/components/ui/textarea";
-import { TagsFormField } from "./form/tags-form-field";
 
 // Config and core
 import { Config } from "@/config";
@@ -91,20 +91,9 @@ export const EditAnnouncementSheetContent: React.FC<{
   );
 };
 
-const updateAnnouncementFormSchema = updateAnnouncementInputSchema
-  .omit({ tags: true, id: true })
-  .extend({
-    tags: z
-      .array(
-        z.object({
-          tag: updateAnnouncementInputSchema.shape.tags
-            .innerType()
-            .innerType()
-            .unwrap().element,
-        }),
-      )
-      .optional(),
-  });
+const updateAnnouncementFormSchema = updateAnnouncementInputSchema.omit({
+  id: true,
+});
 
 // Form component for updating announcement metadata
 const MetadataForm = memo(({ initialData }: { initialData: Announcement }) => {
@@ -113,11 +102,9 @@ const MetadataForm = memo(({ initialData }: { initialData: Announcement }) => {
     defaultValues: {
       title: initialData.title,
       body: initialData.body ?? undefined,
-      tags: initialData.tags?.map((tag) => ({ tag })),
+      tags: initialData.tags || [],
     },
   });
-
-  const tags = useFieldArray({ control: form.control, name: "tags" });
 
   const { mutate, isPending } = useUpdateAnnouncement();
 
@@ -126,7 +113,7 @@ const MetadataForm = memo(({ initialData }: { initialData: Announcement }) => {
     (data: z.infer<typeof updateAnnouncementFormSchema>) => {
       console.log(data);
       mutate(
-        { ...data, tags: data.tags?.map((t) => t.tag), id: initialData.id },
+        { ...data, id: initialData.id },
         {
           onSuccess: () => {
             toast.success("แก้ไขประกาศสำเร็จ");
@@ -171,10 +158,23 @@ const MetadataForm = memo(({ initialData }: { initialData: Announcement }) => {
           )}
         />
 
-        <TagsFormField
-          tags={tags.fields}
-          onRemove={tags.remove}
-          onAdd={(tag) => tags.append({ tag })}
+        <FormField
+          control={form.control}
+          name="tags"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>แท็ก</FormLabel>
+              <FormControl>
+                <TagField
+                  value={field.value || []}
+                  onChange={field.onChange}
+                  multiple={true}
+                  placeholder="เลือกหรือสร้างแท็ก..."
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
 
         <LoaderButton type="submit" isLoading={isPending}>

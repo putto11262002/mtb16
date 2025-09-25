@@ -3,6 +3,7 @@ import { SidebarLayout } from "@/components/layouts/sidebar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster } from "sonner";
+import TestTagPage from "./_test-tag";
 import AdminAnnouncementPage from "./announcements/page";
 const queryClient = new QueryClient();
 // Entry point for the highly interactive admin React app
@@ -20,6 +21,7 @@ export const AdminApp = () => {
                   path="announcements"
                   element={<AdminAnnouncementPage />}
                 />
+                <Route path="test-tag" element={<TestTagPage />} />
               </Route>
             </Route>
           </Routes>
