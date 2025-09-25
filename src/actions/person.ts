@@ -1,25 +1,23 @@
 import {
-  addAttachmentInputSchema,
-  createAnnouncementInputSchema,
-  deleteAnnouncementInputSchema,
-  getManyAnnouncementsInputSchema,
-  removeAttachmentInputSchema,
-  updateAnnouncementInputSchema,
-  updatePreviewImageInputSchema,
-} from "@/core/announcement/schema";
-import { annouyncementsUsecase } from "@/core/announcement/usecase";
+  createPersonInputSchema,
+  deletePersonInputSchema,
+  getManyPersonsInputSchema,
+  updatePersonInputSchema,
+  updatePortraitInputSchema,
+} from "@/core/person/schema";
+import { personUsecase } from "@/core/person/usecase";
 import { ActionError, defineAction } from "astro:actions";
 import { z } from "astro:schema";
 import { handleError, isAuthenticated } from "./shared";
 
-export const announcement = {
+export const person = {
   create: defineAction({
-    input: createAnnouncementInputSchema,
+    input: createPersonInputSchema,
     handler: async (input, ctx) => {
       try {
         const { success, error } = isAuthenticated(ctx);
         if (!success) throw error;
-        const result = await annouyncementsUsecase.create(input);
+        const result = await personUsecase.create(input);
         return result;
       } catch (error) {
         throw handleError(error, ctx);
@@ -28,26 +26,12 @@ export const announcement = {
   }),
 
   update: defineAction({
-    input: updateAnnouncementInputSchema,
+    input: updatePersonInputSchema,
     handler: async (input, ctx) => {
       try {
         const { success, error } = isAuthenticated(ctx);
         if (!success) throw error;
-        await annouyncementsUsecase.update(input);
-        return;
-      } catch (error) {
-        throw handleError(error, ctx);
-      }
-    },
-  }),
-  updatePreviewImage: defineAction({
-    accept: "form",
-    input: updatePreviewImageInputSchema,
-    handler: async (input, ctx) => {
-      try {
-        const { success, error } = isAuthenticated(ctx);
-        if (!success) throw error;
-        await annouyncementsUsecase.updatePreviewImage(input);
+        await personUsecase.update(input);
         return;
       } catch (error) {
         throw handleError(error, ctx);
@@ -55,28 +39,14 @@ export const announcement = {
     },
   }),
 
-  addAttachment: defineAction({
+  updatePortrait: defineAction({
     accept: "form",
-    input: addAttachmentInputSchema,
+    input: updatePortraitInputSchema,
     handler: async (input, ctx) => {
       try {
         const { success, error } = isAuthenticated(ctx);
         if (!success) throw error;
-        await annouyncementsUsecase.addAttachment(input);
-        return;
-      } catch (error) {
-        throw handleError(error, ctx);
-      }
-    },
-  }),
-
-  removeAttachment: defineAction({
-    input: removeAttachmentInputSchema,
-    handler: async (input, ctx) => {
-      try {
-        const { success, error } = isAuthenticated(ctx);
-        if (!success) throw error;
-        await annouyncementsUsecase.removeAttatch(input);
+        await personUsecase.updatePortrait(input);
         return;
       } catch (error) {
         throw handleError(error, ctx);
@@ -85,12 +55,12 @@ export const announcement = {
   }),
 
   delete: defineAction({
-    input: deleteAnnouncementInputSchema,
+    input: deletePersonInputSchema,
     handler: async (input, ctx) => {
       try {
         const { success, error } = isAuthenticated(ctx);
         if (!success) throw error;
-        await annouyncementsUsecase.deleteAnnouncement(input);
+        await personUsecase.deletePerson(input);
         return;
       } catch (error) {
         throw handleError(error, ctx);
@@ -104,11 +74,11 @@ export const announcement = {
       try {
         const { success, error } = isAuthenticated(ctx);
         if (!success) throw error;
-        const result = await annouyncementsUsecase.getById(id);
+        const result = await personUsecase.getById(id);
         if (!result) {
           throw new ActionError({
             code: "NOT_FOUND",
-            message: "Announcement not found",
+            message: "Person not found",
           });
         }
         return result;
@@ -119,39 +89,55 @@ export const announcement = {
   }),
 
   getMany: defineAction({
-    input: getManyAnnouncementsInputSchema,
+    input: getManyPersonsInputSchema,
     handler: async (input, ctx) => {
-      const { success, error } = isAuthenticated(ctx);
-      if (!success) throw error;
       try {
-        const result = await annouyncementsUsecase.getMany(input);
+        const { success, error } = isAuthenticated(ctx);
+        if (!success) throw error;
+        const result = await personUsecase.getMany(input);
         return result;
       } catch (error) {
         throw handleError(error, ctx);
       }
     },
   }),
-  publish: defineAction({
-    input: z.string().uuid(),
-    handler: async (id, ctx) => {
+
+  getAll: defineAction({
+    input: z.object({}),
+    handler: async (input, ctx) => {
       try {
         const { success, error } = isAuthenticated(ctx);
         if (!success) throw error;
-        await annouyncementsUsecase.publish(id);
-        return;
+        const result = await personUsecase.getAll();
+        return result;
       } catch (error) {
         throw handleError(error, ctx);
       }
     },
   }),
-  unpublish: defineAction({
-    input: z.string().uuid(),
-    handler: async (id, ctx) => {
+
+  getPersonsByUnit: defineAction({
+    input: z.object({ unitId: z.string().uuid() }),
+    handler: async (input, ctx) => {
       try {
         const { success, error } = isAuthenticated(ctx);
         if (!success) throw error;
-        await annouyncementsUsecase.unpublish(id);
-        return;
+        const result = await personUsecase.getPersonsByUnit(input.unitId);
+        return result;
+      } catch (error) {
+        throw handleError(error, ctx);
+      }
+    },
+  }),
+
+  getPersonRankTree: defineAction({
+    input: z.object({}),
+    handler: async (input, ctx) => {
+      try {
+        const { success, error } = isAuthenticated(ctx);
+        if (!success) throw error;
+        const result = await personUsecase.getPersonRankTree();
+        return result;
       } catch (error) {
         throw handleError(error, ctx);
       }

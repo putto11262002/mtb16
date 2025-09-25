@@ -140,14 +140,14 @@ export const SidebarLayout = () => {
           </SidebarMenu>
         </SidebarFooter>
       </Sidebar>
-      <main className="flex min-h-screen w-full flex-col">
+      <div className="flex min-h-screen w-full flex-col overflow-x-hidden">
         <div className="sticky top-0 z-10 flex h-(--header-height) w-full items-center border-b bg-background px-4 shadow-sm">
           <SidebarTrigger />
         </div>
         <main className="m-t-( --header-height ) flex-1 w-full p-6">
           <Outlet />
         </main>
-      </main>
+      </div>
     </SidebarProvider>
   );
 };

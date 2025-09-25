@@ -1,7 +1,6 @@
 {
-  "id": "680a6b2a-8535-4fcd-86b2-e0c239018149",
-
-  "prevId": "7aa46c21-17a7-497d-9d25-b19678829b90",
+  "id": "90380dee-6a68-427a-9e53-807becf9f005",
+  "prevId": "0bb77f31-63c5-4c20-80c9-07393ceb60ab",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -80,22 +79,7 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {
-        "directory_entries_tag_tags_id_fk": {
-          "name": "directory_entries_tag_tags_id_fk",
-          "tableFrom": "directory_entries",
-          "tableTo": "tags",
-          "columnsFrom": [
-            "tag"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -125,6 +109,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "rank_order": {
+          "name": "rank_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "role": {
           "name": "role",
           "type": "varchar(255)",
@@ -143,11 +133,21 @@
           "primaryKey": false,
           "notNull": false
         },
-
+        "superior": {
+          "name": "superior",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
         "order": {
           "name": "order",
           "type": "integer",
-
+          "primaryKey": false,
+          "notNull": false
+        },
+        "level": {
+          "name": "level",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
@@ -185,6 +185,19 @@
             "id"
           ],
           "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "persons_superior_persons_id_fk": {
+          "name": "persons_superior_persons_id_fk",
+          "tableFrom": "persons",
+          "tableTo": "persons",
+          "columnsFrom": [
+            "superior"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },
@@ -225,7 +238,7 @@
         },
         "tags": {
           "name": "tags",
-          "type": "varchar(255)[]",
+          "type": "text[]",
           "primaryKey": false,
           "notNull": false
         },
@@ -514,39 +527,6 @@
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.tags": {
-      "name": "tags",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "varchar(255)",
-          "primaryKey": true,
-          "notNull": true
         },
         "created_at": {
           "name": "created_at",
