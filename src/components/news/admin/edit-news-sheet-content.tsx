@@ -1,7 +1,7 @@
 // External libraries
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "astro:schema";
-import { Paperclip, X } from "lucide-react";
+import { X } from "lucide-react";
 import { memo, useCallback, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -233,7 +233,6 @@ const PreviewImageForm = memo(
 );
 
 const addAttachmentFormDefaultValues = {
-  label: "",
   file: undefined as any,
 };
 
@@ -299,34 +298,28 @@ const AttachmentForm = memo(
 
     return (
       <div className="space-y-6">
-        <div className="space-y-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {attachments?.map((attachment) => (
-            <div
-              key={attachment.id}
-              className="flex items-center justify-between px-2 py-1 border rounded gap-1 w-full"
-            >
-              <div className="flex items-center gap-2 flex-1 min-w-0">
-                <Paperclip className="w-3.5 h-3.5 text-muted-foreground" />
-                <a
-                  href={Config.getFileURL(attachment.id)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 text-sm underline overflow-hidden text-ellipsis"
-                >
-                  {attachment.label}
-                </a>
+            <div key={attachment.id} className="relative group">
+              <div className="aspect-square rounded-lg overflow-hidden bg-muted">
+                <img
+                  src={Config.getFileURL(attachment.file.id)}
+                  alt={attachment.label}
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <LoaderButton
-                className="w-7 h-7"
-                inplace
-                variant="ghost"
-                size="icon"
-                isLoading={isRemoving && removingId === attachment.id}
-                onClick={() => remove({ attachmentId: attachment.id })}
-                type="button"
-              >
-                <X className="w-4 h-4" />
-              </LoaderButton>
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 rounded-lg">
+                <LoaderButton
+                  className="w-8 h-8 bg-white/90 hover:bg-white text-black rounded-full"
+                  inplace
+                  size="icon"
+                  isLoading={isRemoving && removingId === attachment.id}
+                  onClick={() => remove({ attachmentId: attachment.id })}
+                  type="button"
+                >
+                  <X className="w-4 h-4" />
+                </LoaderButton>
+              </div>
             </div>
           ))}
         </div>
@@ -334,27 +327,15 @@ const AttachmentForm = memo(
           <form className="grid gap-4" onSubmit={form.handleSubmit(add)}>
             <FormField
               control={form.control}
-              name="label"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>ป้ายชื่อ</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="ป้ายชื่อไฟล์แนบ" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name="file"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>ไฟล์</FormLabel>
+                  <FormLabel>รูปภาพเพิ่มเติม</FormLabel>
                   <FormControl>
                     <Input
                       ref={fileInputRef}
                       type="file"
+                      accept="image/*"
                       onChange={(e) => field.onChange(e.target.files?.[0])}
                     />
                   </FormControl>
@@ -363,7 +344,7 @@ const AttachmentForm = memo(
               )}
             />
             <LoaderButton type="submit" isLoading={isAdding}>
-              เพิ่มไฟล์แนบ
+              เพิ่มรูปภาพ
             </LoaderButton>
           </form>
         </Form>

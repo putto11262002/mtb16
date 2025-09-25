@@ -21,13 +21,13 @@ export const newsColumns: ColumnDef<News>[] = [
   },
   {
     id: "attachments",
-    header: "ไฟล์แนบ",
+    header: "รูปภาพเพิ่มเติม",
     cell: ({ row }) => {
       const numAttachments = row.original.attachments?.length || 0;
 
       return (
         <Badge variant="outline">
-          <Paperclip className="inline mr-2" />
+          <Paperclip className="inline mr-2 w-3 h-3" />
           {numAttachments}
         </Badge>
       );

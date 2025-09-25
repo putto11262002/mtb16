@@ -1,10 +1,6 @@
 import type { Post } from "@/db/schema";
 import { z } from "astro:schema";
 import {
-  MAX_IMAGE_SIZE_MB,
-  SUPPORTED_IMAGE_TYPES,
-} from "../shared/constants";
-import {
   createPostInputSchema,
   deletePostInputSchema as PostDeletePostInputSchema,
   getManyPostsInputSchema as PostGetManyPostsInputSchema,
@@ -12,11 +8,14 @@ import {
   updatePreviewImageInputSchema as PostUpdatePreviewImageInputSchema,
   updatePostInputSchema,
 } from "../post/schema";
+import { MAX_IMAGE_SIZE_MB, SUPPORTED_IMAGE_TYPES } from "../shared/constants";
 
 export type News = Post;
 
-export const createNewsInputSchema = createPostInputSchema
-  .omit({ type: true, tags: true });
+export const createNewsInputSchema = createPostInputSchema.omit({
+  type: true,
+  tags: true,
+});
 
 export type createNewsInput = z.infer<typeof createNewsInputSchema>;
 
@@ -33,7 +32,7 @@ export type UpdatePreviewImage = z.infer<typeof updatePreviewImageInputSchema>;
 
 export const addAttachmentInputSchema = z.object({
   id: z.string().uuid(),
-  label: z.string().min(1),
+  label: z.string().optional(),
   file: z
     .instanceof(File)
     .refine(

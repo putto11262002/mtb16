@@ -1,6 +1,6 @@
 import { postUsecase } from "@/core/post/usecase";
-import type { Post } from "@/db/schema";
 import { db } from "@/db";
+import type { Post } from "@/db/schema";
 import { posts } from "@/db/schema";
 import { getFileStore } from "@/lib/storage";
 import { eq, sql } from "drizzle-orm";
@@ -61,7 +61,7 @@ const addAttachment = async (input: AddAttachmentInput) => {
     .update(posts)
     .set({
       attachments: sql`array_append(attachments, ${JSON.stringify({
-        label: input.label,
+        label: input.file.name || metadata.id,
         file: { id: metadata.id, mimeType: input.file.type },
         id: metadata.id,
       })}::jsonb)`,
