@@ -156,6 +156,7 @@ export const persons = pgTable("persons", {
     onDelete: "set null",
   }),
   order: integer("order"),
+  level: integer("level"),
   bio: text("bio"),
   ...timestamps,
 });

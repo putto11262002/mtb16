@@ -15,6 +15,7 @@ export const createPersonInputSchema = z.object({
     .max(255, "ตำแหน่งต้องไม่เกิน 255 ตัวอักษร")
     .optional(),
   unitId: z.string().uuid().optional(),
+  level: z.number().int().min(0).optional(),
   bio: z
     .string()
     .optional()
@@ -42,6 +43,7 @@ export const updatePersonInputSchema = z.object({
     .max(255, "ตำแหน่งต้องไม่เกิน 255 ตัวอักษร")
     .optional(),
   unitId: z.string().uuid().optional(),
+  level: z.number().int().min(0).optional(),
   bio: z
     .string()
     .optional()
@@ -81,7 +83,7 @@ export const getManyPersonsInputSchema = z.object({
   q: z.string().optional(),
   unitId: z.string().uuid().optional(),
   rank: z.string().optional(),
-  orderBy: z.enum(["name", "rank", "createdAt"]).optional(),
+  orderBy: z.enum(["name", "rank", "level", "createdAt"]).optional(),
   direction: z.enum(["asc", "desc"]).optional(),
 });
 

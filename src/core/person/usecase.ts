@@ -2,7 +2,11 @@ import { db } from "@/db";
 import { persons, type Person } from "@/db/schema";
 import { getFileStore } from "@/lib/storage";
 import { and, asc, count, desc, eq, ilike } from "drizzle-orm";
-import { DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE } from "../shared/constants";
+import {
+  DEFAULT_PAGE_NUMBER,
+  DEFAULT_PAGE_SIZE,
+  THAI_ARMY_RANKS,
+} from "../shared/constants";
 import type { PaginatedResult } from "../shared/types";
 import { createPaginatedResult } from "../shared/utils";
 import type {
@@ -12,19 +16,6 @@ import type {
   UpdatePersonInput,
   UpdatePortraitInput,
 } from "./schema";
-
-const thaiArmyRanks = {
-  จอมพล: 1, // Chom phon
-  พลเอก: 2, // Phon ek
-  พลโท: 3, // Phon tho
-  พลตรี: 4, // Phon tri
-  พันเอก: 5, // Phan ek
-  พันโท: 6, // Phan tho
-  พันตรี: 7, // Phan tri
-  ร้อยเอก: 8, // Roi ek
-  ร้อยโท: 9, // Roi tho
-  ร้อยตรี: 10, // Roi tri
-};
 
 const create = async (input: CreatePersonInput) => {
   const id = await db
@@ -36,8 +27,9 @@ const create = async (input: CreatePersonInput) => {
       unitId: input.unitId,
       bio: input.bio,
       order: input.order,
+      level: input.level,
       rankOrder: input.rank
-        ? (thaiArmyRanks[input.rank as keyof typeof thaiArmyRanks] ?? 100)
+        ? (THAI_ARMY_RANKS[input.rank as keyof typeof THAI_ARMY_RANKS] ?? 100)
         : undefined,
     })
     .returning({ id: persons.id })
@@ -58,8 +50,9 @@ const update = async (input: UpdatePersonInput) => {
       unitId: input.unitId,
       bio: input.bio,
       order: input.order,
+      level: input.level,
       rankOrder: input.rank
-        ? (thaiArmyRanks[input.rank as keyof typeof thaiArmyRanks] ?? 100)
+        ? (THAI_ARMY_RANKS[input.rank as keyof typeof THAI_ARMY_RANKS] ?? 100)
         : undefined,
     })
     .where(eq(persons.id, input.id));
@@ -124,7 +117,7 @@ const getMany = async ({
       limit: pageSize,
       offset: (page - 1) * pageSize,
       orderBy: (direction === "asc" ? asc : desc)(
-        persons[orderBy as "name" | "rank" | "createdAt"],
+        persons[orderBy as "name" | "rank" | "level" | "createdAt"],
       ),
     }),
     db
@@ -170,8 +163,10 @@ const getPersonRankTree = async (): Promise<Person[][]> => {
 
   // Sort all persons by rank hierarchy
   const sortedPersons = allPersons.sort((a, b) => {
-    const rankA = thaiArmyRanks[a.rank as keyof typeof thaiArmyRanks] ?? 100;
-    const rankB = thaiArmyRanks[b.rank as keyof typeof thaiArmyRanks] ?? 100;
+    const rankA =
+      THAI_ARMY_RANKS[a.rank as keyof typeof THAI_ARMY_RANKS] ?? 100;
+    const rankB =
+      THAI_ARMY_RANKS[b.rank as keyof typeof THAI_ARMY_RANKS] ?? 100;
     return rankA - rankB;
   });
 
@@ -180,7 +175,7 @@ const getPersonRankTree = async (): Promise<Person[][]> => {
 
   sortedPersons.forEach((person) => {
     const rankOrder =
-      thaiArmyRanks[person.rank as keyof typeof thaiArmyRanks] ?? 100;
+      THAI_ARMY_RANKS[person.rank as keyof typeof THAI_ARMY_RANKS] ?? 100;
     levels[rankOrder - 1].push(person); // Place person in the corresponding level
   });
 
