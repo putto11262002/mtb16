@@ -4,31 +4,66 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import HistoryTimeline from "./_components/history-timeline";
 import HeroSection from "./_components/hero-section";
+import SloganSection from "./_components/slogan-section";
+import MissionSection from "./_components/mission-section";
+import { getImage } from "astro:assets";
+
+import bg1 from "@/assets/about-us-hero.png";
+import logo from "@/assets/logo.png";
+
+const bg1Optimized = await getImage({
+  src: bg1,
+  width: 1920,
+  height: 1080,
+  format: "webp",
+});
+
+const logoOptimized = await getImage({
+  src: logo,
+  width: 200,
+  height: 200,
+  format: "webp",
+});
+
+const historyItems = [
+  {
+    date: "24 กันยายน พ.ศ. 2558",
+    title: "คำสั่งกองทัพบก",
+    description:
+      "กองทัพบกออกคำสั่ง (เฉพาะ) ที่ 36/58 เรื่องแก้อัตราการจัดและยุทโธปกรณ์กองทัพบก (ครั้งที่ 1) มีผลต่อจังหวัดทหารบกราชบุรี",
+  },
+  {
+    date: "1 ตุลาคม พ.ศ. 2558",
+    title: "เปลี่ยนนามหน่วย",
+    description:
+      "จังหวัดทหารบกราชบุรีแปรสภาพเป็นมณฑลทหารบก และเปลี่ยนนามหน่วยเป็นมณฑลทหารบกที่ 16 โดยมีพื้นที่รับผิดชอบ 3 จังหวัด ได้แก่ ราชบุรี สมุทรสงคราม และสมุทรสาคร",
+  },
+];
 
 const armyProvinceHistoryItems = [
   {
-    date: "30 เมษายน พ.ศ. 2484",
-    title: "ตั้งขึ้นครั้งแรก",
+    date: "30 เมษายน พ.ศ. 2427",
+    title: "การก่อตั้งครั้งแรก",
     description:
-      "ปรากฏตามข้อบังคับทหารว่าด้วยการแบ่งเขตมณฑลและจังหวัดทหาร (มาตรา 2 ข้อ 5)\n\n→ กำหนด 30 เมษายน ของทุกปี เป็น วันสถาปนา จังหวัดทหารบกราชบุรี",
+      "ตั้งขึ้นครั้งแรกปรากฏตามหลักฐานข้อบังคับทหารว่าด้วยการแบ่งเขตมณฑลและจังหวัดทหาร ที่ลงวันที่ 30 เมษายน พ.ศ. 2427 และถือเอาวันนี้เป็นวันครบรอบวันสถาปนาของจังหวัดทหารบกราชบุรี",
   },
   {
     date: "5 สิงหาคม พ.ศ. 2531",
     title: "ปรับการจัดหน่วย",
     description:
-      "มีการปรับการจัดหน่วยตามอัตราการจัดยุทโธปกรณ์ (อจย. 51-301)\n\n→ จังหวัดทหารบกราชบุรีเป็น หน่วยขึ้นตรงของมณฑลทหารบกที่ 11",
+      "มีการปรับการจัดหน่วยตามอัตราการจัดยุทโธปกรณ์ หมายเลข 51–301 ลงวันที่ 5 สิงหาคม พ.ศ. 2531 โดยกำหนดให้จังหวัดทหารบกราชบุรีเป็นหน่วยขึ้นตรงของมณฑลทหารบกที่ 11",
   },
   {
     date: "13 กรกฎาคม พ.ศ. 2541",
     title: "ย้ายที่ตั้ง",
     description:
-      "จังหวัดทหารบกราชบุรี ย้ายที่ตั้งจากกรมการทหารช่าง ไปยังที่ตั้งถาวรใหม่\n\nที่ เลขที่ 158 หมู่ 1 ต.โคกหม้อ อ.เมือง จ.ราชบุรี (ริมถนนเพชรเกษมสายเก่า)\n\nพื้นที่ 19 ไร่ 8 ตารางวา",
+      "เมื่อวันที่ 13 กรกฎาคม พ.ศ. 2541 จังหวัดทหารบกราชบุรีย้ายจากที่ตั้งเดิมภายในกรมการทหารช่าง มายังที่ตั้งถาวรแห่งใหม่ริมถนนเพชรเกษมสายเก่า เลขที่ 158 หมู่ 1 ตำบลโคกหม้อ อำเภอเมือง จังหวัดราชบุรี เนื้อที่ประมาณ 19 ไร่ 8 ตารางวา",
   },
   {
     date: "1 เมษายน พ.ศ. 2552",
-    title: "แปรสภาพเป็นมณฑลทหารบกที่ 15",
+    title: "จัดตั้ง มทบ.15",
     description:
-      "กระทรวงกลาโหมออกกฎกระทรวง จัดตั้ง มณฑลทหารบกที่ 15 (แปรสภาพจาก จทบ.พ.บ. ตาม อจย. 51-201)\n\nจทบ.ราชบุรี (จทบ.ร.บ.) ขึ้นตรงกับ มทบ.15\n\nจัดหน่วยตาม อจย. 51-301 (5 ส.ค. 31) เป็น จังหวัดทหารบกชั้น 1\n\nปรับตำแหน่ง ผู้บังคับการจังหวัดทหารบก ราชบุรี (ผบ.จทบ.ร.บ.) จาก พันเอกพิเศษ → พลตรี\n\nพื้นที่รับผิดชอบ: 2 จังหวัด\n\nราชบุรี\n\nสมุทรสงคราม",
+      "ในปี พ.ศ. 2552 กระทรวงกลาโหมออกกฎกระทรวงจัดตั้งมณฑลทหารบกที่ 15 (มทบ.15) โดยแปรสภาพมาจาก จทบ.พ.บ. ตาม อจย. หมายเลข 51–201 มีผลบังคับใช้ตั้งแต่วันที่ 1 เมษายน พ.ศ. 2552 ครอบคลุมพื้นที่รับผิดชอบจังหวัดราชบุรีและจังหวัดสมุทรสงคราม พร้อมทั้งปรับตำแหน่งผู้บัญชาการจากพันเอกพิเศษเป็นพลตรี",
   },
 ];
 ---
@@ -44,28 +79,39 @@ const armyProvinceHistoryItems = [
   <slot slot="body">
     <main class="min-h-screen bg-background">
       <!-- Hero Section -->
-      <HeroSection client:visible />
+      <HeroSection client:visible bg1Src={bg1Optimized.src} />
+
+      <Separator />
+
+      <!-- Slogan Section -->
+      <SloganSection client:visible />
+
+      <Separator />
+
+      <!-- Mission Section -->
+      <MissionSection client:visible />
 
       <Separator />
 
       <!-- History Section -->
-      <section class="py-16 px-4 bg-muted/20">
+      <section class="py-16 px-4 bg-gradient-to-br from-muted to-background">
         <div class="max-w-4xl mx-auto">
-          <h2 class="text-2xl font-semibold text-center mb-12">ประวัติ</h2>
-          <HistoryTimeline client:visible />
+          <h2 class="text-2xl font-semibold text-center mb-12">
+            ประวัติมณฑลทหารบกที่ ๑๖
+          </h2>
+          <HistoryTimeline client:visible items={historyItems} />
         </div>
       </section>
 
       <Separator />
 
       <!-- Army Province History Section -->
-      <section class="py-16 px-4 bg-muted/20">
+      <section class="py-16 px-4 bg-gradient-to-br from-background to-muted/50">
         <div class="max-w-4xl mx-auto">
-          <HistoryTimeline
-            client:visible
-            title="Army Province History"
-            items={armyProvinceHistoryItems}
-          />
+          <h2 class="text-2xl font-semibold text-center mb-12">
+            ประวัติจังหวัดทหารบกราชบุรี
+          </h2>
+          <HistoryTimeline client:visible items={armyProvinceHistoryItems} />
         </div>
       </section>
 
