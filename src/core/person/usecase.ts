@@ -159,7 +159,9 @@ const getPersonsByUnit = async (unitId: string): Promise<Person[]> => {
 };
 
 const getPersonRankTree = async (): Promise<Person[][]> => {
-  const allPersons = await db.query.persons.findMany();
+  const allPersons = await db.query.persons.findMany({
+    with: { unit: true },
+  });
 
   // Sort all persons by rank hierarchy
   const sortedPersons = allPersons.sort((a, b) => {
