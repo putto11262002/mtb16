@@ -5,6 +5,7 @@ import PublicLayout from "@/layouts/public-layout.astro";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { annouyncementsUsecase } from "@/core/announcement/usecase";
+import { tagUsecase } from "@/core/tag/usecase";
 import PaginationNav from "@/components/common/pagination-nav.astro";
 import { AnnouncementCard } from "@/components/announcement/announcement-card";
 
@@ -22,7 +23,7 @@ const page = pageParam ? parseInt(pageParam, 10) || 1 : 1;
 
 const pageSize = 20;
 
-const allTags = await annouyncementsUsecase.getAllTags();
+const allTags = await tagUsecase.getAllTags();
 
 // Get filtered announcements with pagination
 const result = await annouyncementsUsecase.getMany({

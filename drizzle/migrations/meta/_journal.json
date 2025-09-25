@@ -12,22 +12,8 @@
     {
       "idx": 1,
       "version": "7",
-      "when": 1758767363751,
-      "tag": "0001_parallel_the_executioner",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1758768254502,
-      "tag": "0002_good_maestro",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1758770850090,
-      "tag": "0003_charming_killraven",
+      "when": 1758727701258,
+      "tag": "0001_gifted_overlord",
       "breakpoints": true
     }
   ]

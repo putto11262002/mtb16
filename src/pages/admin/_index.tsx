@@ -6,6 +6,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster } from "sonner";
 import AdminAnnouncementPage from "./announcements/_page";
 import AdminPersonPage from "./persons/_page";
+
 const queryClient = new QueryClient();
 // Entry point for the highly interactive admin React app
 // - All routes are handled by React Router

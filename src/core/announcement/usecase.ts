@@ -67,10 +67,6 @@ const deleteAnnouncement = async (input: DeleteAnnouncementInput) => {
   await postUsecase.deletePost(input);
 };
 
-const getAllTags = async (): Promise<string[]> => {
-  return await postUsecase.getAllTags("announcement");
-};
-
 export const annouyncementsUsecase = {
   publish,
   unpublish,
@@ -82,5 +78,4 @@ export const annouyncementsUsecase = {
   addAttachment,
   removeAttatch,
   deleteAnnouncement,
-  getAllTags,
 };
