@@ -2,7 +2,7 @@ import { tagUsecase } from "@/core/tag/usecase";
 import { db } from "@/db";
 import { directoryEntries } from "@/db/schema";
 import { getFileStore } from "@/lib/storage";
-import { asc, count, desc, eq, ilike } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike } from "drizzle-orm";
 import { DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE } from "../shared/constants";
 import type { PaginatedResult } from "../shared/types";
 import { createPaginatedResult } from "../shared/utils";
@@ -81,12 +81,16 @@ const getMany = async ({
   page = DEFAULT_PAGE_NUMBER,
   pageSize = DEFAULT_PAGE_SIZE,
   q,
+  tag,
 }: getManyDirectoryEntriesInput): Promise<
   PaginatedResult<typeof directoryEntries.$inferSelect>
 > => {
   const [items, itemCount] = await Promise.all([
     db.query.directoryEntries.findMany({
-      where: q ? ilike(directoryEntries.name, `${q}%`) : undefined,
+      where: and(
+        q ? ilike(directoryEntries.name, `${q}%`) : undefined,
+        tag ? eq(directoryEntries.tag, tag) : undefined,
+      ),
       limit: pageSize,
       offset: (page - 1) * pageSize,
       orderBy: [asc(directoryEntries.order), desc(directoryEntries.createdAt)],
@@ -94,7 +98,12 @@ const getMany = async ({
     db
       .select({ count: count() })
       .from(directoryEntries)
-      .where(q ? ilike(directoryEntries.name, `${q}%`) : undefined)
+      .where(
+        and(
+          q ? ilike(directoryEntries.name, `${q}%`) : undefined,
+          tag ? eq(directoryEntries.tag, tag) : undefined,
+        ),
+      )
       .then((res) => res[0].count),
   ]);
 

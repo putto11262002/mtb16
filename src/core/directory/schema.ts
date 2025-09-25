@@ -52,6 +52,7 @@ export const getManyDirectoryEntriesInputSchema = z.object({
   page: z.coerce.number().min(1).default(1).optional(),
   pageSize: z.coerce.number().min(1).max(100).default(10).optional(),
   q: z.string().optional(),
+  tag: tagSchema.optional(),
 });
 
 export type getManyDirectoryEntriesInput = z.infer<
