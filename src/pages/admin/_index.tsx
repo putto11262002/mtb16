@@ -1,12 +1,14 @@
 import { AnnouncementActionProvider } from "@/components/announcement/admin/announcement-action-context";
 import { DirectoryActionProvider } from "@/components/directory/admin/directory-action-context";
 import { SidebarLayout } from "@/components/layouts/sidebar";
+import { NewsActionProvider } from "@/components/news/admin/news-action-context";
 import { PersonActionProvider } from "@/components/person/admin/person-action-context";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster } from "sonner";
 import AdminAnnouncementPage from "./announcements/_page";
 import AdminDirectoryPage from "./directory/_page";
+import AdminNewsPage from "./news/_page";
 import AdminPersonPage from "./persons/_page";
 
 const queryClient = new QueryClient();
@@ -26,6 +28,9 @@ export const AdminApp = () => {
                     path="announcements"
                     element={<AdminAnnouncementPage />}
                   />
+                </Route>
+                <Route element={<NewsActionProvider />}>
+                  <Route path="news" element={<AdminNewsPage />} />
                 </Route>
                 <Route element={<DirectoryActionProvider />}>
                   <Route path="directory" element={<AdminDirectoryPage />} />
