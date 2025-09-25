@@ -1,6 +1,7 @@
 import { tagUsecase } from "@/core/tag/usecase";
 import { db } from "@/db";
 import { directoryEntries } from "@/db/schema";
+import { getFileStore } from "@/lib/storage";
 import { asc, count, desc, eq, ilike } from "drizzle-orm";
 import { DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE } from "../shared/constants";
 import type { PaginatedResult } from "../shared/types";
@@ -9,6 +10,7 @@ import type {
   createDirectoryEntryInput,
   deleteDirectoryEntryInput,
   getManyDirectoryEntriesInput,
+  UpdateDirectoryEntryImage,
   updateDirectoryEntryInput,
 } from "./schema";
 
@@ -18,15 +20,7 @@ const create = async (input: createDirectoryEntryInput) => {
   }
   const [result] = await db
     .insert(directoryEntries)
-    .values({
-      name: input.name,
-      tag: input.tag || null,
-      link: input.link || null,
-      phone: input.phone || null,
-      email: input.email || null,
-      notes: input.notes || null,
-      order: input.order || null,
-    })
+    .values(input)
     .returning({ id: directoryEntries.id });
   return { id: result.id };
 };
@@ -40,16 +34,39 @@ const update = async (input: updateDirectoryEntryInput) => {
   }
   await db
     .update(directoryEntries)
-    .set({
-      name: input.name,
-      tag: input.tag,
-      link: input.link,
-      phone: input.phone,
-      email: input.email,
-      notes: input.notes,
-      order: input.order,
-    })
+    .set(input)
     .where(eq(directoryEntries.id, input.id));
+};
+
+const updateImage = async (input: UpdateDirectoryEntryImage) => {
+  if (!(await exist(input.id))) {
+    throw new Error("Directory entry not found");
+  }
+
+  await db.transaction(async (tx) => {
+    const existingFileId = await tx.query.directoryEntries
+      .findFirst({
+        where: eq(directoryEntries.id, input.id),
+        columns: { image: true },
+      })
+      .then((res) => res?.image?.id);
+
+    const metadata = await getFileStore().store(
+      Buffer.from(await input.file.arrayBuffer()),
+      {
+        mimeType: input.file.type,
+        name: input.file.name,
+      },
+    );
+    await db
+      .update(directoryEntries)
+      .set({ image: { id: metadata.id, mimeType: input.file.type } })
+      .where(eq(directoryEntries.id, input.id));
+
+    if (existingFileId) {
+      await getFileStore().delete(existingFileId);
+    }
+  });
 };
 
 const exist = async (id: string): Promise<boolean> => {
@@ -100,6 +117,7 @@ const deleteEntry = async (input: deleteDirectoryEntryInput) => {
 export const directoryUsecase = {
   create,
   update,
+  updateImage,
   getMany,
   getById,
   deleteEntry,

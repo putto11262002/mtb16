@@ -1,4 +1,5 @@
 import { z } from "astro:schema";
+import { MAX_IMAGE_SIZE_MB, SUPPORTED_IMAGE_TYPES } from "../shared/constants";
 import { tagSchema } from "../tag/schema";
 
 export const createDirectoryEntryInputSchema = z.object({
@@ -55,4 +56,22 @@ export const getManyDirectoryEntriesInputSchema = z.object({
 
 export type getManyDirectoryEntriesInput = z.infer<
   typeof getManyDirectoryEntriesInputSchema
+>;
+
+export const updateDirectoryEntryImageInputSchema = z.object({
+  id: z.string().uuid(),
+  file: z
+    .instanceof(File)
+    .refine(
+      (file) => SUPPORTED_IMAGE_TYPES.includes(file.type),
+      "Unsupported image type",
+    )
+    .refine(
+      (file) => file.size <= MAX_IMAGE_SIZE_MB * 1024 * 1024,
+      `Image size must be less than ${MAX_IMAGE_SIZE_MB} MB`,
+    ),
+});
+
+export type UpdateDirectoryEntryImage = z.infer<
+  typeof updateDirectoryEntryImageInputSchema
 >;
