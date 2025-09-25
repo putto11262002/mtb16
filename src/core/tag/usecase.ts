@@ -1,6 +1,5 @@
 import { db } from "@/db";
-import { posts, tags } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { tags } from "@/db/schema";
 import type {
   createTagInput,
   getAllTagsOutput,
@@ -21,18 +20,8 @@ const validateTags = async (input: validateTagsInput): Promise<void> => {
   await Promise.all(uniqueTags.map((name) => create({ name })));
 };
 
-const getTagsByType = async (type: string): Promise<string[]> => {
-  const result = await db
-    .select({ tags: posts.tags })
-    .from(posts)
-    .where(eq(posts.type, type));
-  const allTags = result.flatMap((r) => r.tags || []);
-  return [...new Set(allTags)];
-};
-
 export const tagUsecase = {
   create,
   getAllTags,
   validateTags,
-  getTagsByType,
 };
