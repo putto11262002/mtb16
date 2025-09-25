@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "astro:schema";
 import { MAX_IMAGE_SIZE_MB, SUPPORTED_IMAGE_TYPES } from "../shared/constants";
 
 export const createPersonInputSchema = z.object({

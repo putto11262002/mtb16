@@ -8,12 +8,8 @@ import {
   updatePreviewImageInputSchema,
 } from "@/core/announcement/schema";
 import { annouyncementsUsecase } from "@/core/announcement/usecase";
-import {
-  ActionError,
-  defineAction,
-  type ActionAPIContext,
-} from "astro:actions";
-import { z } from "astro:content";
+import { ActionError, defineAction } from "astro:actions";
+import { z } from "astro:schema";
 import { handleError, isAuthenticated } from "./shared";
 
 export const announcement = {
