@@ -126,7 +126,7 @@ const updatePreviewImage = async (input: UpdatePreviewImage) => {
         name: input.file.name,
       },
     );
-    await db
+    await tx
       .update(posts)
       .set({ previewImage: { id: metadata.id, mimeType: input.file.type } })
       .where(eq(posts.id, input.id));
@@ -179,7 +179,7 @@ const removeAttachment = async (args: RemoveAttachmentInput) => {
     if (!existingFileId) {
       return;
     }
-    await db
+    await tx
       .update(posts)
       .set({
         attachments: sql`array_remove(attachments, (SELECT attachment FROM unnest(attachments) AS attachment WHERE (attachment->>'id') = ${args.attachmentId}))`,

@@ -78,7 +78,7 @@ const updatePortrait = async (input: UpdatePortraitInput) => {
         name: input.file.name,
       },
     );
-    await db
+    await tx
       .update(persons)
       .set({ portrait: metadata.id })
       .where(eq(persons.id, input.id));

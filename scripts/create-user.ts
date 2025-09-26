@@ -35,4 +35,3 @@ async function createUser() {
 }
 
 createUser();
-process.exit();
