@@ -143,6 +143,7 @@ const MetadataForm = memo(
                 <FormLabel>แท็ก</FormLabel>
                 <FormControl>
                   <TagField
+                    type="directory"
                     value={field.value ? [field.value] : []}
                     onChange={(value) => field.onChange(value[0] || undefined)}
                     multiple={false}

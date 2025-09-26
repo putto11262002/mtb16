@@ -28,8 +28,9 @@ import type {
 } from "./schema";
 
 const create = async (input: createPostInput) => {
+  let validatedTags: string[] | undefined;
   if (input.tags && input.tags.length > 0) {
-    await tagUsecase.validateTags(input.tags);
+    validatedTags = await tagUsecase.validateTags(input.tags, input.type);
   }
   let previewImageMeta: Post["previewImage"] | undefined;
   let attachmentsMeta: Post["attachments"] = [];
@@ -39,7 +40,7 @@ const create = async (input: createPostInput) => {
     .values({
       title: input.title,
       body: input.body,
-      tags: input.tags,
+      tags: validatedTags,
       type: input.type,
       previewImage: previewImageMeta,
       attachments: attachmentsMeta,
@@ -53,15 +54,17 @@ const update = async (input: updatePostInput) => {
   if (!(await exist(input.id))) {
     throw new Error("Post not found");
   }
-  if (input.tags) {
-    await tagUsecase.validateTags(input.tags);
+  let validatedTags: string[] | undefined;
+  if (input.tags && input.tags.length > 0) {
+    const type = await getPostType(input.id);
+    await tagUsecase.validateTags(input.tags, type);
   }
   await db
     .update(posts)
     .set({
       title: input.title,
       body: input.body,
-      tags: input.tags,
+      tags: validatedTags,
     })
     .where(eq(posts.id, input.id));
 };
@@ -89,6 +92,18 @@ const exist = async (id: string): Promise<boolean> => {
     .from(posts)
     .where(eq(posts.id, id));
   return countResult[0].count > 0;
+};
+
+export const getPostType = async (id: string): Promise<Post["type"]> => {
+  const post = await db
+    .select({ type: posts.type })
+    .from(posts)
+    .where(eq(posts.id, id))
+    .then((res) => res?.[0]);
+  if (!post) {
+    throw new Error("Post not found");
+  }
+  return post.type;
 };
 
 const updatePreviewImage = async (input: UpdatePreviewImage) => {

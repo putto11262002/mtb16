@@ -27,6 +27,7 @@ interface TagFieldProps {
   multiple?: boolean;
   placeholder?: string;
   className?: string;
+  type: string;
 }
 
 export const TagField: React.FC<TagFieldProps> = ({
@@ -34,12 +35,13 @@ export const TagField: React.FC<TagFieldProps> = ({
   onChange,
   multiple = true,
   placeholder = "Select or create tags...",
+  type,
   className,
 }) => {
   const [open, setOpen] = React.useState(false);
   const [inputValue, setInputValue] = React.useState("");
 
-  const { data: tags = [], isLoading } = useGetAllTags();
+  const { data: tags = [], isLoading } = useGetAllTags(type);
   const createTagMutation = useCreateTag();
 
   const availableTags = tags.filter((tag) => !value.includes(tag));
@@ -69,7 +71,7 @@ export const TagField: React.FC<TagFieldProps> = ({
     }
 
     try {
-      await createTagMutation.mutateAsync({ name: trimmedValue });
+      await createTagMutation.mutateAsync({ name: trimmedValue, type });
       handleSelect(trimmedValue);
       toast.success(`Tag "${trimmedValue}" created`);
     } catch (error) {

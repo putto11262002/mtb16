@@ -1,3 +1,5 @@
+import { Config } from "@/config";
+import { getEnv } from "../utils/env";
 import { createLocalFileStore, type LocalFileStoreConfig } from "./local";
 import type { FileStore } from "./types";
 
@@ -10,11 +12,11 @@ let instance: FileStore | null = null;
  */
 export function getFileStore(): FileStore {
   if (!instance) {
-    if (import.meta.env.DEV) {
+    if (Config.dev) {
       // Read config from environment variables with Astro-friendly defaults
       const config: LocalFileStoreConfig = {
-        baseDirectory: import.meta.env.FILESTORE_DIR || "./uploads",
-        createDirectory: import.meta.env.FILESTORE_CREATE_DIR !== "true", // defaults to true unless explicitly set to 'false'
+        baseDirectory: getEnv("FILE_STORE_BASE_DIR") || "temp/uploads",
+        createDirectory: getEnv("FILE_STORE_CREATE_DIR") === "true" || true,
       };
 
       instance = createLocalFileStore(config);

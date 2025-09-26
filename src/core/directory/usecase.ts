@@ -16,7 +16,7 @@ import type {
 
 const create = async (input: createDirectoryEntryInput) => {
   if (input.tag) {
-    await tagUsecase.validateTags([input.tag]);
+    await tagUsecase.validateTags([input.tag], "directory");
   }
   const [result] = await db
     .insert(directoryEntries)
@@ -30,7 +30,7 @@ const update = async (input: updateDirectoryEntryInput) => {
     throw new Error("Directory entry not found");
   }
   if (input.tag) {
-    await tagUsecase.validateTags([input.tag]);
+    await tagUsecase.validateTags([input.tag], "directory");
   }
   await db
     .update(directoryEntries)
