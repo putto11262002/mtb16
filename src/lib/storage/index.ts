@@ -1,6 +1,7 @@
 import { Config } from "@/config";
 import { getEnv } from "../utils/env";
 import { createLocalFileStore, type LocalFileStoreConfig } from "./local";
+import { createNetlifyFileStore, type NetlifyFileStoreConfig } from "./netlify";
 import type { FileStore } from "./types";
 
 // Singleton instance
@@ -21,7 +22,13 @@ export function getFileStore(): FileStore {
 
       instance = createLocalFileStore(config);
     } else {
-      throw new Error("NetlifyFileStore not implemented yet");
+      // Use Netlify Blobs in production
+      const config: NetlifyFileStoreConfig = {
+        storeName: import.meta.env.FILESTORE_STORE_NAME || "files",
+        // siteID and token are auto-detected in Netlify environment
+      };
+
+      instance = createNetlifyFileStore(config);
     }
   }
   return instance;
