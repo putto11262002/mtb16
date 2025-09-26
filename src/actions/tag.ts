@@ -20,12 +20,14 @@ export const tag = {
   }),
 
   getAllTags: defineAction({
-    input: z.void(),
+    input: z.object({
+      type: z.string(),
+    }),
     handler: async (input, ctx) => {
       try {
         const { success, error } = isAuthenticated(ctx);
         if (!success) throw error;
-        const result = await tagUsecase.getAllTags();
+        const result = await tagUsecase.getAllTags(input.type);
         return result;
       } catch (error) {
         throw handleError(error, ctx);

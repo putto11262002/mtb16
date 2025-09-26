@@ -166,6 +166,7 @@ const MetadataForm = memo(({ initialData }: { initialData: Announcement }) => {
               <FormLabel>แท็ก</FormLabel>
               <FormControl>
                 <TagField
+                  type="announcement"
                   value={field.value || []}
                   onChange={field.onChange}
                   multiple={true}

@@ -9,9 +9,9 @@ export const createDirectoryEntryInputSchema = z.object({
     .min(1, "Name is required")
     .max(255, "Name must not exceed 255 characters"),
   tag: tagSchema.optional(),
-  link: z.string().url("Invalid URL").optional().or(z.literal("")),
+  link: z.string().url("Invalid URL").min(1, "Link is required"),
   phone: z.string().optional(),
-  email: z.string().email("Invalid email").optional(),
+  email: z.string().email("Invalid email").optional().or(z.literal("")),
   notes: z.string().optional(),
 });
 
@@ -30,7 +30,7 @@ export const updateDirectoryEntryInputSchema = z.object({
   tag: tagSchema.optional(),
   link: z.string().url("Invalid URL").optional().or(z.literal("")),
   phone: z.string().optional(),
-  email: z.string().email("Invalid email").optional(),
+  email: z.string().email("Invalid email").optional().or(z.literal("")),
   notes: z.string().optional(),
 });
 

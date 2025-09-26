@@ -8,14 +8,9 @@ export const tagSchema = z
 
 export const createTagInputSchema = z.object({
   name: tagSchema,
+  type: z.string(),
 });
 
 export type createTagInput = z.infer<typeof createTagInputSchema>;
 
-export const getAllTagsOutputSchema = z.array(tagSchema);
-
-export type getAllTagsOutput = z.infer<typeof getAllTagsOutputSchema>;
-
-export const validateTagsInputSchema = z.array(tagSchema);
-
-export type validateTagsInput = z.infer<typeof validateTagsInputSchema>;
+export type getAllTagsOutput = string[];

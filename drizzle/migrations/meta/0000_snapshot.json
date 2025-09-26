@@ -1,6 +1,6 @@
 {
-  "id": "0d5322c1-ce55-49c0-9a2b-db6fbcfecd9b",
-  "prevId": "90380dee-6a68-427a-9e53-807becf9f005",
+  "id": "6c8963f8-eec4-40ef-a994-d7b34307ea89",
+  "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -37,7 +37,7 @@
           "name": "link",
           "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "phone": {
           "name": "phone",
@@ -73,21 +73,7 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {
-        "directory_entries_tag_tags_id_fk": {
-          "name": "directory_entries_tag_tags_id_fk",
-          "tableFrom": "directory_entries",
-          "tableTo": "tags",
-          "columnsFrom": [
-            "tag"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -563,10 +549,16 @@
       "name": "tags",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
+        "name": {
+          "name": "name",
           "type": "varchar(255)",
-          "primaryKey": true,
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "varchar(50)",
+          "primaryKey": false,
           "notNull": true
         },
         "created_at": {
@@ -586,7 +578,15 @@
       },
       "indexes": {},
       "foreignKeys": {},
-      "compositePrimaryKeys": {},
+      "compositePrimaryKeys": {
+        "tags_name_type_pk": {
+          "name": "tags_name_type_pk",
+          "columns": [
+            "name",
+            "type"
+          ]
+        }
+      },
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},

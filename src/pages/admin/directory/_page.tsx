@@ -43,7 +43,7 @@ export default function AdminDirectoryPage() {
   );
 
   const filters = useDirectoryFilters();
-  const { data: tags } = useGetAllTags();
+  const { data: tags } = useGetAllTags("directory");
 
   const { page, nextPage, prevPage } = usePagination();
 

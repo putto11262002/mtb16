@@ -6,6 +6,7 @@ import {
   jsonb,
   pgEnum,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   uuid,
@@ -109,19 +110,26 @@ export const procurements = pgTable("procurements", {
   ...timestamps,
 });
 
-export const tags = pgTable("tags", {
-  id: varchar("id", { length: 255 }).primaryKey(),
-  ...timestamps,
-});
+export const tags = pgTable(
+  "tags",
+  {
+    name: varchar("name", { length: 255 }).notNull(),
+    type: varchar("type", { length: 50 }).notNull(),
+    ...timestamps,
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.name, table.type] }),
+  }),
+);
 
 export const directoryEntries = pgTable("directory_entries", {
   id: uuid("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
   name: varchar("name", { length: 255 }).notNull(),
-  tag: varchar("tag", { length: 255 }).references(() => tags.id),
+  tag: varchar("tag", { length: 255 }),
   image: jsonb("image").$type<FileMeta | undefined>(),
-  link: varchar("link", { length: 255 }),
+  link: varchar("link", { length: 255 }).notNull(),
   phone: varchar("phone", { length: 255 }),
   email: varchar("email", { length: 255 }),
   notes: text("notes"),
@@ -181,20 +189,6 @@ export const personsRelations = relations(persons, ({ one }) => ({
     references: [units.id],
   }),
 }));
-
-export const tagsRelations = relations(tags, ({ many }) => ({
-  directoryEntries: many(directoryEntries),
-}));
-
-export const directoryEntriesRelations = relations(
-  directoryEntries,
-  ({ one }) => ({
-    tag: one(tags, {
-      fields: [directoryEntries.tag],
-      references: [tags.id],
-    }),
-  }),
-);
 
 // Exported types
 export type SiteSettings = typeof siteSettings.$inferSelect;

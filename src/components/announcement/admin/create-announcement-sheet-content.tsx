@@ -107,6 +107,7 @@ export const CreateAnnouncementSheetContent: React.FC<{
                   <FormLabel>แท็ก</FormLabel>
                   <FormControl>
                     <TagField
+                      type={"announcement"}
                       value={field.value || []}
                       onChange={field.onChange}
                       multiple={true}
