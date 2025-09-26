@@ -2,8 +2,16 @@
 import PublicLayout from "@/layouts/public-layout.astro";
 import LeadershipTree from "@/components/person/leadership-tree";
 import { personUsecase } from "@/core/person/usecase";
+import { Config } from "@/config";
 
-const levels = await personUsecase.getPersonRankTree();
+const levels = await personUsecase.getPersonRankTree().then((levels) =>
+  levels.map((level) =>
+    level.map((person) => ({
+      ...person,
+      portrait: person.portrait ? Config.getFileURL(person.portrait) : null,
+    })),
+  ),
+);
 ---
 
 <PublicLayout>

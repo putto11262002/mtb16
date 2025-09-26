@@ -18,10 +18,15 @@ const PersonCard = ({ person }: { person: PersonWithUnit }) => (
   >
     <CardContent>
       <div className="flex flex-col items-center text-center">
-        <AspectRatio
-          ratio={1 / 1}
-          className="bg-muted rounded overflow-hidden"
-        ></AspectRatio>
+        <AspectRatio ratio={1 / 1} className="bg-muted rounded overflow-hidden">
+          {person.portrait && (
+            <img
+              src={person.portrait}
+              alt={person.name}
+              className="object-cover w-full h-full"
+            />
+          )}
+        </AspectRatio>
         <div className="mt-4">
           <Badge variant={"outline"} className="mb-2">
             {person.rank}

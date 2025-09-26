@@ -24,6 +24,7 @@ import { personColumns } from "@/components/person/admin/person-table-definition
 import LeadershipTree from "@/components/person/leadership-tree";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { DataTable } from "@/components/ui/data-table";
+import { Config } from "@/config";
 import { THAI_ARMY_RANKS } from "@/core/shared/constants";
 import { useDeletePerson } from "@/hooks/person/mutation";
 import { useGetPersonRankTree, useGetPersons } from "@/hooks/person/queries";
@@ -147,7 +148,18 @@ export default function AdminPersonPage() {
               <AlertTitle>เกิดข้อผิดพลาดในการโหลดโครงสร้าง</AlertTitle>
             </Alert>
           ) : (
-            <LeadershipTree levels={treeData || []} />
+            <LeadershipTree
+              levels={
+                treeData?.map((level) =>
+                  level.map((profile) => ({
+                    ...profile,
+                    portrait: profile.portrait
+                      ? Config.getFileURL(profile.portrait)
+                      : null,
+                  })),
+                ) || []
+              }
+            />
           )}
         </TabsContent>
       </Tabs>
