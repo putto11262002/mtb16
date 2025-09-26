@@ -58,7 +58,7 @@ const updateImage = async (input: UpdateDirectoryEntryImage) => {
         name: input.file.name,
       },
     );
-    await db
+    await tx
       .update(directoryEntries)
       .set({ image: { id: metadata.id, mimeType: input.file.type } })
       .where(eq(directoryEntries.id, input.id));
