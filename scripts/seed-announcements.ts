@@ -2,7 +2,7 @@ import { annouyncementsUsecase } from "@/core/announcement/usecase";
 import { faker } from "@faker-js/faker";
 import * as path from "node:path";
 import { TEMP_DIR } from "scripts";
-import { getCachedAvatar } from "./image-cache";
+import { getCachedAvatar } from "./mock-file-cache";
 import { down, parseArgs, up } from "./utils";
 
 const TEMP_FILE_NAME = "seeded_announcements.json";

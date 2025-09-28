@@ -4,7 +4,7 @@ import "dotenv/config";
 import { randomInt } from "node:crypto";
 import * as path from "node:path";
 import { TEMP_DIR } from "scripts";
-import { getCachedAvatar, getCachedPicsum } from "./image-cache";
+import { getCachedAvatar, getCachedPicsum } from "./mock-file-cache";
 import { down, parseArgs, up } from "./utils";
 
 const TEMP_FILE_NAME = "seeded_news.json";
