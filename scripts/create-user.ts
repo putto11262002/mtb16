@@ -29,8 +29,10 @@ async function createUser() {
     });
 
     console.log("User created successfully:", result);
+    process.exit(0);
   } catch (error) {
     console.error("Failed to create user:", error);
+    process.exit(1);
   }
 }
 
