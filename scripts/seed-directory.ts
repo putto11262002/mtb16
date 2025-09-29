@@ -3,7 +3,7 @@ import { faker } from "@faker-js/faker";
 import "dotenv/config";
 import * as path from "node:path";
 import { TEMP_DIR } from "scripts";
-import { getCachedAvatar } from "./image-cache";
+import { getCachedAvatar } from "./mock-file-cache";
 import { down, parseArgs, up } from "./utils";
 
 const TEMP_FILE_NAME = "seeded_directory.json";
