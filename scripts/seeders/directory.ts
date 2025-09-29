@@ -1,6 +1,6 @@
 import { directoryUsecase } from "@/core/directory/usecase";
 import type { Faker } from "@faker-js/faker";
-import type { ImageCache } from "../image-cache";
+import type { MockFileCache } from "scripts/mock-file-cache";
 import type { Seed } from "../seed";
 
 export class DirectorySeeder implements Seed {
@@ -10,7 +10,7 @@ export class DirectorySeeder implements Seed {
     count,
   }: {
     faker: Faker;
-    fileCache: ImageCache;
+    fileCache: MockFileCache;
     count: number;
   }): Promise<string[]> {
     console.log(`Seeding ${count} mock directory entries...`);
@@ -49,7 +49,7 @@ export class DirectorySeeder implements Seed {
 
         // Optionally add an image
         if (faker.datatype.boolean({ probability: 0.6 })) {
-          const file = await fileCache.getRandomCachedImage("avatar");
+          const file = await fileCache.getRandomCachedFile("avatar");
           await directoryUsecase.updateImage({ id: result.id, file });
         }
 

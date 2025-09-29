@@ -1,6 +1,6 @@
 import { annouyncementsUsecase } from "@/core/announcement/usecase";
 import type { Faker } from "@faker-js/faker";
-import type { ImageCache } from "../image-cache";
+import type { MockFileCache } from "../mock-file-cache";
 import type { Seed } from "../seed";
 
 const TAGS = [
@@ -21,7 +21,7 @@ export class AnnouncementsSeeder implements Seed {
     count,
   }: {
     faker: Faker;
-    fileCache: ImageCache;
+    fileCache: MockFileCache;
     count: number;
   }): Promise<string[]> {
     console.log(`Seeding ${count} mock announcements...`);
@@ -39,7 +39,7 @@ export class AnnouncementsSeeder implements Seed {
           tags: tags.length > 0 ? tags : undefined,
         });
 
-        const file = await fileCache.getRandomCachedImage("avatar");
+        const file = await fileCache.getRandomCachedFile("avatar");
         await annouyncementsUsecase.updatePreviewImage({
           id: result.id,
           file,

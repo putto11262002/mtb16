@@ -3,9 +3,8 @@ import { faker } from "@faker-js/faker";
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import * as path from "node:path";
-import type { ImageCache } from "./image-cache";
-import { imageCache } from "./image-cache";
 import { TEMP_DIR } from "./index";
+import { mockFileCache, type MockFileCache } from "./mock-file-cache";
 import { AnnouncementsSeeder } from "./seeders/announcements";
 import { DirectorySeeder } from "./seeders/directory";
 import { NewsSeeder } from "./seeders/news";
@@ -19,7 +18,7 @@ export interface Seed {
     count,
   }: {
     faker: Faker;
-    fileCache: ImageCache;
+    fileCache: MockFileCache;
     count: number;
   }): Promise<string[]>;
   down({ ids }: { ids: string[] }): Promise<void>;
@@ -59,7 +58,7 @@ class UnifiedSeeder {
 
     const tempFile = this.getTempFile(resource);
     await up(
-      () => seeder.up({ faker, fileCache: imageCache, count }),
+      () => seeder.up({ faker, fileCache: mockFileCache, count }),
       tempFile,
     );
   }

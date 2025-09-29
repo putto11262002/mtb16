@@ -1,7 +1,7 @@
 import { newsUsecase } from "@/core/news/usecase";
 import type { Faker } from "@faker-js/faker";
 import { randomInt } from "node:crypto";
-import type { ImageCache } from "../image-cache";
+import type { MockFileCache } from "scripts/mock-file-cache";
 import type { Seed } from "../seed";
 
 export class NewsSeeder implements Seed {
@@ -11,7 +11,7 @@ export class NewsSeeder implements Seed {
     count,
   }: {
     faker: Faker;
-    fileCache: ImageCache;
+    fileCache: MockFileCache;
     count: number;
   }): Promise<string[]> {
     console.log(`Seeding ${count} mock news...`);
@@ -25,12 +25,12 @@ export class NewsSeeder implements Seed {
       try {
         const result = await newsUsecase.create({ title, body });
 
-        const file = await fileCache.getRandomCachedImage("avatar");
+        const file = await fileCache.getRandomCachedFile("avatar");
         await newsUsecase.updatePreviewImage({ id: result.id, file });
 
         await Promise.all(
           Array.from({ length: numAdditionalImages }, async () => {
-            const imgFile = await fileCache.getRandomCachedImage("picsum");
+            const imgFile = await fileCache.getRandomCachedFile("picsum");
             await newsUsecase.addAttachment({ id: result.id, file: imgFile });
           }),
         );

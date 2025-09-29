@@ -1,6 +1,6 @@
 import { personUsecase } from "@/core/person/usecase";
 import type { Faker } from "@faker-js/faker";
-import type { ImageCache } from "../image-cache";
+import type { MockFileCache } from "scripts/mock-file-cache";
 import type { Seed } from "../seed";
 
 export class PersonsSeeder implements Seed {
@@ -10,7 +10,7 @@ export class PersonsSeeder implements Seed {
     count,
   }: {
     faker: Faker;
-    fileCache: ImageCache;
+    fileCache: MockFileCache;
     count: number;
   }): Promise<string[]> {
     console.log(`Seeding ${count} mock persons...`);
@@ -72,7 +72,7 @@ export class PersonsSeeder implements Seed {
     const promises = persons.map(async (person) => {
       try {
         const result = await personUsecase.create(person);
-        const file = await fileCache.getRandomCachedImage("avatar");
+        const file = await fileCache.getRandomCachedFile("avatar");
         await personUsecase.updatePortrait({ id: result.id, file });
 
         console.log(`Created person: ${person.name} with ID: ${result.id}`);
