@@ -16,12 +16,13 @@ import { Menu } from "lucide-react";
 import { ModeToggle } from "../../common/mode-toggle";
 
 const navigationItems = [
+  { title: "หน้าแรก", href: "/" },
   { title: "เกี่ยวกับ", href: "/about" },
-  { title: "ข่าว", href: "/news" },
   { title: "ประกาศ", href: "/announcements" },
-  { title: "สารบบหน่วยงาน", href: "/directory" },
-  { title: "ผู้นำ", href: "/leadership" },
-  { title: "ทรัพยากร", href: "/resources" },
+  { title: "ข่าวสาร", href: "/news" },
+  { title: "สารบัญหน่วยงาน", href: "/directory" },
+  { title: "จัดซื้อจัดจ้าง", href: "/procurement" },
+  { title: "ผู้บังคับบัญชา", href: "/leadership" },
 ];
 
 export function Navbar() {

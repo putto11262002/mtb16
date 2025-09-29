@@ -44,7 +44,6 @@ const commander = await personUsecase.getByOrder(1);
 if (commander?.portrait) {
   commander.portrait = Config.getFileURL(commander.portrait);
 }
-console.log(config);
 ---
 
 <PublicLayout>

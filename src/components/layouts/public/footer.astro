@@ -1,65 +1,120 @@
 ---
-// src/components/Footer.astro
+// src/components/layouts/public/footer.astro
+interface Props {
+  config: {
+    addressTh?: string;
+    phone?: string;
+    email?: string;
+    facebookOfficial?: string;
+    facebookNews?: string;
+    tiktok?: string;
+  };
+}
+
+const { config } = Astro.props;
 ---
 
 <!-- Footer -->
 <footer class="bg-muted/50 border-t py-12 px-4">
   <div class="container mx-auto">
-    <div class="grid gap-8 md:grid-cols-4">
+    <div class="grid gap-8 md:grid-cols-3">
       <div>
-        <h3 class="text-lg font-semibold mb-4">16th Military Circle</h3>
-        <p class="text-muted-foreground text-sm leading-relaxed">
-          Dedicated to excellence in service, training, and community
-          engagement.
-        </p>
+        <h3 class="text-lg font-semibold mb-4">มณฑลทหารบกที่ 16</h3>
       </div>
       <div>
-        <h4 class="font-medium mb-4">Quick Links</h4>
+        <h4 class="font-medium mb-4">ลิงก์ด่วน</h4>
         <ul class="space-y-2 text-sm">
           <li>
             <a
               href="/news"
               class="text-muted-foreground hover:text-foreground transition-colors"
-              >Latest News</a>
+              >ข่าวล่าสุด</a
+            >
           </li>
           <li>
             <a
               href="/announcements"
               class="text-muted-foreground hover:text-foreground transition-colors"
-              >Announcements</a>
+              >ประกาศ</a
+            >
           </li>
           <li>
             <a
-              href="/resources"
+              href="/about"
               class="text-muted-foreground hover:text-foreground transition-colors"
-              >Resources</a>
+              >เกี่ยวกับเรา</a
+            >
           </li>
           <li>
             <a
-              href="/commanders-tree"
+              href="/leadership"
               class="text-muted-foreground hover:text-foreground transition-colors"
-              >Commanders Tree</a>
+              >ผู้บังคับบัญชา</a
+            >
           </li>
         </ul>
       </div>
       <div>
-        <h4 class="font-medium mb-4">Contact</h4>
+        <h4 class="font-medium mb-4">ติดต่อ</h4>
         <ul class="space-y-2 text-sm text-muted-foreground">
-          <li>Phone: (555) 123-4567</li>
-          <li>Email: info@16thmilitarycircle.mil</li>
-          <li>Address: Fort Example, State 12345</li>
+           {config.addressTh && <li>{config.addressTh}</li>}
+           {
+             config.phone && (
+               <li>
+                 <a
+                   href={`tel:${config.phone}`}
+                   class="hover:text-foreground transition-colors"
+                 >
+                   โทร: {config.phone}
+                 </a>
+               </li>
+             )
+           }
+           {
+             config.email && (
+               <li>
+                 <a
+                   href={`mailto:${config.email}`}
+                   class="hover:text-foreground transition-colors"
+                 >
+                   อีเมล: {config.email}
+                 </a>
+               </li>
+             )
+           }
+           {
+             config.facebookOfficial && (
+               <li>
+                 <a
+                   href={config.facebookOfficial}
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="hover:text-foreground transition-colors"
+                 >
+                   Facebook
+                 </a>
+               </li>
+             )
+           }
+          {
+            config.tiktok && (
+              <li>
+                <a
+                  href={config.tiktok}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="hover:text-foreground transition-colors"
+                >
+                  TikTok
+                </a>
+              </li>
+            )
+          }
         </ul>
-      </div>
-      <div>
-        <h4 class="font-medium mb-4">Follow Us</h4>
-        <p class="text-sm text-muted-foreground">
-          Stay connected through official channels for updates and important
-          information.
-        </p>
       </div>
     </div>
     <div class="border-t mt-8 pt-8 text-center text-sm text-muted-foreground">
-      <p>&copy; 2024 16th Military Circle. All rights reserved.</p>
+      <p>&copy; 2024 มณฑลทหารบกที่ 16 สงวนลิขสิทธิ์</p>
     </div>
   </div>
 </footer>
