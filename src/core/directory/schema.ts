@@ -62,7 +62,7 @@ export type getManyDirectoryEntriesInput = z.infer<
 export const updateDirectoryEntryImageInputSchema = z.object({
   id: z.string().uuid(),
   file: z
-    .instanceof(File)
+    .instanceof(Blob)
     .refine(
       (file) => SUPPORTED_IMAGE_TYPES.includes(file.type),
       "Unsupported image type",

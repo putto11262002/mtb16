@@ -34,7 +34,7 @@ export const addAttachmentInputSchema = z.object({
   id: z.string().uuid(),
   label: z.string().optional(),
   file: z
-    .instanceof(File)
+    .instanceof(Blob)
     .refine(
       (file) => SUPPORTED_IMAGE_TYPES.includes(file.type),
       "Unsupported image type",

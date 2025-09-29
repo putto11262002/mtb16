@@ -19,7 +19,7 @@ export function transformToFormData(
       parentKey === null || parentKey === "" ? key : `${parentKey}[${key}]`;
 
     // Handle different data types
-    if (value instanceof File) {
+    if (value instanceof Blob) {
       formData.set(formattedKey, value);
     } else if (Array.isArray(value)) {
       value.forEach((element, idx) => {

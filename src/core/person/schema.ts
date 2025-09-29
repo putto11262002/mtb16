@@ -58,13 +58,13 @@ export type UpdatePersonInput = z.infer<typeof updatePersonInputSchema>;
 export const updatePortraitInputSchema = z.object({
   id: z.string().uuid(),
   file: z
-    .instanceof(File)
+    .instanceof(Blob)
     .refine(
-      (file: File) => SUPPORTED_IMAGE_TYPES.includes(file.type),
+      (file: Blob) => SUPPORTED_IMAGE_TYPES.includes(file.type),
       "Unsupported image type",
     )
     .refine(
-      (file: File) => file.size <= MAX_IMAGE_SIZE_MB * 1024 * 1024,
+      (file: Blob) => file.size <= MAX_IMAGE_SIZE_MB * 1024 * 1024,
       `Image size must be less than ${MAX_IMAGE_SIZE_MB} MB`,
     ),
 });

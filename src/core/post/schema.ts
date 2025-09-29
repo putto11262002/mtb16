@@ -86,7 +86,7 @@ export type updatePostInput = z.infer<typeof updatePostInputSchema>;
 export const updatePreviewImageInputSchema = z.object({
   id: z.string().uuid(),
   file: z
-    .instanceof(File)
+    .instanceof(Blob)
     .refine(
       (file) => SUPPORTED_IMAGE_TYPES.includes(file.type),
       "Unsupported image type",
@@ -103,7 +103,7 @@ export const addAttachmentInputSchema = z.object({
   id: z.string().uuid(),
   label: z.string().min(1),
   file: z
-    .instanceof(File)
+    .instanceof(Blob)
     .refine(
       (file) => file.size <= MAX_ATTACHMENT_SIZE_MB * 1024 * 1024,
       `File size must be less than ${MAX_ATTACHMENT_SIZE_MB} MB`,

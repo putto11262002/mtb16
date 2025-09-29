@@ -69,7 +69,7 @@ export const updateAnnualPlanInputSchema = z.object({
   id: z.string().uuid(),
   files: z.array(
     z
-      .instanceof(File)
+      .instanceof(Blob)
       .refine(
         (file) => file.size <= 20 * 1024 * 1024,
         "File size must be less than 20 MB",
@@ -93,7 +93,7 @@ export const updateInvitationDocsInputSchema = z.object({
   id: z.string().uuid(),
   files: z.array(
     z
-      .instanceof(File)
+      .instanceof(Blob)
       .refine(
         (file) => file.size <= 20 * 1024 * 1024,
         "File size must be less than 20 MB",
@@ -119,7 +119,7 @@ export const updatePriceDisclosureDocsInputSchema = z.object({
   id: z.string().uuid(),
   files: z.array(
     z
-      .instanceof(File)
+      .instanceof(Blob)
       .refine(
         (file) => file.size <= 20 * 1024 * 1024,
         "File size must be less than 20 MB",
@@ -145,7 +145,7 @@ export const updateWinnerDeclarationDocsInputSchema = z.object({
   id: z.string().uuid(),
   files: z.array(
     z
-      .instanceof(File)
+      .instanceof(Blob)
       .refine(
         (file) => file.size <= 20 * 1024 * 1024,
         "File size must be less than 20 MB",

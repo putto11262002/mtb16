@@ -47,19 +47,19 @@ export type UpdateGlobalSettingsInput = z.infer<
 >;
 
 export const updateHeroImageInputSchema = z.object({
-  heroImage: z.instanceof(File),
+  heroImage: z.instanceof(Blob),
 });
 
 export type UpdateHeroImageInput = z.infer<typeof updateHeroImageInputSchema>;
 
 export const updatePopupImageInputSchema = z.object({
-  popupImage: z.instanceof(File),
+  popupImage: z.instanceof(Blob),
 });
 
 export type UpdatePopupImageInput = z.infer<typeof updatePopupImageInputSchema>;
 
 export const updateAboutUsHeroImageInputSchema = z.object({
-  aboutUsHeroImage: z.instanceof(File),
+  aboutUsHeroImage: z.instanceof(Blob),
 });
 
 export type UpdateAboutUsHeroImageInput = z.infer<

@@ -221,7 +221,7 @@ const MetadataForm = memo(
 );
 
 const updateImageFormSchema = z.object({
-  file: z.instanceof(File),
+  file: z.instanceof(Blob),
 });
 
 const ImageForm = memo(

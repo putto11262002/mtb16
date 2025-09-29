@@ -2,16 +2,7 @@ import pino from "pino";
 import type { Logger } from "./index";
 
 export const createPinoLogger = (level: string): Logger => {
-  const pinoLogger = pino({
-    transport: {
-      target: "pino-pretty",
-      options: {
-        colorize: true,
-        translateTime: "SYS:standard",
-        ignore: "pid,hostname",
-      },
-    },
-  });
+  const pinoLogger = pino({});
 
   return {
     debug: (message: string, ...args: any[]) =>
