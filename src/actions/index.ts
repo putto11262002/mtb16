@@ -6,4 +6,12 @@ import { person } from "./person";
 import { procurement } from "./procurement";
 import { tag } from "./tag";
 
-export const server = { announcement, config, directory, news, tag, person };
+export const server = {
+  announcement,
+  config,
+  directory,
+  news,
+  tag,
+  person,
+  procurement,
+};
