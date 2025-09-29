@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { Loader } from "@/components/common/loader";
 import { LoaderButton } from "@/components/common/loader-button";
 import {
   Form,
@@ -58,7 +59,7 @@ export default function LandingPageSettingsForm() {
     });
   });
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <Loader />;
 
   return (
     <Form {...form}>

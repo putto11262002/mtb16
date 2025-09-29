@@ -1,5 +1,6 @@
 import { toast } from "sonner";
 
+import { Loader } from "@/components/common/loader";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -48,7 +49,7 @@ export default function PopupSettingsForm() {
     }
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <Loader />;
 
   return (
     <div className="space-y-6">
@@ -64,9 +65,6 @@ export default function PopupSettingsForm() {
           onCheckedChange={handlePopupEnabledChange}
           disabled={isConfigPending}
         />
-        {isConfigPending && (
-          <p className="text-sm text-muted-foreground ml-2">กำลังบันทึก...</p>
-        )}
       </div>
 
       <div>
@@ -92,9 +90,6 @@ export default function PopupSettingsForm() {
           disabled={isImagePending}
           className="mt-2"
         />
-        {isImagePending && (
-          <p className="text-sm text-muted-foreground mt-1">กำลังอัปโหลด...</p>
-        )}
       </div>
     </div>
   );

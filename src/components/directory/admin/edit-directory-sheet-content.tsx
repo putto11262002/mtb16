@@ -221,7 +221,26 @@ const MetadataForm = memo(
 );
 
 const updateImageFormSchema = z.object({
-  file: z.instanceof(Blob),
+  file: z
+    .any()
+    .refine(
+      (file) =>
+        file &&
+        typeof file === "object" &&
+        "type" in file &&
+        ["image/jpeg", "image/png", "image/gif", "image/webp"].includes(
+          file.type,
+        ),
+      "Unsupported image type",
+    )
+    .refine(
+      (file) =>
+        file &&
+        typeof file === "object" &&
+        "size" in file &&
+        file.size <= 5 * 1024 * 1024,
+      "Image size must be less than 5 MB",
+    ),
 });
 
 const ImageForm = memo(

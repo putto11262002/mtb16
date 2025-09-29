@@ -34,13 +34,21 @@ export const addAttachmentInputSchema = z.object({
   id: z.string().uuid(),
   label: z.string().optional(),
   file: z
-    .instanceof(Blob)
+    .any()
     .refine(
-      (file) => SUPPORTED_IMAGE_TYPES.includes(file.type),
+      (file) =>
+        file &&
+        typeof file === "object" &&
+        "type" in file &&
+        SUPPORTED_IMAGE_TYPES.includes(file.type),
       "Unsupported image type",
     )
     .refine(
-      (file) => file.size <= MAX_IMAGE_SIZE_MB * 1024 * 1024,
+      (file) =>
+        file &&
+        typeof file === "object" &&
+        "size" in file &&
+        file.size <= MAX_IMAGE_SIZE_MB * 1024 * 1024,
       `Image size must be less than ${MAX_IMAGE_SIZE_MB} MB`,
     ),
 });

@@ -1,5 +1,6 @@
 import { toast } from "sonner";
 
+import { Loader } from "@/components/common/loader";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Input } from "@/components/ui/input";
 import { Config } from "@/config";
@@ -28,7 +29,7 @@ export default function AboutUsHeroSettingsForm() {
     }
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <Loader />;
 
   return (
     <div className="space-y-6">
@@ -55,9 +56,6 @@ export default function AboutUsHeroSettingsForm() {
           disabled={isImagePending}
           className="mt-2"
         />
-        {isImagePending && (
-          <p className="text-sm text-muted-foreground mt-1">กำลังอัปโหลด...</p>
-        )}
       </div>
     </div>
   );

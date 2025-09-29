@@ -69,13 +69,20 @@ export const updateAnnualPlanInputSchema = z.object({
   id: z.string().uuid(),
   files: z.array(
     z
-      .instanceof(Blob)
+      .any()
       .refine(
-        (file) => file.size <= 20 * 1024 * 1024,
+        (file) =>
+          file &&
+          typeof file === "object" &&
+          "size" in file &&
+          file.size <= 20 * 1024 * 1024,
         "File size must be less than 20 MB",
       )
       .refine(
         (file) =>
+          file &&
+          typeof file === "object" &&
+          "type" in file &&
           [
             ...SUPPORTED_IMAGE_TYPES,
             "application/pdf",
@@ -93,13 +100,20 @@ export const updateInvitationDocsInputSchema = z.object({
   id: z.string().uuid(),
   files: z.array(
     z
-      .instanceof(Blob)
+      .any()
       .refine(
-        (file) => file.size <= 20 * 1024 * 1024,
+        (file) =>
+          file &&
+          typeof file === "object" &&
+          "size" in file &&
+          file.size <= 20 * 1024 * 1024,
         "File size must be less than 20 MB",
       )
       .refine(
         (file) =>
+          file &&
+          typeof file === "object" &&
+          "type" in file &&
           [
             ...SUPPORTED_IMAGE_TYPES,
             "application/pdf",
@@ -119,13 +133,20 @@ export const updatePriceDisclosureDocsInputSchema = z.object({
   id: z.string().uuid(),
   files: z.array(
     z
-      .instanceof(Blob)
+      .any()
       .refine(
-        (file) => file.size <= 20 * 1024 * 1024,
+        (file) =>
+          file &&
+          typeof file === "object" &&
+          "size" in file &&
+          file.size <= 20 * 1024 * 1024,
         "File size must be less than 20 MB",
       )
       .refine(
         (file) =>
+          file &&
+          typeof file === "object" &&
+          "type" in file &&
           [
             ...SUPPORTED_IMAGE_TYPES,
             "application/pdf",
@@ -145,13 +166,20 @@ export const updateWinnerDeclarationDocsInputSchema = z.object({
   id: z.string().uuid(),
   files: z.array(
     z
-      .instanceof(Blob)
+      .any()
       .refine(
-        (file) => file.size <= 20 * 1024 * 1024,
+        (file) =>
+          file &&
+          typeof file === "object" &&
+          "size" in file &&
+          file.size <= 20 * 1024 * 1024,
         "File size must be less than 20 MB",
       )
       .refine(
         (file) =>
+          file &&
+          typeof file === "object" &&
+          "type" in file &&
           [
             ...SUPPORTED_IMAGE_TYPES,
             "application/pdf",
