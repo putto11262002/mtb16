@@ -1,6 +1,6 @@
 import { relations, sql } from "drizzle-orm";
+
 import {
-  boolean,
   index,
   integer,
   jsonb,
@@ -34,30 +34,19 @@ export const timestamps = {
     .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
 };
 
-// Tables
-export const siteSettings = pgTable("site_settings", {
-  id: uuid("id")
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  unitNameTh: varchar("unit_name_th", { length: 255 }).notNull(),
-  unitNameEn: varchar("unit_name_en", { length: 255 }),
-  logo: text("logo"),
-  footerCopyright: varchar("footer_copyright", { length: 255 }),
-  welcomeText: text("welcome_text"),
-  heroFallbackImage: text("hero_fallback_image"),
-  facebookOfficial: varchar("facebook_official", { length: 255 }),
-  facebookNews: varchar("facebook_news", { length: 255 }),
-  tiktok: varchar("tiktok", { length: 255 }),
-  addressTh: text("address_th"),
-  phone: varchar("phone", { length: 255 }),
-  email: varchar("email", { length: 255 }),
-  mapEmbed: text("map_embed"),
-  homepageAlertEnabled: boolean("homepage_alert_enabled"),
-  homepageAlertImage: text("homepage_alert_image"),
-  homepageAlertAlt: varchar("homepage_alert_alt", { length: 255 }),
-  homepageAlertLink: varchar("homepage_alert_link", { length: 255 }),
-  ...timestamps,
-});
+export const configs = pgTable(
+  "settings",
+  {
+    key: varchar("key", { length: 255 }).primaryKey(),
+    group: varchar("group", { length: 255 }).notNull(),
+    value: jsonb("value").notNull(),
+    ...timestamps,
+  },
+  (table) => ({
+    primary: primaryKey({ columns: [table.key, table.group] }),
+    groupIdx: index("settings_group_idx").on(table.group),
+  }),
+);
 
 type Attachment = {
   id: string;
@@ -191,8 +180,8 @@ export const personsRelations = relations(persons, ({ one }) => ({
 }));
 
 // Exported types
-export type SiteSettings = typeof siteSettings.$inferSelect;
-export type SiteSettingsInsert = typeof siteSettings.$inferInsert;
+export type Config = typeof configs.$inferSelect;
+export type ConfigInsert = typeof configs.$inferInsert;
 export type Post = typeof posts.$inferSelect;
 export type PostInsert = typeof posts.$inferInsert;
 export type Procurement = typeof procurements.$inferSelect;
