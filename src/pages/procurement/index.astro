@@ -1,0 +1,91 @@
+---
+export const prerender = false;
+
+import PublicLayout from "@/layouts/public-layout.astro";
+import { procurementUsecase } from "@/core/procurement/usecase";
+import { Button } from "@/components/ui/button";
+import { DataTable } from "@/components/ui/data-table";
+import { columns } from "@/components/client/procurement/procurement-table";
+import PaginationNav from "@/components/common/pagination-nav.astro";
+
+const url = new URL(Astro.request.url);
+const searchParams = url.searchParams;
+
+const status = searchParams.get("status") || "all";
+const page = parseInt(searchParams.get("page") || "1", 10);
+const pageSize = 20;
+
+const statusFilter = status === "all" ? undefined : status;
+
+const result = await procurementUsecase.getMany({
+  status: statusFilter,
+  pageSize,
+  page,
+  orderBy: "date",
+  direction: "desc",
+});
+---
+
+<PublicLayout>
+  <Fragment slot="head">
+    <title>จัดซื้อ/จัดจ้าง – มณฑลทหารบกที่ 16</title>
+    <meta
+      name="description"
+      content="ประกาศจัดซื้อจัดจ้างจากมณฑลทหารบกที่ 16"
+    />
+  </Fragment>
+
+  <main slot="body" class="container mx-auto px-4 py-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-foreground mb-2">จัดซื้อ/จัดจ้าง</h1>
+      <p class="text-muted-foreground">
+        ข่าวสารและประกาศจัดซื้อจัดจ้างจากมณฑลทหารบกที่ 16
+      </p>
+    </div>
+
+    <div class="mb-8">
+      <div class="flex flex-wrap gap-2">
+        <a href="/procurement">
+          <Button size="sm" variant={status === "all" ? "default" : "outline"}>
+            All
+          </Button>
+        </a>
+        <a href="/procurement?status=open">
+          <Button size="sm" variant={status === "open" ? "default" : "outline"}>
+            Open
+          </Button>
+        </a>
+        <a href="/procurement?status=closed">
+          <Button
+            size="sm"
+            variant={status === "closed" ? "default" : "outline"}
+          >
+            Closed
+          </Button>
+        </a>
+      </div>
+    </div>
+
+    {
+      result.items && result.items.length > 0 ? (
+        <div class="mb-8">
+          <DataTable columns={columns} data={result.items} />
+        </div>
+      ) : (
+        <div class="text-center py-12">
+          <p class="text-lg text-muted-foreground">ยังไม่มีรายการ</p>
+        </div>
+      )
+    }
+
+    <div class="mt-8">
+      <PaginationNav
+        basePath="/procurement"
+        page={page}
+        totalPages={result.totalPages}
+        pageSize={pageSize}
+      />
+    </div>
+  </main>
+</PublicLayout>
+

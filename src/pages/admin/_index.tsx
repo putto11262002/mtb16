@@ -10,6 +10,7 @@ import AdminAnnouncementPage from "./announcements/_page";
 import AdminDirectoryPage from "./directory/_page";
 import AdminNewsPage from "./news/_page";
 import AdminPersonPage from "./persons/_page";
+import AdminProcurementPage from "./procurement/_page";
 import AdminSettingsPage from "./settings/_page";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,10 @@ export const AdminApp = () => {
             <Route element={<SidebarLayout />}>
               <Route path="admin">
                 <Route element={<AnnouncementActionProvider />}>
+                  <Route
+                    path="procurements"
+                    element={<AdminProcurementPage />}
+                  />
                   <Route
                     path="announcements"
                     element={<AdminAnnouncementPage />}

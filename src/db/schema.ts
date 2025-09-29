@@ -97,7 +97,7 @@ export const procurements = pgTable("procurements", {
   year: integer("year").notNull(),
   details: text("details"),
   // แผนการจัดซื้อจัดจ้าง
-  annualPlan: jsonb("annual_plan").$type<Docs>(),
+  annualPlan: jsonb("annual_plan").$type<FileMeta[]>(),
   // ประกาศเชิญชวน
   invitation: jsonb("invitation_docs").$type<FileMeta[]>(),
   // เอกสารประกวดราคา/สอบราคา

@@ -47,6 +47,11 @@ const menuItems = [
         icon: Speaker,
       },
       {
+        title: "จัดซื้อ/จัดจ้าง",
+        url: "/admin/procurements",
+        icon: Folder,
+      },
+      {
         title: "ไดเรกทอรี",
         url: "/admin/directory",
         icon: Folder,
