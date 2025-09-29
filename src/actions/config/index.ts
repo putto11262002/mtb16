@@ -1,4 +1,3 @@
-import { contact } from "./contact";
-import { landingPage } from "./landing-page";
+import { global } from "./global";
 
-export const config = { landingPage, contact };
+export const config = { global };

@@ -7,16 +7,11 @@ export const GreetingPopup: React.FC<{ imageURL: string }> = ({ imageURL }) => {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (import.meta.env.DEV) {
-      // In dev mode, always show popup on page load
+    // In production, show only once per session
+    const hasSeen = sessionStorage.getItem("greeting-seen");
+    if (!hasSeen) {
       setOpen(true);
-    } else {
-      // In production, show only once per session
-      const hasSeen = sessionStorage.getItem("greeting-seen");
-      if (!hasSeen) {
-        setOpen(true);
-        sessionStorage.setItem("greeting-seen", "true");
-      }
+      sessionStorage.setItem("greeting-seen", "true");
     }
   }, []);
 

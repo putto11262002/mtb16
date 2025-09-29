@@ -24,7 +24,7 @@ const itemVariants = {
   },
 };
 
-export default function HeroText({ heroTitle }: HeroTextProps) {
+export default function HeroText() {
   return (
     <motion.div
       className="relative container mx-auto text-center z-20"
@@ -39,19 +39,19 @@ export default function HeroText({ heroTitle }: HeroTextProps) {
         <span className="text-white/90">เว็บไซต์ทางการของ</span>
       </motion.div>
       <motion.h1
-        className="mt-12 text-4xl sm:text-5xl md:text-7xl font-bold text-white drop-shadow-lg"
+        className="mt-12 text-4xl sm:text-5xl md:text-7xl font-bold text-accent drop-shadow-lg"
         variants={itemVariants}
       >
-        {heroTitle || "มณฑลทหารบกที่ ๑๖"}
+        {"มณฑลทหารบกที่ ๑๖"}
       </motion.h1>
       <motion.p
-        className="mt-8 sm:text-3xl text-lg text-accent max-w-2xl mx-auto leading-relaxed drop-shadow-sm px-4"
+        className="mt-8 sm:text-3xl text-lg text-white max-w-2xl mx-auto leading-relaxed drop-shadow-sm px-4"
         variants={itemVariants}
       >
         เพื่อชาติ ศาสน์ กษัตริย์ และประชาชน
       </motion.p>
       <motion.p
-        className="mt-4 text-sm sm:text-base text-white/80 max-w-2xl mx-auto leading-relaxed drop-shadow-sm px-4"
+        className="mt-2 text-sm sm:text-base text-white/80 max-w-2xl mx-auto leading-relaxed drop-shadow-sm px-4"
         variants={itemVariants}
       >
         For the Nation, Religion, Monarchy, and People
@@ -81,10 +81,14 @@ export default function HeroText({ heroTitle }: HeroTextProps) {
         className="hidden md:flex flex-col sm:flex-row gap-4 justify-center mt-12"
         variants={itemVariants}
       >
-        <Button size="sm" className="px-8">
+        <Button size="sm" className="px-8 bg-accent  hover:bg-accent/90">
           <a href="/news">ข่าวล่าสุด</a>
         </Button>
-        <Button variant="outline" size="sm" className="px-8">
+        <Button
+          variant="outline"
+          size="sm"
+          className="px-8 hover:bg-background/90"
+        >
           <a href="/announcements">ดูประกาศ</a>
         </Button>
       </motion.div>

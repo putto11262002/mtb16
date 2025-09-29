@@ -7,9 +7,13 @@ import HeroSection from "./_components/hero-section";
 import { Slogan } from "../_components/slogan";
 import MissionSection from "./_components/mission-section";
 import { getImage } from "astro:assets";
+import { configUsecase } from "@/core/config/usecase";
+import { Config } from "@/config";
 
 import bg1 from "@/assets/about-us-hero.png";
 import logo from "@/assets/logo.png";
+
+const config = await configUsecase.getGlobalSettings({});
 
 const bg1Optimized = await getImage({
   src: bg1,
@@ -79,7 +83,11 @@ const armyProvinceHistoryItems = [
   <slot slot="body">
     <main class="min-h-screen bg-background">
       <!-- Hero Section -->
-      <HeroSection client:visible bg1Src={bg1Optimized.src} />
+      <HeroSection
+        client:visible
+        bg1Src={bg1Optimized.src}
+        heroImage={config?.aboutUsHeroImage ? Config.getFileURL(config.aboutUsHeroImage.id) : undefined}
+      />
 
       <Separator />
 

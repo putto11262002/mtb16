@@ -1,6 +1,7 @@
 import { relations, sql } from "drizzle-orm";
 
 import {
+  boolean,
   index,
   integer,
   jsonb,
@@ -34,19 +35,27 @@ export const timestamps = {
     .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
 };
 
-export const configs = pgTable(
-  "settings",
-  {
-    key: varchar("key", { length: 255 }),
-    group: varchar("group", { length: 255 }).notNull(),
-    value: jsonb("value").notNull(),
-    ...timestamps,
-  },
-  (table) => ({
-    primary: primaryKey({ columns: [table.key, table.group] }),
-    groupIdx: index("settings_group_idx").on(table.group),
-  }),
-);
+export const settings = pgTable("settings", {
+  id: varchar("id", { length: 255 }).primaryKey().default("global"),
+  // Landing page fields
+  heroTitle: varchar("hero_title", { length: 255 }),
+  heroImage: jsonb("hero_image").$type<FileMeta | undefined>(),
+  // About us page fields
+  aboutUsHeroImage: jsonb("about_us_hero_image").$type<FileMeta | undefined>(),
+  newsTag: varchar("news_tag", { length: 255 }),
+  announcementsTag: varchar("announcements_tag", { length: 255 }),
+  popupEnabled: boolean("popup_enabled").default(false),
+  popupImage: jsonb("popup_image").$type<FileMeta | undefined>(),
+  // Contact fields
+  addressTh: text("address_th"),
+  phone: varchar("phone", { length: 255 }),
+  email: varchar("email", { length: 255 }),
+  mapEmbed: text("map_embed"),
+  facebookOfficial: varchar("facebook_official", { length: 255 }),
+  facebookNews: varchar("facebook_news", { length: 255 }),
+  tiktok: varchar("tiktok", { length: 255 }),
+  ...timestamps,
+});
 
 type Attachment = {
   id: string;
@@ -181,8 +190,8 @@ export const personsRelations = relations(persons, ({ one }) => ({
 }));
 
 // Exported types
-export type Config = typeof configs.$inferSelect;
-export type ConfigInsert = typeof configs.$inferInsert;
+export type Settings = typeof settings.$inferSelect;
+export type SettingsInsert = typeof settings.$inferInsert;
 export type Post = typeof posts.$inferSelect;
 export type PostInsert = typeof posts.$inferInsert;
 export type Procurement = typeof procurements.$inferSelect;

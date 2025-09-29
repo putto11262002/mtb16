@@ -6,7 +6,7 @@ import Footer from "@/components/layouts/public/footer.astro";
 import { GreetingPopup } from "@/components/layouts/public/greeting-popup";
 import { configUsecase } from "@/core/config/usecase";
 import { Config } from "@/config";
-const config = await configUsecase.getLandingPageConfig();
+const config = await configUsecase.getGlobalSettings({});
 ---
 
 <BaseLayout>

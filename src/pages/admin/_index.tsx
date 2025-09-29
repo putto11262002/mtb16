@@ -10,8 +10,7 @@ import AdminAnnouncementPage from "./announcements/_page";
 import AdminDirectoryPage from "./directory/_page";
 import AdminNewsPage from "./news/_page";
 import AdminPersonPage from "./persons/_page";
-import AdminContactSettingsPage from "./settings/contact/_page";
-import AdminSettingsPage from "./settings/landing-page/_page";
+import AdminSettingsPage from "./settings/_page";
 
 const queryClient = new QueryClient();
 // Entry point for the highly interactive admin React app
@@ -37,14 +36,7 @@ export const AdminApp = () => {
                 <Route element={<DirectoryActionProvider />}>
                   <Route path="directory" element={<AdminDirectoryPage />} />
                 </Route>
-                <Route
-                  path="settings/landing-page"
-                  element={<AdminSettingsPage />}
-                />
-                <Route
-                  path="settings/contact"
-                  element={<AdminContactSettingsPage />}
-                />
+                <Route path="settings" element={<AdminSettingsPage />} />
               </Route>
               <Route path="admin" element={<PersonActionProvider />}>
                 <Route path="persons" element={<AdminPersonPage />} />

@@ -24,12 +24,12 @@ export const Slogan = () => {
         >
           <p
             className={cn(
-              "w-full block text-4xl md:text-5xl font-bold text-primary text-center",
+              "w-full block text-4xl md:text-5xl font-bold text-accent text-center",
             )}
           >
             {word.th}
           </p>
-          <span className="text-lg md:text-xl text-muted-foreground mt-2">
+          <span className="text-lg md:text-xl text-accent/60 mt-2">
             {word.en}
           </span>
         </motion.div>

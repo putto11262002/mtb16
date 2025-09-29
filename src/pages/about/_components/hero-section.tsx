@@ -3,9 +3,10 @@ import { useRef } from "react";
 
 interface Props {
   bg1Src: string;
+  heroImage?: string;
 }
 
-export default function HeroSection({ bg1Src }: Props) {
+export default function HeroSection({ bg1Src, heroImage }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -34,11 +35,11 @@ export default function HeroSection({ bg1Src }: Props) {
         {/* Background image */}
         <div className="absolute inset-0">
           <img
-            src={bg1Src}
+            src={heroImage || bg1Src}
             alt="Military background"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-primary/70 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-black/70 z-10" />
         </div>
 
         <div className="relative z-10 h-full flex items-center justify-center px-4">

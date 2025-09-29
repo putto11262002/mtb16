@@ -24,7 +24,6 @@ import {
   ChevronUp,
   Folder,
   Newspaper,
-  Phone,
   Settings,
   Speaker,
   User2,
@@ -59,22 +58,14 @@ const menuItems = [
       },
     ],
   },
-  {
-    groupLabel: "บุคคล",
-    items: [],
-  },
+
   {
     groupLabel: "ตั้งค่า",
     items: [
       {
-        title: "หน้าแรก",
-        url: "/admin/settings/landing-page",
+        title: "การตั้งค่า",
+        url: "/admin/settings",
         icon: Settings,
-      },
-      {
-        title: "ติดต่อ",
-        url: "/admin/settings/contact",
-        icon: Phone,
       },
     ],
   },

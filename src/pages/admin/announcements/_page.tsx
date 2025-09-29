@@ -71,7 +71,7 @@ export default function AdminAnnouncementPage() {
     published: filters.published,
     orderBy: "createdAt",
     direction: "desc",
-    pageSize: 20,
+    pageSize: 10,
   });
 
   return (

@@ -41,8 +41,6 @@ export function Navbar() {
               </NavigationMenuLink>
             </NavigationMenuItem>
           ))}
-
-          <ModeToggle />
         </NavigationMenuList>
       </NavigationMenu>
 

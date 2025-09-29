@@ -1,86 +1,82 @@
 import { db } from "@/db";
-import { configs, type Config } from "@/db/schema";
-import { and, eq, sql } from "drizzle-orm";
+import { settings } from "@/db/schema";
+import { eq, sql } from "drizzle-orm";
 import type {
-  ContactConfig,
-  DeleteConfigInput,
-  GetConfigInput,
-  GetContactConfigInput,
-  GetManyConfigsInput,
-  LandingPageConfig,
-  PutConfigInput,
-  SetContactConfigInput,
-  UpdateLandingPageConfigInput,
-  UpdateLandingPageHeroImageInput,
-  UpdateLandingPagePopupImageInput,
+  GetGlobalSettingsInput,
+  GlobalSettings,
+  UpdateAboutUsHeroImageInput,
+  UpdateGlobalSettingsInput,
+  UpdateHeroImageInput,
+  UpdatePopupImageInput,
 } from "./schema";
 
-const put = async (input: PutConfigInput) => {
+const GLOBAL_ID = "global";
+
+const DEFAULT_SETTINGS: GlobalSettings = {
+  id: GLOBAL_ID,
+  heroTitle: undefined,
+  heroImage: undefined,
+  aboutUsHeroImage: undefined,
+  newsTag: undefined,
+  announcementsTag: undefined,
+  popupEnabled: false,
+  popupImage: undefined,
+  addressTh: undefined,
+  phone: undefined,
+  email: undefined,
+  mapEmbed: undefined,
+  facebookOfficial: undefined,
+  facebookNews: undefined,
+  tiktok: undefined,
+};
+
+const getGlobalSettings = async (
+  input: GetGlobalSettingsInput,
+): Promise<GlobalSettings> => {
+  const result = await db
+    .select()
+    .from(settings)
+    .where(eq(settings.id, GLOBAL_ID));
+  const existing = result?.[0];
+  if (existing) {
+    // Convert null to undefined for optional fields
+    return {
+      ...existing,
+      heroTitle: existing.heroTitle ?? undefined,
+      heroImage: existing.heroImage ?? undefined,
+      aboutUsHeroImage: existing.aboutUsHeroImage ?? undefined,
+      newsTag: existing.newsTag ?? undefined,
+      announcementsTag: existing.announcementsTag ?? undefined,
+      popupEnabled: existing.popupEnabled ?? false,
+      popupImage: existing.popupImage ?? undefined,
+      addressTh: existing.addressTh ?? undefined,
+      phone: existing.phone ?? undefined,
+      email: existing.email ?? undefined,
+      mapEmbed: existing.mapEmbed ?? undefined,
+      facebookOfficial: existing.facebookOfficial ?? undefined,
+      facebookNews: existing.facebookNews ?? undefined,
+      tiktok: existing.tiktok ?? undefined,
+    };
+  }
+  return DEFAULT_SETTINGS;
+};
+
+const updateGlobalSettings = async (input: UpdateGlobalSettingsInput) => {
+  const existing = await getGlobalSettings({});
+  const updated = { ...existing, ...input };
   await db
-    .insert(configs)
-    .values({
-      group: input.group,
-      key: input.key,
-      value: input.value,
-    })
+    .insert(settings)
+    .values(updated)
     .onConflictDoUpdate({
-      target: [configs.key, configs.group],
+      target: settings.id,
       set: {
-        value: input.value,
+        ...input,
         updatedAt: sql`CURRENT_TIMESTAMP`,
       },
     });
 };
 
-const getMany = async (input: GetManyConfigsInput): Promise<Config[]> => {
-  return await db
-    .select()
-    .from(configs)
-    .where(input.group ? eq(configs.group, input.group) : undefined);
-};
-
-const getConfig = async (
-  input: GetConfigInput,
-): Promise<Config | undefined> => {
-  const result = await db
-    .select()
-    .from(configs)
-    .where(and(eq(configs.group, input.group), eq(configs.key, input.key)));
-  return result?.[0];
-};
-
-const deleteConfig = async (input: DeleteConfigInput) => {
-  await db
-    .delete(configs)
-    .where(and(eq(configs.group, input.group), eq(configs.key, input.key)));
-};
-
-const getLandingPageConfig = async (): Promise<
-  LandingPageConfig | undefined
-> => {
-  const config = await getConfig({ group: "landing_page", key: "config" });
-  return config?.value !== undefined
-    ? (config.value as LandingPageConfig)
-    : undefined;
-};
-
-const setLandingPageConfig = async (input: UpdateLandingPageConfigInput) => {
-  const existingConfig = await getLandingPageConfig();
-  const config = {
-    heroTitle: input.heroTitle,
-    heroImage: existingConfig?.heroImage,
-    newsTag: input.newsTag || undefined,
-    announcementsTag: input.announcementsTag || undefined,
-    popupEnabled: input.popupEnabled,
-    popupImage: existingConfig?.popupImage,
-  };
-
-  await put({ group: "landing_page", key: "config", value: config });
-};
-
-const setLandingPageHeroImage = async (
-  input: UpdateLandingPageHeroImageInput,
-) => {
+const updateHeroImage = async (input: UpdateHeroImageInput) => {
   const { getFileStore } = await import("@/lib/storage");
   const files = getFileStore();
   const buffer = Buffer.from(await input.heroImage.arrayBuffer());
@@ -89,22 +85,19 @@ const setLandingPageHeroImage = async (
     mimeType: input.heroImage.type,
   });
 
-  const existingConfig = await getLandingPageConfig();
-  const config = {
-    heroTitle: existingConfig?.heroTitle || "",
-    heroImage: heroImageMeta,
-    newsTag: existingConfig?.newsTag,
-    announcementsTag: existingConfig?.announcementsTag,
-    popupEnabled: existingConfig?.popupEnabled,
-    popupImage: existingConfig?.popupImage,
-  };
-
-  await put({ group: "landing_page", key: "config", value: config });
+  await db
+    .insert(settings)
+    .values({ id: GLOBAL_ID, heroImage: heroImageMeta })
+    .onConflictDoUpdate({
+      target: settings.id,
+      set: {
+        heroImage: heroImageMeta,
+        updatedAt: sql`CURRENT_TIMESTAMP`,
+      },
+    });
 };
 
-const setLandingPagePopupImage = async (
-  input: UpdateLandingPagePopupImageInput,
-) => {
+const updatePopupImage = async (input: UpdatePopupImageInput) => {
   const { getFileStore } = await import("@/lib/storage");
   const files = getFileStore();
   const buffer = Buffer.from(await input.popupImage.arrayBuffer());
@@ -113,43 +106,43 @@ const setLandingPagePopupImage = async (
     mimeType: input.popupImage.type,
   });
 
-  const existingConfig = await getLandingPageConfig();
-  const config = {
-    heroTitle: existingConfig?.heroTitle || "",
-    heroImage: existingConfig?.heroImage,
-    newsTag: existingConfig?.newsTag,
-    announcementsTag: existingConfig?.announcementsTag,
-    popupEnabled: existingConfig?.popupEnabled,
-    popupImage: popupImageMeta,
-  };
-
-  await put({ group: "landing_page", key: "config", value: config });
+  await db
+    .insert(settings)
+    .values({ id: GLOBAL_ID, popupImage: popupImageMeta })
+    .onConflictDoUpdate({
+      target: settings.id,
+      set: {
+        popupImage: popupImageMeta,
+        updatedAt: sql`CURRENT_TIMESTAMP`,
+      },
+    });
 };
 
-const getContactConfig = async (
-  input: GetContactConfigInput,
-): Promise<ContactConfig> => {
-  const config = await getConfig({ group: "contact", key: "config" });
-  if (config?.value) {
-    return config.value as ContactConfig;
-  }
-  // Return defaults when no config exists
-  return {};
-};
+const updateAboutUsHeroImage = async (input: UpdateAboutUsHeroImageInput) => {
+  const { getFileStore } = await import("@/lib/storage");
+  const files = getFileStore();
+  const buffer = Buffer.from(await input.aboutUsHeroImage.arrayBuffer());
+  const aboutUsHeroImageMeta = await files.store(buffer, {
+    name: input.aboutUsHeroImage.name,
+    mimeType: input.aboutUsHeroImage.type,
+  });
 
-const setContactConfig = async (input: SetContactConfigInput) => {
-  await put({ group: "contact", key: "config", value: input });
+  await db
+    .insert(settings)
+    .values({ id: GLOBAL_ID, aboutUsHeroImage: aboutUsHeroImageMeta })
+    .onConflictDoUpdate({
+      target: settings.id,
+      set: {
+        aboutUsHeroImage: aboutUsHeroImageMeta,
+        updatedAt: sql`CURRENT_TIMESTAMP`,
+      },
+    });
 };
 
 export const configUsecase = {
-  put,
-  getMany,
-  getConfig,
-  deleteConfig,
-  getLandingPageConfig,
-  setLandingPageConfig,
-  setLandingPageHeroImage,
-  setLandingPagePopupImage,
-  getContactConfig,
-  setContactConfig,
+  getGlobalSettings,
+  updateGlobalSettings,
+  updateHeroImage,
+  updatePopupImage,
+  updateAboutUsHeroImage,
 };

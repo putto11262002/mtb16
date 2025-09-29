@@ -23,7 +23,7 @@ import { configUsecase } from "@/core/config/usecase";
 import HeroSection from "./_components/hero-section.astro";
 import GreetingPopup from "@/components/layouts/public/greeting-popup";
 
-const config = await configUsecase.getLandingPageConfig();
+const config = await configUsecase.getGlobalSettings({});
 
 const { items: latestNews } = await newsUsecase.getMany({
   published: true,
@@ -62,19 +62,7 @@ console.log(config);
         heroImage={config?.heroImage
           ? Config.getFileURL(config.heroImage.id)
           : ""}
-        heroTitle={config?.heroTitle}
       />
-
-      <!-- Greeting Popup -->
-      {config?.popupEnabled && config.popupImage && (
-        <GreetingPopup client:visible>
-          <img
-            src={Config.getFileURL(config.popupImage.id)}
-            alt="Greeting"
-            className="w-full h-full object-cover"
-          />
-        </GreetingPopup>
-      )}
 
       <!-- Unit Slogan Section -->
       <section class="py-16 px-4 bg-muted">
@@ -100,7 +88,7 @@ console.log(config);
       >
         <div class="container mx-auto">
           <div class="text-center mb-12">
-            <h2 class="text-4xl font-bold mb-4">ประกาศสำคัญ</h2>
+            <h2 class="text-4xl font-bold mb-4 text-accent">ประกาศสำคัญ</h2>
             <p class="text-xl text-muted-foreground max-w-2xl mx-auto">
               อัปเดตและประกาศสำคัญที่ส่งผลต่อหน่วยและชุมชนของเรา
             </p>
@@ -126,7 +114,7 @@ console.log(config);
       <section class="py-16 px-4 bg-muted/30">
         <div class="container mx-auto">
           <div class="text-center mb-12">
-            <h2 class="text-4xl font-bold mb-4">ข่าวล่าสุด</h2>
+            <h2 class="text-4xl font-bold mb-4 text-accent">ข่าวล่าสุด</h2>
             <p class="text-xl text-muted-foreground max-w-2xl mx-auto">
               รับข่าวสารล่าสุดเกี่ยวกับการพัฒนาและเรื่องราวจากหน่วยของเรา
             </p>
