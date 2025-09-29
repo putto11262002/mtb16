@@ -1,4 +1,5 @@
 import { relations, sql } from "drizzle-orm";
+
 import {
   boolean,
   index,
@@ -34,28 +35,25 @@ export const timestamps = {
     .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
 };
 
-// Tables
-export const siteSettings = pgTable("site_settings", {
-  id: uuid("id")
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  unitNameTh: varchar("unit_name_th", { length: 255 }).notNull(),
-  unitNameEn: varchar("unit_name_en", { length: 255 }),
-  logo: text("logo"),
-  footerCopyright: varchar("footer_copyright", { length: 255 }),
-  welcomeText: text("welcome_text"),
-  heroFallbackImage: text("hero_fallback_image"),
-  facebookOfficial: varchar("facebook_official", { length: 255 }),
-  facebookNews: varchar("facebook_news", { length: 255 }),
-  tiktok: varchar("tiktok", { length: 255 }),
+export const settings = pgTable("settings", {
+  id: varchar("id", { length: 255 }).primaryKey().default("global"),
+  // Landing page fields
+  heroTitle: varchar("hero_title", { length: 255 }),
+  heroImage: jsonb("hero_image").$type<FileMeta | undefined>(),
+  // About us page fields
+  aboutUsHeroImage: jsonb("about_us_hero_image").$type<FileMeta | undefined>(),
+  newsTag: varchar("news_tag", { length: 255 }),
+  announcementsTag: varchar("announcements_tag", { length: 255 }),
+  popupEnabled: boolean("popup_enabled").default(false),
+  popupImage: jsonb("popup_image").$type<FileMeta | undefined>(),
+  // Contact fields
   addressTh: text("address_th"),
   phone: varchar("phone", { length: 255 }),
   email: varchar("email", { length: 255 }),
   mapEmbed: text("map_embed"),
-  homepageAlertEnabled: boolean("homepage_alert_enabled"),
-  homepageAlertImage: text("homepage_alert_image"),
-  homepageAlertAlt: varchar("homepage_alert_alt", { length: 255 }),
-  homepageAlertLink: varchar("homepage_alert_link", { length: 255 }),
+  facebookOfficial: varchar("facebook_official", { length: 255 }),
+  facebookNews: varchar("facebook_news", { length: 255 }),
+  tiktok: varchar("tiktok", { length: 255 }),
   ...timestamps,
 });
 
@@ -133,6 +131,7 @@ export const directoryEntries = pgTable("directory_entries", {
   phone: varchar("phone", { length: 255 }),
   email: varchar("email", { length: 255 }),
   notes: text("notes"),
+  order: integer("order"),
   ...timestamps,
 });
 
@@ -191,8 +190,8 @@ export const personsRelations = relations(persons, ({ one }) => ({
 }));
 
 // Exported types
-export type SiteSettings = typeof siteSettings.$inferSelect;
-export type SiteSettingsInsert = typeof siteSettings.$inferInsert;
+export type Settings = typeof settings.$inferSelect;
+export type SettingsInsert = typeof settings.$inferInsert;
 export type Post = typeof posts.$inferSelect;
 export type PostInsert = typeof posts.$inferInsert;
 export type Procurement = typeof procurements.$inferSelect;

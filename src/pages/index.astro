@@ -8,152 +8,43 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Image } from "astro:assets";
-import backgroundSvg from "@/assets/hero-background4.png";
 import PublicLayout from "@/layouts/public-layout.astro";
 import { Separator } from "@/components/ui/separator";
+import { actions } from "astro:actions";
+import { Config } from "@/config";
+import { annouyncementsUsecase } from "@/core/announcement/usecase";
+import { newsUsecase } from "@/core/news/usecase";
+import { personUsecase } from "@/core/person/usecase";
+import { AnnouncementCard } from "@/components/announcement/announcement-card";
+import { NewsCard } from "@/components/news/news-card";
+import { CommanderSection } from "./_components/CommanderSection";
+import { configUsecase } from "@/core/config/usecase";
+import HeroSection from "./_components/hero-section.astro";
+import GreetingPopup from "@/components/layouts/public/greeting-popup";
 
-// Placeholder data
-const latestNews: {
-  id: number;
-  title: string;
-  description: string;
-  publishedAt: string;
-  mainImageUrl: string;
-}[] = [
-  {
-    id: 1,
-    title: "อัปเดตการฝึกหน่วย",
-    description: "การพัฒนาล่าสุดในโปรแกรมและตารางการฝึกของเรา",
-    publishedAt: "2024-09-01",
-    mainImageUrl: "/placeholder-news-1.jpg",
-  },
-  {
-    id: 2,
-    title: "กิจกรรมชุมชน",
-    description: "เข้าร่วมกับเราในกิจกรรมการเข้าถึงชุมชนที่จะมาถึง",
-    publishedAt: "2024-08-28",
-    mainImageUrl: "/placeholder-news-2.jpg",
-  },
-  {
-    id: 3,
-    title: "การบำรุงรักษาอุปกรณ์",
-    description: "การบำรุงรักษาตามกำหนดสำหรับอุปกรณ์หน่วยทั้งหมดในเดือนนี้",
-    publishedAt: "2024-08-25",
-    mainImageUrl: "/placeholder-news-3.jpg",
-  },
-  {
-    id: 4,
-    title: "การประชุมผู้นำ",
-    description: "การตัดสินใจสำคัญจากงานประชุมผู้นำล่าสุด",
-    publishedAt: "2024-08-20",
-    mainImageUrl: "/placeholder-news-4.jpg",
-  },
-  {
-    id: 5,
-    title: "การขับเคลื่อนการสรรหา",
-    description: "ความคิดริเริ่มใหม่เพื่อขยายสมาชิกหน่วยของเรา",
-    publishedAt: "2024-08-15",
-    mainImageUrl: "/placeholder-news-5.jpg",
-  },
-  {
-    id: 6,
-    title: "โปรโตคอลความปลอดภัย",
-    description: "แนวทางความปลอดภัยที่อัปเดตสำหรับการดำเนินงานทั้งหมด",
-    publishedAt: "2024-08-10",
-    mainImageUrl: "/placeholder-news-6.jpg",
-  },
-];
+const config = await configUsecase.getGlobalSettings({});
 
-const announcements: {
-  id: number;
-  title: string;
-  content: string;
-  publishedAt: string;
-  mainImageUrl: string;
-  attachmentFileUrl: string | null;
-}[] = [
-  {
-    id: 1,
-    title: "ประกาศการบำรุงรักษา",
-    content: "การบำรุงรักษาสถานที่ตามกำหนดสำหรับสุดสัปดาห์หน้า",
-    publishedAt: "2024-09-05",
-    mainImageUrl: "/placeholder-maintenance.jpg",
-    attachmentFileUrl: null,
-  },
-  {
-    id: 2,
-    title: "การดำเนินการนโยบายใหม่",
-    content: "โปรโตคอลความปลอดภัยใหม่จะถูกดำเนินการเริ่มตั้งแต่วันจันทร์",
-    publishedAt: "2024-09-03",
-    mainImageUrl: "/placeholder-policy.jpg",
-    attachmentFileUrl: "/placeholder-policy.pdf",
-  },
-  {
-    id: 3,
-    title: "อัปเดตตารางการฝึก",
-    content: "ตารางการฝึกที่อัปเดตสำหรับไตรมาสที่จะมาถึง",
-    publishedAt: "2024-09-01",
-    mainImageUrl: "/placeholder-training.jpg",
-    attachmentFileUrl: "/placeholder-schedule.pdf",
-  },
-  {
-    id: 4,
-    title: "การตรวจสอบอุปกรณ์",
-    content: "การตรวจสอบอุปกรณ์ที่บังคับในวันอังคารหน้า",
-    publishedAt: "2024-08-30",
-    mainImageUrl: "/placeholder-inspection.jpg",
-    attachmentFileUrl: null,
-  },
-  {
-    id: 5,
-    title: "การปิดทำการวันหยุด",
-    content: "สถานที่หน่วยจะปิดทำการสำหรับวันหยุด",
-    publishedAt: "2024-08-28",
-    mainImageUrl: "/placeholder-holiday.jpg",
-    attachmentFileUrl: "/placeholder-closure.pdf",
-  },
-  {
-    id: 6,
-    title: "โอกาสอาสาสมัคร",
-    content: "ตำแหน่งอาสาสมัครใหม่ที่มีอยู่ในงานเข้าถึงชุมชน",
-    publishedAt: "2024-08-25",
-    mainImageUrl: "/placeholder-volunteer.jpg",
-    attachmentFileUrl: null,
-  },
-];
+const { items: latestNews } = await newsUsecase.getMany({
+  published: true,
+  pageSize: 6,
+  orderBy: "publishedAt",
+  direction: "desc",
+});
 
-const isImage = (url: string | null) => {
-  if (!url) return false;
-  const ext = url.split(".").pop()?.toLowerCase();
-  return ["jpg", "jpeg", "png", "gif", "webp"].includes(ext || "");
-};
+const { items: announcements } = await annouyncementsUsecase.getMany({
+  published: true,
+  pageSize: 6,
+  orderBy: "publishedAt",
+  direction: "desc",
+  tags: config?.announcementsTag ? [config.announcementsTag] : undefined,
+});
 
-const commander = {
-  name: "Colonel John Smith",
-  position: "ผู้บัญชาการ",
-  image: "/placeholder-avatar.jpg", // Placeholder
-};
-
-const quickLinks: { title: string; href: string; description: string }[] = [
-  { title: "ข่าวและโพสต์", href: "/news", description: "รับข่าวสารล่าสุด" },
-  {
-    title: "ประกาศ",
-    href: "/announcements",
-    description: "ประกาศและอัปเดตสำคัญ",
-  },
-  {
-    title: "ทรัพยากร",
-    href: "/resources",
-    description: "ดาวน์โหลดเอกสารและไฟล์",
-  },
-  {
-    title: "ต้นผู้นำ",
-    href: "/commanders-tree",
-    description: "ดูโครงสร้างองค์กร",
-  },
-];
+const commander = await personUsecase.getByOrder(1);
+if (commander?.portrait) {
+  commander.portrait = Config.getFileURL(commander.portrait);
+}
+console.log(config);
 ---
 
 <PublicLayout>
@@ -167,323 +58,78 @@ const quickLinks: { title: string; href: string; description: string }[] = [
   <Fragment slot="body">
     <main class="min-h-screen bg-background">
       <!-- Hero Section -->
-      <section
-        class="relative min-h-[calc(100vh-4rem)] md:min-h-0 flex flex-col items-center bg-cover bg-center pt-24 pb-44"
-        style={`background-image: url(${backgroundSvg.src})`}
-      >
-        <div
-          class="absolute inset-0 bg-gradient-to-b from-black/30 via-background/90 to-background via-80% to-90%"
-        >
+      <HeroSection
+        heroImage={config?.heroImage
+          ? Config.getFileURL(config.heroImage.id)
+          : ""}
+      />
+
+      <!-- Unit Slogan Section -->
+      <section class="py-16 px-4 bg-muted">
+        <div class="container mx-auto text-center">
+          <div class="mb-12">
+            <h2 class="text-4xl font-bold mb-4">คำขวัญหน่วย</h2>
+            <p class="text-xl text-muted-foreground max-w-2xl mx-auto">
+              คำขวัญที่เป็นแรงบันดาลใจนำทางหน่วยของเราไปสู่ความสำเร็จ
+            </p>
+          </div>
+          <div class="mb-12">
+            <Slogan client:visible />
+          </div>
         </div>
-        <div class="relative container mx-auto text-center md:mt-0">
-          <div
-            class="inline-flex items-center rounded-full border px-3 py-1 text-sm bg-white/10 backdrop-blur-sm border-white/20"
-          >
-            <span class="text-white/90">เว็บไซต์ทางการของ</span>
+      </section>
+
+      <!-- Commanding Officer -->
+      {commander && <CommanderSection person={commander} />}
+
+      <!-- Announcements -->
+      <section
+        class="py-16 px-4 bg-gradient-to-br from-muted/10 via-background to-muted/20"
+      >
+        <div class="container mx-auto">
+          <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold mb-4 text-accent">ประกาศสำคัญ</h2>
+            <p class="text-xl text-muted-foreground max-w-2xl mx-auto">
+              อัปเดตและประกาศสำคัญที่ส่งผลต่อหน่วยและชุมชนของเรา
+            </p>
           </div>
-          <h1
-            class="mt-8 text-4xl sm:text-5xl md:text-7xl font-bold text-white drop-shadow-lg"
-          >
-            มณฑลทหารบกที่ ๑๖
-          </h1>
-          <p
-            class="mt-6 sm:text-3xl text-lg text-primary max-w-2xl mx-auto leading-relaxed drop-shadow-sm px-4"
-          >
-            เพื่อชาติ ศาสน์ กษัตริย์ และประชาชน
-          </p>
-          <p
-            class="text-sm sm:text-base text-white/90 max-w-2xl mx-auto leading-relaxed drop-shadow-sm px-4"
-          >
-            For the Nation, Religion, Monarchy, and People
-          </p>
-          <!-- Mobile Links -->
-          <div class="flex flex-col gap-6 justify-center mt-8 md:hidden">
-            <div class="flex flex-col gap-6 text-center">
-              <a
-                href="/news"
-                class="hover:text-primary/80 transition-colors text-xl font-semibold underline decoration-2 underline-offset-4 hover:decoration-primary/80 block"
-              >
-                → อ่านข่าวล่าสุด
-              </a>
-              <a
-                href="/announcements"
-                class="text-white/80 hover:text-primary transition-colors text-lg font-medium underline decoration-2 underline-offset-4 hover:decoration-primary block"
-              >
-                <span class="mr-2">→</span>ดูประกาศทั้งหมด
-              </a>
-            </div>
-          </div>
-          <!-- Desktop Buttons -->
           <div
-            class="hidden md:flex flex-col sm:flex-row gap-4 justify-center mt-8"
+            class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto"
           >
-            <Button size="sm" className="px-8">
-              <a href="/news">ข่าวล่าสุด</a>
-            </Button>
-            <Button variant="outline" size="sm" className="px-8">
-              <a href="/announcements">ดูประกาศ</a>
+            {
+              announcements.map((announcement) => (
+                <AnnouncementCard announcement={announcement} />
+              ))
+            }
+          </div>
+          <div class="text-center mt-8">
+            <Button size="lg" className="px-8">
+              <a href="/announcements">ดูประกาศเพิ่มเติม</a>
             </Button>
           </div>
         </div>
       </section>
-      <!-- Quick Links -->
-      <section class="pb-16 pt-28 px-4 bg-background">
+
+      <!-- Latest News -->
+      <section class="py-16 px-4 bg-muted/30">
         <div class="container mx-auto">
+          <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold mb-4 text-accent">ข่าวล่าสุด</h2>
+            <p class="text-xl text-muted-foreground max-w-2xl mx-auto">
+              รับข่าวสารล่าสุดเกี่ยวกับการพัฒนาและเรื่องราวจากหน่วยของเรา
+            </p>
+          </div>
           <div
-            class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 justify-evenly"
+            class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto"
           >
-            {
-              quickLinks.map((link, index) => (
-                <Card
-                  key={link.href}
-                  className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-0 bg-card/50 backdrop-blur-sm"
-                >
-                  <CardHeader className="text-center pb-4">
-                    <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-primary/20 to-primary/5 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <span class="text-2xl font-bold text-primary">
-                        {index === 0 && "N"}
-                        {index === 1 && "A"}
-                        {index === 2 && "R"}
-                        {index === 3 && "C"}
-                      </span>
-                    </div>
-                    <CardTitle className="text-xl group-hover:text-primary transition-colors">
-                      {link.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-center">
-                    <p class="text-muted-foreground mb-6 leading-relaxed">
-                      {link.description}
-                    </p>
-                    <Button
-                      className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
-                      asChild
-                    >
-                      <a href={link.href}>สำรวจ</a>
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))
-            }
+            {latestNews.map((news) => <NewsCard news={news} />)}
+          </div>
+          <div class="text-center mt-8">
+            <Button size="lg" className="px-8">
+              <a href="/news">ดูข่าวเพิ่มเติม</a>
+            </Button>
           </div>
         </div>
-
-        <!-- Commanding Officer -->
-
-        <section class="py-16 px-4">
-          <div class="container mx-auto">
-            <div class="text-center mb-12">
-              <h2 class="text-4xl font-bold mb-4">พบกับผู้นำของเรา</h2>
-
-              <p class="text-xl text-muted-foreground max-w-2xl mx-auto">
-                ผู้เชี่ยวชาญที่อุทิศตนนำหน่วยของเราด้วยความเป็นเลิศและความมุ่งมั่น
-              </p>
-            </div>
-
-            <div class="flex justify-center">
-              <Card
-                className="max-w-md hover:shadow-xl transition-all duration-300 group"
-              >
-                <CardHeader className="text-center pb-6">
-                  <div class="relative mx-auto mb-6">
-                    <div
-                      class="w-32 h-32 bg-gradient-to-br from-primary/20 to-primary/5 rounded-full flex items-center justify-center border-4 border-primary/10 group-hover:border-primary/30 transition-colors"
-                    >
-                      <span class="text-3xl font-bold text-primary">
-                        {
-                          commander.name
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")
-                        }
-                      </span>
-                    </div>
-                  </div>
-
-                  <CardTitle className="text-2xl mb-2"
-                    >{commander.name}</CardTitle
-                  >
-
-                  <CardDescription className="text-lg font-medium text-primary">
-                    {commander.position}
-                  </CardDescription>
-                </CardHeader>
-
-                <CardContent className="text-center">
-                  <p class="text-muted-foreground mb-4">
-                    นำหน่วยของเราด้วยความอุทิศและวิสัยทัศน์เชิงกลยุทธ์มากกว่า 15
-                    ปี
-                  </p>
-
-                  <Button
-                    variant="outline"
-                    className="group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
-                  >
-                    เรียนรู้เพิ่มเติม
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section>
-
-        <!-- Unit Slogan Section -->
-        <section class="py-16 px-4 bg-muted">
-          <div class="container mx-auto text-center">
-            <div class="mb-12">
-              <h2 class="text-4xl font-bold mb-4">คำขวัญหน่วย</h2>
-              <p class="text-xl text-muted-foreground max-w-2xl mx-auto">
-                คำขวัญที่เป็นแรงบันดาลใจนำทางหน่วยของเราไปสู่ความสำเร็จ
-              </p>
-            </div>
-            <div class="mb-12">
-		    <Slogan client:visible />
-            </div>
-          </div>
-        </section>
-
-        <!-- Announcements -->
-        <section class="py-16 px-4 bg-muted/30">
-          <div class="container mx-auto">
-            <div class="text-center mb-12">
-              <h2 class="text-4xl font-bold mb-4">ประกาศสำคัญ</h2>
-              <p class="text-xl text-muted-foreground max-w-2xl mx-auto">
-                อัปเดตและประกาศสำคัญที่ส่งผลต่อหน่วยและชุมชนของเรา
-              </p>
-            </div>
-            <div
-              class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto"
-            >
-              {
-                announcements.map((announcement) => (
-                  <div class="rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 group relative bg-card border">
-                    <div class="aspect-video relative overflow-hidden">
-                      <img
-                        src={announcement.mainImageUrl}
-                        alt={announcement.title}
-                        loading="lazy"
-                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
-                      <div class="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-4">
-                        <div class="text-white text-center space-y-2">
-                          <h3 class="text-xl font-bold">
-                            {announcement.title}
-                          </h3>
-                          <p class="text-sm opacity-90">
-                            {new Date(
-                              announcement.publishedAt,
-                            ).toLocaleDateString("en-US", {
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                            })}
-                          </p>
-                          <p class="text-sm leading-relaxed line-clamp-3">
-                            {announcement.content}
-                          </p>
-                          {announcement.attachmentFileUrl && (
-                            <div class="mt-4">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                class="bg-white/10 border-white/20 text-white hover:bg-white hover:text-black"
-                              >
-                                <a
-                                  href={announcement.attachmentFileUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
-                                  {isImage(announcement.attachmentFileUrl)
-                                    ? "ดูรูปภาพเต็ม"
-                                    : "ดูเอกสารแนบ"}
-                                </a>
-                              </Button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              }
-            </div>
-            <div class="text-center mt-8">
-              <Button size="lg" className="px-8">
-                <a href="/announcements">ดูประกาศเพิ่มเติม</a>
-              </Button>
-            </div>
-          </div>
-        </section>
-
-        <!-- Latest News -->
-        <section
-          class="py-16 px-4 bg-gradient-to-br from-muted/10 via-background to-muted/20"
-        >
-          <div class="container mx-auto">
-            <div class="text-center mb-12">
-              <h2 class="text-4xl font-bold mb-4">ข่าวล่าสุด</h2>
-              <p class="text-xl text-muted-foreground max-w-2xl mx-auto">
-                รับข่าวสารล่าสุดเกี่ยวกับการพัฒนาและเรื่องราวจากหน่วยของเรา
-              </p>
-            </div>
-            <div
-              class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-            >
-              {
-                latestNews.map((news) => (
-                  <Card
-                    key={news.id}
-                    className="overflow-hidden hover:shadow-xl transition-all duration-300 group"
-                  >
-                    <div class="aspect-video bg-muted relative overflow-hidden">
-                      <img
-                        src={news.mainImageUrl}
-                        alt={news.title}
-                        loading="lazy"
-                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
-                    </div>
-                    <CardHeader>
-                      <div class="flex items-center justify-between">
-                        <CardDescription className="text-sm">
-                          {new Date(news.publishedAt).toLocaleDateString(
-                            "en-US",
-                            {
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                            },
-                          )}
-                        </CardDescription>
-                      </div>
-                      <CardTitle className="text-xl group-hover:text-primary transition-colors">
-                        {news.title}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p class="text-muted-foreground mb-4 line-clamp-3">
-                        {news.description}
-                      </p>
-                      <Button
-                        variant="outline"
-                        class="group-hover:bg-secondary group-hover:text-secondary-foreground transition-colors"
-                      >
-                        อ่านเพิ่มเติม
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))
-              }
-            </div>
-            <div class="text-center mt-8">
-              <Button size="lg" className="px-8">
-                <a href="/news">ดูข่าวเพิ่มเติม</a>
-              </Button>
-            </div>
-          </div>
-        </section>
       </section>
     </main>
   </Fragment>

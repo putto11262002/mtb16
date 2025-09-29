@@ -4,12 +4,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import HistoryTimeline from "./_components/history-timeline";
 import HeroSection from "./_components/hero-section";
-import SloganSection from "./_components/slogan-section";
+import { Slogan } from "../_components/slogan";
 import MissionSection from "./_components/mission-section";
 import { getImage } from "astro:assets";
+import { configUsecase } from "@/core/config/usecase";
+import { Config } from "@/config";
 
 import bg1 from "@/assets/about-us-hero.png";
 import logo from "@/assets/logo.png";
+
+const config = await configUsecase.getGlobalSettings({});
 
 const bg1Optimized = await getImage({
   src: bg1,
@@ -79,12 +83,20 @@ const armyProvinceHistoryItems = [
   <slot slot="body">
     <main class="min-h-screen bg-background">
       <!-- Hero Section -->
-      <HeroSection client:visible bg1Src={bg1Optimized.src} />
+      <HeroSection
+        client:visible
+        bg1Src={bg1Optimized.src}
+        heroImage={config?.aboutUsHeroImage ? Config.getFileURL(config.aboutUsHeroImage.id) : undefined}
+      />
 
       <Separator />
 
       <!-- Slogan Section -->
-      <SloganSection client:visible />
+      <section class="py-16 px-4 bg-gradient-to-br from-background to-muted">
+        <div class="max-w-4xl mx-auto">
+          <Slogan client:visible />
+        </div>
+      </section>
 
       <Separator />
 

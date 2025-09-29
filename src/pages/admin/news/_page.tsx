@@ -73,7 +73,7 @@ export default function AdminNewsPage() {
     published: filters.published,
     orderBy: "createdAt",
     direction: "desc",
-    pageSize: 20,
+    pageSize: 10,
   });
 
   return (

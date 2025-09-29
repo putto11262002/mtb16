@@ -2,7 +2,7 @@ import { tagUsecase } from "@/core/tag/usecase";
 import { db } from "@/db";
 import { directoryEntries } from "@/db/schema";
 import { getFileStore } from "@/lib/storage";
-import { and, count, desc, eq, ilike } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike } from "drizzle-orm";
 import { DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE } from "../shared/constants";
 import type { PaginatedResult } from "../shared/types";
 import { createPaginatedResult } from "../shared/utils";
@@ -82,7 +82,10 @@ const getMany = async ({
   pageSize = DEFAULT_PAGE_SIZE,
   q,
   tag,
-}: getManyDirectoryEntriesInput): Promise<
+  tagContains,
+  orderBy = "createdAt",
+  direction = "asc",
+}: getManyDirectoryEntriesInput & { tagContains?: string }): Promise<
   PaginatedResult<typeof directoryEntries.$inferSelect>
 > => {
   const [items, itemCount] = await Promise.all([
@@ -93,7 +96,7 @@ const getMany = async ({
       ),
       limit: pageSize,
       offset: (page - 1) * pageSize,
-      orderBy: [desc(directoryEntries.createdAt)],
+      orderBy: (direction === "asc" ? asc : desc)(directoryEntries[orderBy]),
     }),
     db
       .select({ count: count() })

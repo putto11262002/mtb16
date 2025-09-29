@@ -196,6 +196,13 @@ const getPersonRankTree = async (): Promise<Person[][]> => {
   return levels;
 };
 
+const getByOrder = async (order: number): Promise<Person | undefined> => {
+  const person = await db.query.persons.findFirst({
+    where: eq(persons.order, order),
+  });
+  return person;
+};
+
 const deletePerson = async (args: DeletePersonInput) => {
   if (!(await exist(args.id))) {
     throw new Error("Person not found");
@@ -212,5 +219,6 @@ export const personUsecase = {
   getAll,
   getPersonsByUnit,
   getPersonRankTree,
+  getByOrder,
   deletePerson,
 };
