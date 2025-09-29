@@ -51,6 +51,8 @@ export const getManyDirectoryEntriesInputSchema = z.object({
   pageSize: z.coerce.number().min(1).max(100).default(10).optional(),
   q: z.string().optional(),
   tag: tagSchema.optional(),
+  orderBy: z.enum(["name", "createdAt", "updatedAt", "order"]).default("name"),
+  direction: z.enum(["asc", "desc"]).default("asc"),
 });
 
 export type getManyDirectoryEntriesInput = z.infer<

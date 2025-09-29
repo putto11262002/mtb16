@@ -52,6 +52,8 @@ export default function AdminDirectoryPage() {
     q: filters.debouncedQ,
     tag: filters.tag,
     pageSize: 20,
+    orderBy: "createdAt",
+    direction: "desc",
   });
 
   return (

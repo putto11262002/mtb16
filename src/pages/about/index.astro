@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import HistoryTimeline from "./_components/history-timeline";
 import HeroSection from "./_components/hero-section";
-import SloganSection from "./_components/slogan-section";
+import { Slogan } from "../_components/slogan";
 import MissionSection from "./_components/mission-section";
 import { getImage } from "astro:assets";
 
@@ -84,7 +84,11 @@ const armyProvinceHistoryItems = [
       <Separator />
 
       <!-- Slogan Section -->
-      <SloganSection client:visible />
+      <section class="py-16 px-4 bg-gradient-to-br from-background to-muted">
+        <div class="max-w-4xl mx-auto">
+          <Slogan client:visible />
+        </div>
+      </section>
 
       <Separator />
 

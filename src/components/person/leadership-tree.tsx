@@ -1,47 +1,14 @@
-import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import type { Person } from "@/db/schema";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useLayoutEffect, useRef, useState } from "react";
+import { PersonCard } from "./person-card";
 
 type PersonWithUnit = Person;
 
 interface LeadershipTreeProps {
   levels: PersonWithUnit[][];
 }
-
-const PersonCard = ({ person }: { person: PersonWithUnit }) => (
-  <Card
-    className={`flex-shrink-0 w-32 sm:w-44 md:w-52 lg:w-60 shadow-lg hover:shadow-xl transition-shadow duration-300`}
-  >
-    <CardContent>
-      <div className="flex flex-col items-center text-center">
-        <AspectRatio ratio={1 / 1} className="bg-muted rounded overflow-hidden">
-          {person.portrait && (
-            <img
-              src={person.portrait}
-              alt={person.name}
-              className="object-cover w-full h-full"
-            />
-          )}
-        </AspectRatio>
-        <div className="mt-4">
-          <Badge variant={"outline"} className="mb-2">
-            {person.rank}
-          </Badge>
-          <h3 className="text-xs sm:text-sm font-semibold mb-2">
-            {person.name}
-          </h3>
-          <p className={`text-xs sm:text-sm mb-2 text-muted-foreground`}>
-            {person.role}
-          </p>
-        </div>
-      </div>
-    </CardContent>
-  </Card>
-);
 
 const LevelComponent = ({ level }: { level: PersonWithUnit[] }) => {
   const [translateX, setTranslateX] = useState(0);

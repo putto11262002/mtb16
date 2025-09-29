@@ -4,22 +4,22 @@ import BaseLayout from "@/layouts/base-layout.astro";
 import Header from "@/components/layouts/public/header.astro";
 import Footer from "@/components/layouts/public/footer.astro";
 import { GreetingPopup } from "@/components/layouts/public/greeting-popup";
-import { Image } from "astro:assets";
+import { configUsecase } from "@/core/config/usecase";
+import { Config } from "@/config";
+const config = await configUsecase.getLandingPageConfig();
 ---
 
 <BaseLayout>
   <slot name="head" />
   <Fragment slot="body">
-    <GreetingPopup client:load>
-      <Image
-        src={""}
-        alt="Hero Background"
-        class={"w-full h-full object-cover"}
-        width={1920}
-        height={1080}
-        loading="eager"
-      />
-    </GreetingPopup>
+    {
+      config?.popupImage && config.popupEnabled && (
+        <GreetingPopup
+          imageURL={Config.getFileURL(config.popupImage.id)}
+          client:load
+        />
+      )
+    }
     <Header />
     <slot name="body" />
     <Footer />

@@ -37,7 +37,7 @@ export const timestamps = {
 export const configs = pgTable(
   "settings",
   {
-    key: varchar("key", { length: 255 }).primaryKey(),
+    key: varchar("key", { length: 255 }),
     group: varchar("group", { length: 255 }).notNull(),
     value: jsonb("value").notNull(),
     ...timestamps,
@@ -122,6 +122,7 @@ export const directoryEntries = pgTable("directory_entries", {
   phone: varchar("phone", { length: 255 }),
   email: varchar("email", { length: 255 }),
   notes: text("notes"),
+  order: integer("order"),
   ...timestamps,
 });
 
