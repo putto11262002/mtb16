@@ -19,6 +19,7 @@ const navigationItems = [
   { title: "เกี่ยวกับ", href: "/about" },
   { title: "ข่าว", href: "/news" },
   { title: "ประกาศ", href: "/announcements" },
+  { title: "สารบบหน่วยงาน", href: "/directory" },
   { title: "ผู้นำ", href: "/leadership" },
   { title: "ทรัพยากร", href: "/resources" },
 ];

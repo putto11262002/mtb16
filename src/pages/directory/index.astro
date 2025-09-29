@@ -1,0 +1,79 @@
+---
+export const prerender = false;
+
+import PublicLayout from "@/layouts/public-layout.astro";
+import { Button } from "@/components/ui/button";
+import { tagUsecase } from "@/core/tag/usecase";
+import { directoryUsecase } from "@/core/directory/usecase";
+import PaginationNav from "@/components/common/pagination-nav.astro";
+import DirectoryList from "@/components/directory/directory-listing";
+
+const url = new URL(Astro.request.url);
+const searchParams = url.searchParams;
+
+const selectedTag = searchParams.get("tag") || "";
+const pageParam = searchParams.get("page");
+
+const page = pageParam ? parseInt(pageParam, 10) || 1 : 1;
+const pageSize = 20;
+
+const tags = await tagUsecase.getAllTags("directory");
+
+const result = await directoryUsecase.getMany({
+  tag: selectedTag || undefined,
+  pageSize,
+  page,
+});
+const items = result.items;
+---
+
+<PublicLayout>
+  <Fragment slot="head">
+    <title>สารบบหน่วยงาน – มณฑลทหารบกที่ 16</title>
+    <meta name="description" content="สารบบหน่วยงานในเครือข่ายกองทัพบก" />
+  </Fragment>
+
+  <main slot="body" class="container mx-auto px-4 py-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-foreground mb-2">สารบบหน่วยงาน</h1>
+      <p class="text-muted-foreground">สำรวจหน่วยงานในเครือข่ายกองทัพบก</p>
+    </div>
+
+    <div class="mb-8">
+      <div class="flex flex-wrap gap-2">
+        <a href="/directory">
+          <Button size="sm" variant={!selectedTag ? "default" : "outline"}>
+            ทั้งหมด
+          </Button>
+        </a>
+        {
+          tags.map((tag) => {
+            const isSelected = selectedTag === tag;
+            const href = isSelected
+              ? "/directory"
+              : `/directory?tag=${encodeURIComponent(tag)}`;
+            return (
+              <a href={href}>
+                <Button size="sm" variant={isSelected ? "default" : "outline"}>
+                  {tag}
+                </Button>
+              </a>
+            );
+          })
+        }
+      </div>
+    </div>
+
+    <DirectoryList items={items} />
+
+    <div class="mt-8">
+      <PaginationNav
+        basePath="/directory"
+        page={page}
+        totalPages={result.totalPages}
+        pageSize={pageSize}
+      />
+    </div>
+  </main>
+</PublicLayout>
+
