@@ -8,6 +8,7 @@ CREATE TABLE "directory_entries" (
 	"phone" varchar(255),
 	"email" varchar(255),
 	"notes" text,
+	"order" integer,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
@@ -58,25 +59,22 @@ CREATE TABLE "procurements" (
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "site_settings" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"unit_name_th" varchar(255) NOT NULL,
-	"unit_name_en" varchar(255),
-	"logo" text,
-	"footer_copyright" varchar(255),
-	"welcome_text" text,
-	"hero_fallback_image" text,
-	"facebook_official" varchar(255),
-	"facebook_news" varchar(255),
-	"tiktok" varchar(255),
+CREATE TABLE "settings" (
+	"id" varchar(255) PRIMARY KEY DEFAULT 'global' NOT NULL,
+	"hero_title" varchar(255),
+	"hero_image" jsonb,
+	"about_us_hero_image" jsonb,
+	"news_tag" varchar(255),
+	"announcements_tag" varchar(255),
+	"popup_enabled" boolean DEFAULT false,
+	"popup_image" jsonb,
 	"address_th" text,
 	"phone" varchar(255),
 	"email" varchar(255),
 	"map_embed" text,
-	"homepage_alert_enabled" boolean,
-	"homepage_alert_image" text,
-	"homepage_alert_alt" varchar(255),
-	"homepage_alert_link" varchar(255),
+	"facebook_official" varchar(255),
+	"facebook_news" varchar(255),
+	"tiktok" varchar(255),
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );

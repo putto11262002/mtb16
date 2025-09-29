@@ -1,5 +1,5 @@
 {
-  "id": "6c8963f8-eec4-40ef-a994-d7b34307ea89",
+  "id": "b6a9b6ed-aced-4857-bc00-843e434b6761",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -54,6 +54,12 @@
         "notes": {
           "name": "notes",
           "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "order": {
+          "name": "order",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
@@ -409,68 +415,57 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.site_settings": {
-      "name": "site_settings",
+    "public.settings": {
+      "name": "settings",
       "schema": "",
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "varchar(255)",
           "primaryKey": true,
           "notNull": true,
-          "default": "gen_random_uuid()"
+          "default": "'global'"
         },
-        "unit_name_th": {
-          "name": "unit_name_th",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "unit_name_en": {
-          "name": "unit_name_en",
+        "hero_title": {
+          "name": "hero_title",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
         },
-        "logo": {
-          "name": "logo",
-          "type": "text",
+        "hero_image": {
+          "name": "hero_image",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         },
-        "footer_copyright": {
-          "name": "footer_copyright",
+        "about_us_hero_image": {
+          "name": "about_us_hero_image",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "news_tag": {
+          "name": "news_tag",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
         },
-        "welcome_text": {
-          "name": "welcome_text",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "hero_fallback_image": {
-          "name": "hero_fallback_image",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "facebook_official": {
-          "name": "facebook_official",
+        "announcements_tag": {
+          "name": "announcements_tag",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
         },
-        "facebook_news": {
-          "name": "facebook_news",
-          "type": "varchar(255)",
+        "popup_enabled": {
+          "name": "popup_enabled",
+          "type": "boolean",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": false
         },
-        "tiktok": {
-          "name": "tiktok",
-          "type": "varchar(255)",
+        "popup_image": {
+          "name": "popup_image",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         },
@@ -498,26 +493,20 @@
           "primaryKey": false,
           "notNull": false
         },
-        "homepage_alert_enabled": {
-          "name": "homepage_alert_enabled",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "homepage_alert_image": {
-          "name": "homepage_alert_image",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "homepage_alert_alt": {
-          "name": "homepage_alert_alt",
+        "facebook_official": {
+          "name": "facebook_official",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
         },
-        "homepage_alert_link": {
-          "name": "homepage_alert_link",
+        "facebook_news": {
+          "name": "facebook_news",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tiktok": {
+          "name": "tiktok",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
