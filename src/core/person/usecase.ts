@@ -177,9 +177,7 @@ const getPersonRankTree = async (): Promise<Person[][]> => {
   const levels: Person[][] = Array.from({ length: 10 }, () => []); // Create 10 empty arrays for levels
 
   sortedPersons.forEach((person) => {
-    const rankOrder =
-      THAI_ARMY_RANKS[person.rank as keyof typeof THAI_ARMY_RANKS] ?? 100;
-    levels[rankOrder - 1].push(person); // Place person in the corresponding level
+    levels[person.level ?? 0].push(person); // Place person in the corresponding level
   });
 
   // Intra-level sorting by order
@@ -194,7 +192,10 @@ const getPersonRankTree = async (): Promise<Person[][]> => {
     });
   });
 
-  return levels;
+  // remove empty levels
+  const nonEmptyLevels = levels.filter((level) => level.length > 0);
+
+  return nonEmptyLevels;
 };
 
 const getByOrder = async (order: number): Promise<Person | undefined> => {
@@ -205,6 +206,15 @@ const getByOrder = async (order: number): Promise<Person | undefined> => {
     .limit(1)
     .then((res) => res[0]);
   return person;
+};
+
+export const getByLevel = async (level: number): Promise<Person[]> => {
+  const personsInLevel = await db
+    .select()
+    .from(persons)
+    .where(eq(persons.level, level))
+    .orderBy(asc(persons.order));
+  return personsInLevel;
 };
 
 const deletePerson = async (args: DeletePersonInput) => {
