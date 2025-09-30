@@ -111,30 +111,27 @@ const updatePreviewImage = async (input: UpdatePreviewImage) => {
     throw new Error("Post not found");
   }
 
-  await db.transaction(async (tx) => {
-    const existingFileId = await tx.query.posts
-      .findFirst({
-        where: eq(posts.id, input.id),
-        columns: { previewImage: true },
-      })
-      .then((res) => res?.previewImage?.id);
+  const res = await db
+    .select({ previewImage: posts.previewImage })
+    .from(posts)
+    .where(eq(posts.id, input.id));
+  const existingFileId = res[0]?.previewImage?.id;
 
-    const metadata = await getFileStore().store(
-      Buffer.from(await input.file.arrayBuffer()),
-      {
-        mimeType: input.file.type,
-        name: input.file.name,
-      },
-    );
-    await tx
-      .update(posts)
-      .set({ previewImage: { id: metadata.id, mimeType: input.file.type } })
-      .where(eq(posts.id, input.id));
+  const metadata = await getFileStore().store(
+    Buffer.from(await input.file.arrayBuffer()),
+    {
+      mimeType: input.file.type,
+      name: input.file.name,
+    },
+  );
+  await db
+    .update(posts)
+    .set({ previewImage: { id: metadata.id, mimeType: input.file.type } })
+    .where(eq(posts.id, input.id));
 
-    if (existingFileId) {
-      await getFileStore().delete(existingFileId);
-    }
-  });
+  if (existingFileId) {
+    await getFileStore().delete(existingFileId);
+  }
 };
 
 const addAttachment = async (input: AddAttachmentInput) => {
@@ -167,27 +164,25 @@ const removeAttachment = async (args: RemoveAttachmentInput) => {
     throw new Error("Post not found");
   }
 
-  await db.transaction(async (tx) => {
-    const existingFileId = await tx
-      .select({
-        existingFileId: sql<string>`(SELECT attachment->>'id' FROM unnest(attachments) AS attachment WHERE (attachment->>'id') = ${args.attachmentId})`,
-      })
-      .from(posts)
-      .where(eq(posts.id, args.id))
-      .then((res) => res?.[0].existingFileId);
+  const res = await db
+    .select({
+      existingFileId: sql<string>`(SELECT attachment->>'id' FROM unnest(attachments) AS attachment WHERE (attachment->>'id') = ${args.attachmentId})`,
+    })
+    .from(posts)
+    .where(eq(posts.id, args.id));
+  const existingFileId = res?.[0].existingFileId;
 
-    if (!existingFileId) {
-      return;
-    }
-    await tx
-      .update(posts)
-      .set({
-        attachments: sql`array_remove(attachments, (SELECT attachment FROM unnest(attachments) AS attachment WHERE (attachment->>'id') = ${args.attachmentId}))`,
-      })
-      .where(eq(posts.id, args.id));
+  if (!existingFileId) {
+    return;
+  }
+  await db
+    .update(posts)
+    .set({
+      attachments: sql`array_remove(attachments, (SELECT attachment FROM unnest(attachments) AS attachment WHERE (attachment->>'id') = ${args.attachmentId}))`,
+    })
+    .where(eq(posts.id, args.id));
 
-    await getFileStore().delete(existingFileId);
-  });
+  await getFileStore().delete(existingFileId);
 };
 
 const getMany = async ({

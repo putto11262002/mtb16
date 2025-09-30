@@ -122,42 +122,37 @@ const updateDocumentFiles = async <T extends { id: string; files: File[] }>(
     throw new Error("Procurement not found");
   }
 
-  await db.transaction(async (tx) => {
-    // Get existing file IDs
-    const existingFiles = await tx.query.procurements
-      .findFirst({
-        where: eq(procurements.id, input.id),
-        columns: { [field]: true },
-      })
-      .then((res) => (res as any)?.[field] || []);
+  // Get existing file IDs
+  const res = await db
+    .select({ [field]: procurements[field] })
+    .from(procurements)
+    .where(eq(procurements.id, input.id));
+  const existingFiles = res[0]?.[field] || [];
 
-    // Store new files
-    const newFileMetas = await Promise.all(
-      input.files.map(async (file: File) => {
-        const metadata = await getFileStore().store(
-          Buffer.from(await file.arrayBuffer()),
-          {
-            mimeType: file.type,
-            name: file.name,
-          },
-        );
-        return { id: metadata.id, mimeType: file.type };
-      }),
-    );
+  // Store new files
+  const newFileMetas = await Promise.all(
+    input.files.map(async (file: File) => {
+      const metadata = await getFileStore().store(
+        Buffer.from(await file.arrayBuffer()),
+        {
+          mimeType: file.type,
+          name: file.name,
+        },
+      );
+      return { id: metadata.id, mimeType: file.type };
+    }),
+  );
 
-    // Update DB
-    await tx
-      .update(procurements)
-      .set({ [field]: newFileMetas } as any)
-      .where(eq(procurements.id, input.id));
+  // Update DB
+  await db
+    .update(procurements)
+    .set({ [field]: newFileMetas } as any)
+    .where(eq(procurements.id, input.id));
 
-    // Delete old files
-    await Promise.all(
-      existingFiles.map((file: { id: string }) =>
-        getFileStore().delete(file.id),
-      ),
-    );
-  });
+  // Delete old files
+  await Promise.all(
+    existingFiles.map((file: { id: string }) => getFileStore().delete(file.id)),
+  );
 };
 
 const updateInvitationDocs = async (input: UpdateInvitationDocsInput) => {
@@ -206,27 +201,25 @@ const removeAttachment = async (args: RemoveProcurementAttachmentInput) => {
     throw new Error("Procurement not found");
   }
 
-  await db.transaction(async (tx) => {
-    const existingFileId = await tx
-      .select({
-        existingFileId: sql<string>`(SELECT attachment->>'id' FROM unnest(attachments) AS attachment WHERE (attachment->>'id') = ${args.attachmentId})`,
-      })
-      .from(procurements)
-      .where(eq(procurements.id, args.id))
-      .then((res) => res?.[0].existingFileId);
+  const res = await db
+    .select({
+      existingFileId: sql<string>`(SELECT attachment->>'id' FROM unnest(attachments) AS attachment WHERE (attachment->>'id') = ${args.attachmentId})`,
+    })
+    .from(procurements)
+    .where(eq(procurements.id, args.id));
+  const existingFileId = res?.[0].existingFileId;
 
-    if (!existingFileId) {
-      return;
-    }
-    await tx
-      .update(procurements)
-      .set({
-        attachments: sql`array_remove(attachments, (SELECT attachment FROM unnest(attachments) AS attachment WHERE (attachment->>'id') = ${args.attachmentId}))`,
-      })
-      .where(eq(procurements.id, args.id));
+  if (!existingFileId) {
+    return;
+  }
+  await db
+    .update(procurements)
+    .set({
+      attachments: sql`array_remove(attachments, (SELECT attachment FROM unnest(attachments) AS attachment WHERE (attachment->>'id') = ${args.attachmentId}))`,
+    })
+    .where(eq(procurements.id, args.id));
 
-    await getFileStore().delete(existingFileId);
-  });
+  await getFileStore().delete(existingFileId);
 };
 
 export const procurementUsecase = {

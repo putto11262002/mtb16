@@ -79,6 +79,11 @@ const updateGlobalSettings = async (input: UpdateGlobalSettingsInput) => {
 const updateHeroImage = async (input: UpdateHeroImageInput) => {
   const { getFileStore } = await import("@/lib/storage");
   const files = getFileStore();
+
+  // Get existing image
+  const existing = await getGlobalSettings({});
+  const existingImageId = existing.heroImage?.id;
+
   const buffer = Buffer.from(await input.heroImage.arrayBuffer());
   const heroImageMeta = await files.store(buffer, {
     name: input.heroImage.name,
@@ -95,11 +100,21 @@ const updateHeroImage = async (input: UpdateHeroImageInput) => {
         updatedAt: sql`CURRENT_TIMESTAMP`,
       },
     });
+
+  // Delete old image if exists
+  if (existingImageId) {
+    await files.delete(existingImageId);
+  }
 };
 
 const updatePopupImage = async (input: UpdatePopupImageInput) => {
   const { getFileStore } = await import("@/lib/storage");
   const files = getFileStore();
+
+  // Get existing image
+  const existing = await getGlobalSettings({});
+  const existingImageId = existing.popupImage?.id;
+
   const buffer = Buffer.from(await input.popupImage.arrayBuffer());
   const popupImageMeta = await files.store(buffer, {
     name: input.popupImage.name,
@@ -116,11 +131,21 @@ const updatePopupImage = async (input: UpdatePopupImageInput) => {
         updatedAt: sql`CURRENT_TIMESTAMP`,
       },
     });
+
+  // Delete old image if exists
+  if (existingImageId) {
+    await files.delete(existingImageId);
+  }
 };
 
 const updateAboutUsHeroImage = async (input: UpdateAboutUsHeroImageInput) => {
   const { getFileStore } = await import("@/lib/storage");
   const files = getFileStore();
+
+  // Get existing image
+  const existing = await getGlobalSettings({});
+  const existingImageId = existing.aboutUsHeroImage?.id;
+
   const buffer = Buffer.from(await input.aboutUsHeroImage.arrayBuffer());
   const aboutUsHeroImageMeta = await files.store(buffer, {
     name: input.aboutUsHeroImage.name,
@@ -137,6 +162,11 @@ const updateAboutUsHeroImage = async (input: UpdateAboutUsHeroImageInput) => {
         updatedAt: sql`CURRENT_TIMESTAMP`,
       },
     });
+
+  // Delete old image if exists
+  if (existingImageId) {
+    await files.delete(existingImageId);
+  }
 };
 
 export const configUsecase = {
