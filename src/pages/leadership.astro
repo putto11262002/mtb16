@@ -1,4 +1,5 @@
 ---
+export const prerender = false;
 import PublicLayout from "@/layouts/public-layout.astro";
 import LeadershipTree from "@/components/person/leadership-tree";
 import { personUsecase } from "@/core/person/usecase";
@@ -11,6 +12,15 @@ const levels = await personUsecase.getPersonRankTree().then((levels) =>
       portrait: person.portrait ? Config.getFileURL(person.portrait) : null,
     })),
   ),
+);
+
+Astro.response.headers.set(
+  "Cache-Control",
+  "public, max-age=86400, must-revalidate",
+);
+Astro.response.headers.set(
+  "Netlify-CDN-Cache-Control",
+  "public, durable, s-maxage=86400, stale-while-revalidate=86400",
 );
 ---
 
