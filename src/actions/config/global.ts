@@ -46,13 +46,18 @@ export const update = defineAction({
 
 export const updateHeroImage = defineAction({
   accept: "form",
-  input: updateHeroImageInputSchema,
   handler: async (input, ctx): Promise<MutationResult> => {
     try {
       const { success, error } = isAuthenticated(ctx);
       if (!success) throw error;
+      const validation = updateHeroImageInputSchema.safeParse({
+        heroImage: input.get("heroImage"),
+      });
+      if (!validation.success) {
+        throw validation.error;
+      }
 
-      await configUsecase.updateHeroImage(input);
+      await configUsecase.updateHeroImage(validation.data);
       return {
         ok: true,
         id: "global_hero_image",
@@ -66,13 +71,18 @@ export const updateHeroImage = defineAction({
 
 export const updatePopupImage = defineAction({
   accept: "form",
-  input: updatePopupImageInputSchema,
   handler: async (input, ctx): Promise<MutationResult> => {
     try {
       const { success, error } = isAuthenticated(ctx);
       if (!success) throw error;
+      const validation = updatePopupImageInputSchema.safeParse({
+        popupImage: input.get("popupImage"),
+      });
+      if (!validation.success) {
+        throw validation.error;
+      }
 
-      await configUsecase.updatePopupImage(input);
+      await configUsecase.updatePopupImage(validation.data);
       return {
         ok: true,
         id: "global_popup_image",
@@ -86,13 +96,18 @@ export const updatePopupImage = defineAction({
 
 export const updateAboutUsHeroImage = defineAction({
   accept: "form",
-  input: updateAboutUsHeroImageInputSchema,
   handler: async (input, ctx): Promise<MutationResult> => {
     try {
       const { success, error } = isAuthenticated(ctx);
       if (!success) throw error;
+      const validation = updateAboutUsHeroImageInputSchema.safeParse({
+        aboutUsHeroImage: input.get("aboutUsHeroImage"),
+      });
+      if (!validation.success) {
+        throw validation.error;
+      }
 
-      await configUsecase.updateAboutUsHeroImage(input);
+      await configUsecase.updateAboutUsHeroImage(validation.data);
       return {
         ok: true,
         id: "global_about_us_hero_image",

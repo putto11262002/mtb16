@@ -43,12 +43,18 @@ export const news = {
 
   updatePreviewImage: defineAction({
     accept: "form",
-    input: updatePreviewImageInputSchema,
     handler: async (input, ctx) => {
       try {
         const { success, error } = isAuthenticated(ctx);
         if (!success) throw error;
-        await newsUsecase.updatePreviewImage(input);
+        const validation = updatePreviewImageInputSchema.safeParse({
+          id: input.get("id"),
+          file: input.get("file"),
+        });
+        if (!validation.success) {
+          throw validation.error;
+        }
+        await newsUsecase.updatePreviewImage(validation.data);
         return;
       } catch (error) {
         throw handleError(error, ctx);
@@ -58,12 +64,19 @@ export const news = {
 
   addAttachment: defineAction({
     accept: "form",
-    input: addAttachmentInputSchema,
     handler: async (input, ctx) => {
       try {
         const { success, error } = isAuthenticated(ctx);
         if (!success) throw error;
-        await newsUsecase.addAttachment(input);
+        const validation = addAttachmentInputSchema.safeParse({
+          id: input.get("id"),
+          label: input.get("label"),
+          file: input.get("file"),
+        });
+        if (!validation.success) {
+          throw validation.error;
+        }
+        await newsUsecase.addAttachment(validation.data);
         return;
       } catch (error) {
         throw handleError(error, ctx);

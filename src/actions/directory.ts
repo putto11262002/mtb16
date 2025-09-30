@@ -40,12 +40,18 @@ export const directory = {
   }),
   updateImage: defineAction({
     accept: "form",
-    input: updateDirectoryEntryImageInputSchema,
     handler: async (input, ctx) => {
       try {
         const { success, error } = isAuthenticated(ctx);
         if (!success) throw error;
-        await directoryUsecase.updateImage(input);
+        const validation = updateDirectoryEntryImageInputSchema.safeParse({
+          id: input.get("id"),
+          file: input.get("file"),
+        });
+        if (!validation.success) {
+          throw validation.error;
+        }
+        await directoryUsecase.updateImage(validation.data);
         return;
       } catch (error) {
         throw handleError(error, ctx);

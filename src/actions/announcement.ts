@@ -42,12 +42,18 @@ export const announcement = {
   }),
   updatePreviewImage: defineAction({
     accept: "form",
-    input: updatePreviewImageInputSchema,
     handler: async (input, ctx) => {
       try {
         const { success, error } = isAuthenticated(ctx);
         if (!success) throw error;
-        await annouyncementsUsecase.updatePreviewImage(input);
+        const validation = updatePreviewImageInputSchema.safeParse({
+          id: input.get("id"),
+          file: input.get("file"),
+        });
+        if (!validation.success) {
+          throw validation.error;
+        }
+        await annouyncementsUsecase.updatePreviewImage(validation.data);
         return;
       } catch (error) {
         throw handleError(error, ctx);
@@ -57,12 +63,19 @@ export const announcement = {
 
   addAttachment: defineAction({
     accept: "form",
-    input: addAttachmentInputSchema,
     handler: async (input, ctx) => {
       try {
         const { success, error } = isAuthenticated(ctx);
         if (!success) throw error;
-        await annouyncementsUsecase.addAttachment(input);
+        const validation = addAttachmentInputSchema.safeParse({
+          id: input.get("id"),
+          label: input.get("label"),
+          file: input.get("file"),
+        });
+        if (!validation.success) {
+          throw validation.error;
+        }
+        await annouyncementsUsecase.addAttachment(validation.data);
         return;
       } catch (error) {
         throw handleError(error, ctx);

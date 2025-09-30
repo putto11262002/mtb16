@@ -94,12 +94,18 @@ export const procurement = {
 
   updateAnnualPlan: defineAction({
     accept: "form",
-    input: updateAnnualPlanInputSchema,
     handler: async (input, ctx) => {
       try {
         const { success, error } = isAuthenticated(ctx);
         if (!success) throw error;
-        await procurementUsecase.updateAnnualPlan(input);
+        const validation = updateAnnualPlanInputSchema.safeParse({
+          id: input.get("id"),
+          files: input.getAll("files"),
+        });
+        if (!validation.success) {
+          throw validation.error;
+        }
+        await procurementUsecase.updateAnnualPlan(validation.data);
         return;
       } catch (error) {
         throw handleError(error, ctx);
@@ -109,12 +115,18 @@ export const procurement = {
 
   updateInvitationDocs: defineAction({
     accept: "form",
-    input: updateInvitationDocsInputSchema,
     handler: async (input, ctx) => {
       try {
         const { success, error } = isAuthenticated(ctx);
         if (!success) throw error;
-        await procurementUsecase.updateInvitationDocs(input);
+        const validation = updateInvitationDocsInputSchema.safeParse({
+          id: input.get("id"),
+          files: input.getAll("files"),
+        });
+        if (!validation.success) {
+          throw validation.error;
+        }
+        await procurementUsecase.updateInvitationDocs(validation.data);
         return;
       } catch (error) {
         throw handleError(error, ctx);
@@ -124,12 +136,18 @@ export const procurement = {
 
   updatePriceDisclosureDocs: defineAction({
     accept: "form",
-    input: updatePriceDisclosureDocsInputSchema,
     handler: async (input, ctx) => {
       try {
         const { success, error } = isAuthenticated(ctx);
         if (!success) throw error;
-        await procurementUsecase.updatePriceDisclosureDocs(input);
+        const validation = updatePriceDisclosureDocsInputSchema.safeParse({
+          id: input.get("id"),
+          files: input.getAll("files"),
+        });
+        if (!validation.success) {
+          throw validation.error;
+        }
+        await procurementUsecase.updatePriceDisclosureDocs(validation.data);
         return;
       } catch (error) {
         throw handleError(error, ctx);
@@ -139,12 +157,18 @@ export const procurement = {
 
   updateWinnerDeclarationDocs: defineAction({
     accept: "form",
-    input: updateWinnerDeclarationDocsInputSchema,
     handler: async (input, ctx) => {
       try {
         const { success, error } = isAuthenticated(ctx);
         if (!success) throw error;
-        await procurementUsecase.updateWinnerDeclarationDocs(input);
+        const validation = updateWinnerDeclarationDocsInputSchema.safeParse({
+          id: input.get("id"),
+          files: input.getAll("files"),
+        });
+        if (!validation.success) {
+          throw validation.error;
+        }
+        await procurementUsecase.updateWinnerDeclarationDocs(validation.data);
         return;
       } catch (error) {
         throw handleError(error, ctx);
@@ -154,12 +178,19 @@ export const procurement = {
 
   addAttachment: defineAction({
     accept: "form",
-    input: addProcurementAttachmentInputSchema,
     handler: async (input, ctx) => {
       try {
         const { success, error } = isAuthenticated(ctx);
         if (!success) throw error;
-        await procurementUsecase.addAttachment(input);
+        const validation = addProcurementAttachmentInputSchema.safeParse({
+          id: input.get("id"),
+          label: input.get("label"),
+          file: input.get("file"),
+        });
+        if (!validation.success) {
+          throw validation.error;
+        }
+        await procurementUsecase.addAttachment(validation.data);
         return;
       } catch (error) {
         throw handleError(error, ctx);

@@ -41,12 +41,18 @@ export const person = {
 
   updatePortrait: defineAction({
     accept: "form",
-    input: updatePortraitInputSchema,
     handler: async (input, ctx) => {
       try {
         const { success, error } = isAuthenticated(ctx);
         if (!success) throw error;
-        await personUsecase.updatePortrait(input);
+        const validation = updatePortraitInputSchema.safeParse({
+          id: input.get("id"),
+          file: input.get("file"),
+        });
+        if (!validation.success) {
+          throw validation.error;
+        }
+        await personUsecase.updatePortrait(validation.data);
         return;
       } catch (error) {
         throw handleError(error, ctx);
