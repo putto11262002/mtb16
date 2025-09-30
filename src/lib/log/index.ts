@@ -1,4 +1,5 @@
 import { createConsoleLogger } from "./console";
+import { createSentryLogger } from "./sentry";
 
 /**
  * Defines a standard logging interface with methods for different log levels.
@@ -24,5 +25,9 @@ const logger: null | Logger = null;
 export const getLogger = (): Logger => {
   if (logger) return logger;
   const level = process.env.LOG_LEVEL || "info";
-  return createConsoleLogger(level);
+  if (process.env.NODE_ENV === "production") {
+    return createSentryLogger(level);
+  } else {
+    return createConsoleLogger(level);
+  }
 };
