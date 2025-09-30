@@ -16,6 +16,7 @@ Sentry.init({
       // Additional SDK configuration goes in here, for example:
       colorScheme: "system",
     }),
+    Sentry.consoleLoggingIntegration({ levels: ["log", "warn", "error"] }),
     //  user-feedback
   ],
   //  logs

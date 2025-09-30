@@ -1,4 +1,4 @@
-import { createPinoLogger } from "./pino";
+import { createConsoleLogger } from "./console";
 
 /**
  * Defines a standard logging interface with methods for different log levels.
@@ -24,5 +24,5 @@ const logger: null | Logger = null;
 export const getLogger = (): Logger => {
   if (logger) return logger;
   const level = process.env.LOG_LEVEL || "info";
-  return createPinoLogger(level);
+  return createConsoleLogger(level);
 };

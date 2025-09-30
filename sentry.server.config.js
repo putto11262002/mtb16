@@ -11,6 +11,8 @@ Sentry.init({
   integrations: [
     // Add our Profiling integration
     nodeProfilingIntegration(),
+    // send console.log, console.warn, and console.error calls as logs to Sentry
+    Sentry.consoleLoggingIntegration({ levels: ["log", "warn", "error"] }),
   ],
   //  profiling
   //  logs
