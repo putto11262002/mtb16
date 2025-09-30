@@ -1,4 +1,4 @@
-import { Config } from "@/config";
+import "dotenv/config";
 import { getEnv } from "../utils/env";
 import { createLocalFileStore, type LocalFileStoreConfig } from "./local";
 import { createNetlifyFileStore, type NetlifyFileStoreConfig } from "./netlify";
@@ -12,8 +12,9 @@ let instance: FileStore | null = null;
  * Reads configuration from environment variables
  */
 export function getFileStore(): FileStore {
+  console.log(process.env.NODE_ENV);
   if (!instance) {
-    if (Config.dev) {
+    if (process.env.NODE_ENV !== "production") {
       // Read config from environment variables with Astro-friendly defaults
       const config: LocalFileStoreConfig = {
         baseDirectory: getEnv("FILE_STORE_BASE_DIR") || "temp/uploads",
