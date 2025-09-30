@@ -19,6 +19,9 @@ export const GET: APIRoute = async ({ params, request }) => {
     status: 200,
     headers: {
       "Content-Type": metadata?.mimeType || "application/octet-stream",
+      "Cache-Control": "public, max-age=31536000, immutable", // 1 year
+      "Netlify-CDN-Cache-Control":
+        "public, durable, s-maxage=31536000, stale-while-revalidate=604800",
     },
   });
 };
