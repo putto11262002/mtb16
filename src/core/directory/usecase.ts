@@ -43,30 +43,27 @@ const updateImage = async (input: UpdateDirectoryEntryImage) => {
     throw new Error("Directory entry not found");
   }
 
-  await db.transaction(async (tx) => {
-    const existingFileId = await tx.query.directoryEntries
-      .findFirst({
-        where: eq(directoryEntries.id, input.id),
-        columns: { image: true },
-      })
-      .then((res) => res?.image?.id);
+  const res = await db
+    .select({ image: directoryEntries.image })
+    .from(directoryEntries)
+    .where(eq(directoryEntries.id, input.id));
+  const existingFileId = res[0]?.image?.id;
 
-    const metadata = await getFileStore().store(
-      Buffer.from(await input.file.arrayBuffer()),
-      {
-        mimeType: input.file.type,
-        name: input.file.name,
-      },
-    );
-    await tx
-      .update(directoryEntries)
-      .set({ image: { id: metadata.id, mimeType: input.file.type } })
-      .where(eq(directoryEntries.id, input.id));
+  const metadata = await getFileStore().store(
+    Buffer.from(await input.file.arrayBuffer()),
+    {
+      mimeType: input.file.type,
+      name: input.file.name,
+    },
+  );
+  await db
+    .update(directoryEntries)
+    .set({ image: { id: metadata.id, mimeType: input.file.type } })
+    .where(eq(directoryEntries.id, input.id));
 
-    if (existingFileId) {
-      await getFileStore().delete(existingFileId);
-    }
-  });
+  if (existingFileId) {
+    await getFileStore().delete(existingFileId);
+  }
 };
 
 const exist = async (id: string): Promise<boolean> => {

@@ -63,30 +63,27 @@ const updatePortrait = async (input: UpdatePortraitInput) => {
     throw new Error("Person not found");
   }
 
-  await db.transaction(async (tx) => {
-    const existingPortrait = await tx.query.persons
-      .findFirst({
-        where: eq(persons.id, input.id),
-        columns: { portrait: true },
-      })
-      .then((res) => res?.portrait);
+  const res = await (db as any)
+    .select({ portrait: persons.portrait })
+    .from(persons)
+    .where(eq(persons.id, input.id));
+  const existingPortrait = res[0]?.portrait;
 
-    const metadata = await getFileStore().store(
-      Buffer.from(await input.file.arrayBuffer()),
-      {
-        mimeType: input.file.type,
-        name: input.file.name,
-      },
-    );
-    await tx
-      .update(persons)
-      .set({ portrait: metadata.id })
-      .where(eq(persons.id, input.id));
+  const metadata = await getFileStore().store(
+    Buffer.from(await input.file.arrayBuffer()),
+    {
+      mimeType: input.file.type,
+      name: input.file.name,
+    },
+  );
+  await db
+    .update(persons)
+    .set({ portrait: metadata.id })
+    .where(eq(persons.id, input.id));
 
-    if (existingPortrait) {
-      await getFileStore().delete(existingPortrait);
-    }
-  });
+  if (existingPortrait) {
+    await getFileStore().delete(existingPortrait);
+  }
 };
 
 const exist = async (id: string): Promise<boolean> => {
@@ -107,19 +104,23 @@ const getMany = async ({
   direction = "desc",
 }: GetManyPersonsInput): Promise<PaginatedResult<Person>> => {
   const [items, itemCount] = await Promise.all([
-    db.query.persons.findMany({
-      where: and(
-        q ? ilike(persons.name, `${q}%`) : undefined,
-        unitId ? eq(persons.unitId, unitId) : undefined,
-        rank ? eq(persons.rank, rank) : undefined,
-      ),
-
-      limit: pageSize,
-      offset: (page - 1) * pageSize,
-      orderBy: (direction === "asc" ? asc : desc)(
-        persons[orderBy as "name" | "rank" | "level" | "createdAt"],
-      ),
-    }),
+    db
+      .select()
+      .from(persons)
+      .where(
+        and(
+          q ? ilike(persons.name, `${q}%`) : undefined,
+          unitId ? eq(persons.unitId, unitId) : undefined,
+          rank ? eq(persons.rank, rank) : undefined,
+        ),
+      )
+      .orderBy(
+        (direction === "asc" ? asc : desc)(
+          persons[orderBy as "name" | "rank" | "level" | "createdAt"],
+        ),
+      )
+      .limit(pageSize)
+      .offset((page - 1) * pageSize),
     db
       .select({ count: count() })
       .from(persons)
@@ -137,31 +138,31 @@ const getMany = async ({
 };
 
 const getById = async (id: string): Promise<Person | undefined> => {
-  const person = await db.query.persons.findFirst({
-    where: eq(persons.id, id),
-  });
+  const person = await db
+    .select()
+    .from(persons)
+    .where(eq(persons.id, id))
+    .limit(1)
+    .then((res) => res[0]);
   return person;
 };
 
 const getAll = async (): Promise<Person[]> => {
-  const allPersons = await db.query.persons.findMany({
-    orderBy: asc(persons.name),
-  });
+  const allPersons = await db.select().from(persons).orderBy(asc(persons.name));
   return allPersons;
 };
 
 const getPersonsByUnit = async (unitId: string): Promise<Person[]> => {
-  const personsInUnit = await db.query.persons.findMany({
-    where: eq(persons.unitId, unitId),
-    orderBy: asc(persons.name),
-  });
+  const personsInUnit = await db
+    .select()
+    .from(persons)
+    .where(eq(persons.unitId, unitId))
+    .orderBy(asc(persons.name));
   return personsInUnit;
 };
 
 const getPersonRankTree = async (): Promise<Person[][]> => {
-  const allPersons = await db.query.persons.findMany({
-    with: { unit: true },
-  });
+  const allPersons = await db.select().from(persons);
 
   // Sort all persons by rank hierarchy
   const sortedPersons = allPersons.sort((a, b) => {
@@ -176,9 +177,7 @@ const getPersonRankTree = async (): Promise<Person[][]> => {
   const levels: Person[][] = Array.from({ length: 10 }, () => []); // Create 10 empty arrays for levels
 
   sortedPersons.forEach((person) => {
-    const rankOrder =
-      THAI_ARMY_RANKS[person.rank as keyof typeof THAI_ARMY_RANKS] ?? 100;
-    levels[rankOrder - 1].push(person); // Place person in the corresponding level
+    levels[person.level ?? 0].push(person); // Place person in the corresponding level
   });
 
   // Intra-level sorting by order
@@ -193,14 +192,29 @@ const getPersonRankTree = async (): Promise<Person[][]> => {
     });
   });
 
-  return levels;
+  // remove empty levels
+  const nonEmptyLevels = levels.filter((level) => level.length > 0);
+
+  return nonEmptyLevels;
 };
 
 const getByOrder = async (order: number): Promise<Person | undefined> => {
-  const person = await db.query.persons.findFirst({
-    where: eq(persons.order, order),
-  });
+  const person = await db
+    .select()
+    .from(persons)
+    .where(eq(persons.order, order))
+    .limit(1)
+    .then((res) => res[0]);
   return person;
+};
+
+export const getByLevel = async (level: number): Promise<Person[]> => {
+  const personsInLevel = await db
+    .select()
+    .from(persons)
+    .where(eq(persons.level, level))
+    .orderBy(asc(persons.order));
+  return personsInLevel;
 };
 
 const deletePerson = async (args: DeletePersonInput) => {

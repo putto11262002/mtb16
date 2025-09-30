@@ -41,8 +41,9 @@ const { items: announcements } = await annouyncementsUsecase.getMany({
   tags: config?.announcementsTag ? [config.announcementsTag] : undefined,
 });
 
-const commander = await personUsecase.getByOrder(1);
-if (commander?.portrait) {
+const commanders = await personUsecase.getPersonRankTree();
+const commander = commanders?.[0]?.[0] || null;
+if (commander && commander?.portrait) {
   commander.portrait = Config.getFileURL(commander.portrait);
 }
 
