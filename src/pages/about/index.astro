@@ -1,6 +1,5 @@
 ---
 export const prerender = false;
-
 import PublicLayout from "@/layouts/public-layout.astro";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -72,6 +71,15 @@ const armyProvinceHistoryItems = [
       "ในปี พ.ศ. 2552 กระทรวงกลาโหมออกกฎกระทรวงจัดตั้งมณฑลทหารบกที่ 15 (มทบ.15) โดยแปรสภาพมาจาก จทบ.พ.บ. ตาม อจย. หมายเลข 51–201 มีผลบังคับใช้ตั้งแต่วันที่ 1 เมษายน พ.ศ. 2552 ครอบคลุมพื้นที่รับผิดชอบจังหวัดราชบุรีและจังหวัดสมุทรสงคราม พร้อมทั้งปรับตำแหน่งผู้บัญชาการจากพันเอกพิเศษเป็นพลตรี",
   },
 ];
+
+Astro.response.headers.set(
+  "Cache-Control",
+  "public, max-age=86400, must-revalidate",
+);
+Astro.response.headers.set(
+  "Netlify-CDN-Cache-Control",
+  "public, durable, s-maxage=86400, stale-while-revalidate=86400",
+);
 ---
 
 <PublicLayout>
@@ -88,7 +96,9 @@ const armyProvinceHistoryItems = [
       <HeroSection
         client:visible
         bg1Src={bg1Optimized.src}
-        heroImage={config?.aboutUsHeroImage ? Config.getFileURL(config.aboutUsHeroImage.id) : undefined}
+        heroImage={config?.aboutUsHeroImage
+          ? Config.getFileURL(config.aboutUsHeroImage.id)
+          : undefined}
       />
 
       <Separator />

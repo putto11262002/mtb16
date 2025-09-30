@@ -25,6 +25,15 @@ const result = await directoryUsecase.getMany({
   page,
 });
 const items = result.items;
+
+Astro.response.headers.set(
+  "Cache-Control",
+  "public, max-age=86400, must-revalidate",
+);
+Astro.response.headers.set(
+  "Netlify-CDN-Cache-Control",
+  "public, durable, s-maxage=86400, stale-while-revalidate=86400",
+);
 ---
 
 <PublicLayout>
@@ -76,4 +85,3 @@ const items = result.items;
     </div>
   </main>
 </PublicLayout>
-

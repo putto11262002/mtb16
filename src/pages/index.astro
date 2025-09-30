@@ -1,6 +1,5 @@
 ---
 export const prerender = false;
-
 import { Slogan } from "./_components/slogan";
 import {
   Card,
@@ -47,6 +46,15 @@ const commander = commanders?.[0]?.[0] || null;
 if (commander && commander?.portrait) {
   commander.portrait = Config.getFileURL(commander.portrait);
 }
+
+Astro.response.headers.set(
+  "Cache-Control",
+  "public, max-age=86400, must-revalidate",
+);
+Astro.response.headers.set(
+  "Netlify-CDN-Cache-Control",
+  "public, durable, s-maxage=86400, stale-while-revalidate=86400",
+);
 ---
 
 <PublicLayout>

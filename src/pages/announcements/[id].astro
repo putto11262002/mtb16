@@ -29,6 +29,15 @@ const description = announcement.seo?.ogImage
 const ogImage = announcement.seo?.ogImage
   ? `/api/files/${announcement.seo.ogImage}`
   : undefined;
+
+Astro.response.headers.set(
+  "Cache-Control",
+  "public, max-age=31536000, must-revalidate",
+);
+Astro.response.headers.set(
+  "Netlify-CDN-Cache-Control",
+  "public, durable, s-maxage=31536000, stale-while-revalidate=604800",
+);
 ---
 
 <PublicLayout>

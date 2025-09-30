@@ -26,6 +26,15 @@ const description = news.seo?.ogImage ? `ข่าวสาร: ${news.title}` :
 const ogImage = news.seo?.ogImage
   ? `/api/files/${news.seo.ogImage}`
   : undefined;
+
+Astro.response.headers.set(
+  "Cache-Control",
+  "public, max-age=31536000, must-revalidate",
+);
+Astro.response.headers.set(
+  "Netlify-CDN-Cache-Control",
+  "public, durable, s-maxage=31536000, stale-while-revalidate=604800",
+);
 ---
 
 <PublicLayout>
@@ -119,4 +128,3 @@ const ogImage = news.seo?.ogImage
     </article>
   </main>
 </PublicLayout>
-

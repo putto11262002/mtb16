@@ -33,6 +33,15 @@ const result = await annouyncementsUsecase.getMany({
   tags: selectedTags.length > 0 ? selectedTags : undefined,
   year: selectedYear ? parseInt(selectedYear, 10) : undefined,
 });
+
+Astro.response.headers.set(
+  "Cache-Control",
+  "public, max-age=86400, must-revalidate",
+);
+Astro.response.headers.set(
+  "Netlify-CDN-Cache-Control",
+  "public, durable, s-maxage=86400, stale-while-revalidate=86400",
+);
 ---
 
 <PublicLayout>

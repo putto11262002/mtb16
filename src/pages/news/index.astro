@@ -22,12 +22,24 @@ const result = await newsUsecase.getMany({
   orderBy: "publishedAt",
   direction: "desc",
 });
+
+Astro.response.headers.set(
+  "Cache-Control",
+  "public, max-age=86400, must-revalidate",
+);
+Astro.response.headers.set(
+  "Netlify-CDN-Cache-Control",
+  "public, durable, s-maxage=86400, stale-while-revalidate=86400",
+);
 ---
 
 <PublicLayout>
   <Fragment slot="head">
     <title>ข่าวสาร – มณฑลทหารบกที่ 16</title>
-    <meta name="description" content="ข่าวสารและข้อมูลสำคัญจากมณฑลทหารบกที่ 16" />
+    <meta
+      name="description"
+      content="ข่าวสารและข้อมูลสำคัญจากมณฑลทหารบกที่ 16"
+    />
   </Fragment>
 
   <main slot="body" class="container mx-auto px-4 py-8">
@@ -61,3 +73,4 @@ const result = await newsUsecase.getMany({
     </div>
   </main>
 </PublicLayout>
+
